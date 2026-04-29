@@ -1,0 +1,13 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+plans/
+public/lib
+public/tailwind.css
+config/config.json
+!config/config.json.example

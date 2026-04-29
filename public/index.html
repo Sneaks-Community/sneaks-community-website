@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" class="system scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>Sneak's Community | Since 2015</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Sneak's Community - An open and fun gaming community for all. Join our CS2 servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.">
+    <meta name="keywords" content="sneak community, gaming, cs2, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community">
+    <meta name="author" content="Sneak's Community">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snksrv.com/">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://snksrv.com/">
+    <meta property="og:title" content="Sneak's Community | Gaming Community Since 2015">
+    <meta property="og:description" content="An open and fun gaming community for all. Join our CS2 servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more.">
+    <meta property="og:image" content="/og-image.png">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://snksrv.com/">
+    <meta name="twitter:title" content="Sneak's Community | Gaming Community Since 2015">
+    <meta name="twitter:description" content="An open and fun gaming community for all. Join our CS2 servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more.">
+    <meta name="twitter:image" content="/og-image.png">
+    <!-- Preconnect hints for external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Tailwind CSS (compiled) -->
+    <link rel="stylesheet" href="/tailwind.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Motion.dev (self-hosted) -->
+    <script src="/lib/motion.js"></script>
+    <!-- Icons (Lucide - self-hosted) -->
+    <script src="/lib/lucide.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-slate-50 dark:bg-[#08090b] text-slate-800 dark:text-[#e2e8f0] font-sans antialiased transition-colors duration-300">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 h-16 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-black/20 backdrop-blur-xl transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div class="flex items-center justify-between h-full">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center space-x-3 cursor-pointer select-none">
+                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-black text-white">
+                        <i data-lucide="crosshair" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block uppercase">SNEAK'S COMMUNITY</span>
+                </div>
+                
+                <!-- Links -->
+                <div class="hidden md:block select-none">
+                    <div class="ml-10 flex items-baseline gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+                        <a href="#home" class="hover:text-blue-600 dark:hover:text-white transition-colors">Home</a>
+                        <a href="#about" class="hover:text-blue-600 dark:hover:text-white transition-colors">About</a>
+                        <a href="#servers" class="hover:text-blue-600 dark:hover:text-white transition-colors">Servers</a>
+                        <a href="#community" class="hover:text-blue-600 dark:hover:text-white transition-colors">Community</a>
+                        <a href="#rules" class="hover:text-blue-600 dark:hover:text-white transition-colors">Rules</a>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center space-x-4 border-l border-black/10 dark:border-white/10 pl-4 sm:pl-8">
+                    <!-- Theme Toggle -->
+                    <button id="themeToggle" aria-label="Toggle Theme" class="p-2 rounded-full bg-slate-200/50 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-white transition-colors focus:outline-none" title="Toggle Theme">
+                        <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+                    </button>
+                    <!-- Mobile Menu Toggle -->
+                    <button id="mobileMenuBtn" aria-label="Toggle Mobile Menu" class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-800 dark:text-white transition-colors focus:outline-none">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <!-- CTA -->
+                    <a href="#community" class="hidden sm:flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow-lg shadow-blue-900/20 transition-all text-sm gap-2">
+                        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord align-bottom"><title>Discord</title><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg> JOIN DISCORD
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="fixed inset-0 z-40 bg-slate-50/95 dark:bg-[#08090b]/95 backdrop-blur-xl flex flex-col justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="flex flex-col items-center gap-8 text-xl font-bold tracking-tight">
+            <a href="#home" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Home</a>
+            <a href="#about" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">About</a>
+            <a href="#servers" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Servers</a>
+            <a href="#community" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Community</a>
+            <a href="#rules" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Rules</a>
+            <a href="#community" class="mobile-link mt-4 px-8 py-3 bg-blue-600 text-white rounded shadow-lg shadow-blue-900/20 flex items-center gap-2">
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-discord align-bottom"><title>Discord</title><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg> JOIN DISCORD
+            </a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header id="home" class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden flex flex-col justify-center min-h-[75vh]">
+        <!-- Background accents -->
+        <div class="absolute inset-0 z-0 select-none pointer-events-none">
+            <div class="absolute top-[0] left-[0] w-[400px] h-[400px] bg-blue-900/20 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-[0] right-[0] w-[400px] h-[400px] bg-indigo-900/10 rounded-full blur-[120px]"></div>
+        </div>
+
+        <div id="hero-content" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+            <h1 class="text-6xl md:text-7xl font-black leading-none tracking-tighter text-slate-900 dark:text-white mb-6 opacity-0">
+                Welcome to <br class="md:hidden"> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-500">Sneak's Community</span>
+            </h1>
+            <p class="mt-4 max-w-lg text-lg text-slate-600 dark:text-slate-400 mx-auto mb-10 leading-relaxed opacity-0">
+                An open and fun gaming community for all. No application. No membership. Just fun and friends.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 opacity-0">
+                <a href="#servers" class="px-8 py-3 bg-slate-200 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white font-bold rounded transition-all flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-900 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> VIEW SERVERS
+                </a>
+                <a href="#community" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">
+                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord"><title>Discord</title><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg> JOIN DISCORD
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 border-y border-black/5 dark:border-white/5 bg-slate-100 dark:bg-[#08090b] relative transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div id="about-text" class="space-y-4 opacity-0">
+                    <div>
+                        <h2 class="text-blue-600 dark:text-blue-400 font-semibold tracking-widest uppercase text-xs mb-2">Our History</h2>
+                        <h3 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">OVER A DECADE OF GAMING.</h3>
+                    </div>
+                    <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Founded in 2015, Sneak's Community started as a multi-game hub featuring Minecraft, Team Fortress 2, and Garry's Mod. Over the years, our community evolved, and we found our true home in the Counter-Strike franchise.
+                    </p>
+                    <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                        To provide a welcoming environment for players of all skill levels. Whether you're grinding Surf, mastering 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.
+                    </p>
+                </div>
+                <div id="about-features" class="grid sm:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm transition-all opacity-0">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="unlock" class="text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Zero Friction</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">No applications or vetting processes. Jump directly into the action.</p>
+                    </div>
+                    <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm transition-all opacity-0">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="clock" class="text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Longevity</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Nearly 10 years of continuous operation, outliving the competition.</p>
+                    </div>
+                    <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm sm:col-span-2 transition-all opacity-0">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="globe-2" class="text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Global Reach</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Servers in Chicago and Europe, serving players from 145+ countries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servers Section -->
+    <section id="servers" class="py-24 relative transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex justify-between items-end mb-16 opacity-0" id="servers-header">
+                <div>
+                    <h2 class="text-blue-600 dark:text-blue-400 font-semibold tracking-widest uppercase text-xs mb-2">LIVE STATUS</h2>
+                    <h3 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">OUR SERVERS</h3>
+                </div>
+                <div class="hidden sm:block text-slate-500 dark:text-slate-400 text-sm font-mono uppercase">
+                    Updating Live
+                </div>
+            </div>
+
+            <!-- Server Grid -->
+            <div id="server-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Skeletons will be populated by JS -->
+                <div class="bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm animate-pulse flex flex-col sm:flex-row justify-between w-full h-[88px]"></div>
+                <div class="bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm animate-pulse flex flex-col sm:flex-row justify-between w-full h-[88px]"></div>
+                <div class="bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm animate-pulse flex flex-col sm:flex-row justify-between w-full h-[88px]"></div>
+            </div>
+
+            <div class="mt-16 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-sm transition-colors duration-300">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center" id="modes-grid">
+                    <div class="space-y-1">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-2">Surf</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Glide and climb hundreds of maps. Tiers 1-6.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-2">KZ Climb</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Scale towering structures and master precision jumps.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-2">Bhop</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Boost, hop, and test your speed with autobhop.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-2">1v1 Arenas</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Face off in competitive 1v1 skill match-ups.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="py-24 bg-slate-100 dark:bg-[#08090b] relative overflow-hidden border-t border-black/5 dark:border-white/5 transition-colors duration-300">
+        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+            <div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-indigo-600/20 to-transparent"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div id="community-text" class="space-y-6 opacity-0">
+                    <div>
+                        <h2 class="text-blue-600 dark:text-blue-400 font-semibold tracking-widest uppercase text-xs mb-2">CONNECT</h2>
+                        <h3 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight">THE HEART OF<br>THE COMMUNITY.</h3>
+                    </div>
+                    <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Our Discord is out primary hub. With hundreds of members online daily, it's the best place to find a squad, discuss strategies, or just hang out.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-4">
+                        <a id="link-steam-community" href="https://steamcommunity.com/groups/sneaks" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-blue-500/50 transition-all group shadow-sm dark:shadow-none">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"><title>Steam</title><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>
+                            <span class="font-bold text-slate-900 dark:text-white text-sm">Steam Group</span>
+                        </a>
+                        <a id="link-twitch-community" href="https://twitch.tv/snksrv" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-[#9146FF] transition-all group shadow-sm dark:shadow-none">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-twitch"><title>Twitch</title><path fill="currentColor" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+                            <span class="font-bold text-slate-900 dark:text-white text-sm">Twitch</span>
+                        </a>
+                        <a id="link-github-community" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-slate-800 dark:hover:border-white transition-all group shadow-sm dark:shadow-none">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                            <span class="font-bold text-slate-900 dark:text-white text-sm">GitHub</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div id="discord-widget" class="flex justify-center lg:justify-end">
+                    <iframe id="discord-iframe" src="" width="350" height="500" title="Discord Server Widget" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" class="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules Section -->
+    <section id="rules" class="py-24 border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-[#08090b] transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-6">RULES & GUIDELINES</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-400">
+                    Sneak's Community is built on mutual respect. We strive to maintain a safe and enjoyable environment for everyone.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto" id="rules-grid">
+                <div class="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-sm shadow-sm dark:shadow-none transition-colors duration-300 opacity-0">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 font-bold">1</div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">No Toxicity</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Respect all players, regardless of skill level or background. Hate speech and harassment are strictly prohibited.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-sm shadow-sm dark:shadow-none transition-colors duration-300 opacity-0">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 font-bold">2</div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">No Cheating</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Any form of cheating, hacking, or exploitation will result in a permanent, unappealable ban from all servers.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-sm shadow-sm dark:shadow-none transition-colors duration-300 opacity-0">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 font-bold">3</div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">No Spam</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Keep chat and in-game communication relevant. Mic-spamming is generally allowed only if it is universally welcomed.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-sm shadow-sm dark:shadow-none transition-colors duration-300 opacity-0">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 font-bold">4</div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Follow Admin Instructions</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Staff decisions are final. If you feel an admin has acted unfairly, open a ticket in our Discord.</p>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <div class="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 text-sm bg-white dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/10">
+                    <i data-lucide="flag" class="w-4 h-4"></i>
+                    <span>See something wrong? File a report on Discord.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="h-16 border-t border-black/5 dark:border-white/5 bg-slate-100 dark:bg-black/40 flex items-center justify-between px-8 z-20 transition-colors duration-300">
+        <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8">
+            <div class="flex gap-4 footer-icons-container">
+                <a id="link-steam-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
+                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>Steam</title><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>
+                </a>
+                <a id="link-twitch-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="twitch">
+                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10 icon-twitch"><title>Twitch</title><path fill="currentColor" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+                </a>
+                <a id="link-github-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="github">
+                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+            <div class="hidden sm:block">© <span id="year"></span> Sneak's Community</div>
+        </div>
+    </footer>
+
+    <!-- Init script -->
+    <script src="/script.js"></script>
+</body>
+</html>

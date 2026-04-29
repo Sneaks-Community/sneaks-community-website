@@ -1,0 +1,129 @@
+/* style.css */
+/* Tailwind V4 via CDN handles most utility generation. 
+   We only add any required custom global styling here. */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #52525b; /* zinc-600 */
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #3f3f46; /* zinc-700 */
+}
+
+/* Hide empty server cards while loading */
+[data-loading="true"] {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Footer icon container background */
+.footer-icons-container {
+    background-color: rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+}
+
+.dark .footer-icons-container {
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Footer icon hover effects with colored background */
+.footer-icon {
+    transition: background-color 0.3s ease;
+    --bg-color: transparent;
+}
+
+.footer-icon:hover {
+    background-color: var(--bg-color);
+}
+
+/* Light mode: subtle dark backgrounds */
+.footer-icon[data-brand="steam"] {
+    --bg-color: rgba(23, 25, 42, 0.1);
+}
+.footer-icon[data-brand="twitch"] {
+    --bg-color: rgba(145, 70, 255, 0.1);
+}
+.footer-icon[data-brand="github"] {
+    --bg-color: rgba(36, 41, 46, 0.1);
+}
+
+/* Dark mode: brighter backgrounds for visibility */
+.dark .footer-icon[data-brand="steam"] {
+    --bg-color: rgba(138, 170, 221, 0.2);
+}
+.dark .footer-icon[data-brand="twitch"] {
+    --bg-color: rgba(145, 70, 255, 0.2);
+}
+.dark .footer-icon[data-brand="github"] {
+    --bg-color: rgba(241, 245, 249, 0.15);
+}
+
+/* Invert Steam and GitHub icons for dark mode (like their websites) */
+.dark .footer-icon[data-brand="steam"] svg {
+    filter: invert(1) brightness(0.6);
+}
+.dark .footer-icon[data-brand="github"] svg {
+    filter: invert(1) brightness(0.8);
+}
+
+/* Invert Steam and GitHub community icons for dark mode */
+.dark #link-steam-community svg {
+    filter: invert(1) brightness(0.6);
+}
+.dark #link-github-community svg {
+    filter: invert(1) brightness(0.8);
+}
+
+/* Brand icon colors (CSP-compliant alternative to inline styles) */
+.icon-twitch {
+    color: #9146FF;
+}
+
+.icon-discord {
+    color: currentColor;
+}
+
+/* Discord icons on blue buttons should always be white */
+.icon-discord.bg-blue-600,
+a.bg-blue-600 .icon-discord,
+a.bg-blue-600 .icon-discord {
+    color: #FFFFFF;
+}
+
+/* Player bar width via CSS custom property (CSP-compliant) */
+.server-bar {
+    width: var(--bar-width, 0%);
+}
+
+/* Mobile menu overflow lock */
+.overflow-hidden {
+    overflow: hidden;
+}
