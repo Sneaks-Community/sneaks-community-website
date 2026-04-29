@@ -229,15 +229,41 @@ function initAnimations() {
         animate(el, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.6 });
     });
 
-    // Rules
-    inView("#rules-grid", () => {
-        document.querySelectorAll("#rules-grid > div").forEach(el => el.classList.remove('opacity-0'));
+    // Community Rules
+    inView("#community-rules-grid", () => {
+        document.querySelectorAll("#community-rules-grid .rule-card").forEach(el => el.classList.remove('opacity-0'));
         animate(
-            "#rules-grid > div", 
-            { opacity: [0, 1], y: [30, 0] }, 
-            { duration: 0.5, delay: stagger(0.1) }
+            "#community-rules-grid .rule-card",
+            { opacity: [0, 1], y: [20, 0] },
+            { duration: 0.4, delay: stagger(0.08) }
         );
-    }, { amount: 0.2 });
+    }, { amount: 0.1 });
+
+    // Timer Rules
+    inView("#timer-rules-grid", () => {
+        document.querySelectorAll("#timer-rules-grid .rule-card").forEach(el => el.classList.remove('opacity-0'));
+        animate(
+            "#timer-rules-grid .rule-card",
+            { opacity: [0, 1], y: [20, 0] },
+            { duration: 0.4, delay: stagger(0.08) }
+        );
+    }, { amount: 0.1 });
+
+    // Rule card hover animations
+    document.querySelectorAll('.rule-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            animate(card,
+                { scale: 1.05 },
+                { duration: 0.2, ease: "ease-out" }
+            );
+        });
+        card.addEventListener('mouseleave', () => {
+            animate(card,
+                { scale: 1 },
+                { duration: 0.2, ease: "ease-out" }
+            );
+        });
+    });
 }
 
 // Config Logic

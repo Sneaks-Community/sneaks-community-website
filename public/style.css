@@ -127,3 +127,18 @@ a.bg-blue-600 .icon-discord {
 .overflow-hidden {
     overflow: hidden;
 }
+
+/* Rule card hover animation */
+.rule-card {
+    transform-origin: center center;
+    transform-box: fill-box;
+    z-index: 1;
+}
+
+.rule-card:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.dark .rule-card:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+}
