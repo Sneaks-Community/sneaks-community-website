@@ -68,7 +68,7 @@ body {
     background-color: #22c55e;
     border-radius: 9999px;
     margin-right: 6px;
-    animation: ping-green 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 /* Footer icon container background */
