@@ -142,3 +142,19 @@ a.bg-blue-600 .icon-discord {
 .dark .rule-card:hover {
     border-color: rgba(96, 165, 250, 0.4);
 }
+
+/* Custom logo styling */
+#logoContainer.has-logo {
+    background-color: transparent !important;
+}
+
+#logoContainer.has-logo img {
+    height: 36px !important;
+    width: auto !important;
+    object-fit: contain;
+    filter: none;
+}
+
+.dark #logoContainer.has-logo img {
+    filter: brightness(0.95);
+}

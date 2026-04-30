@@ -75,6 +75,12 @@ docker compose restart web
 
 The Docker Compose setup includes a `user-assets/` volume mount that allows you to add, remove, or modify static assets without rebuilding the Docker image. Files in `user-assets/` take precedence over built-in files in the `public/` directory.
 
+#### Custom Logo
+
+To replace the default crosshair icon in the header with your own logo, place an image file named `logo.png`, `logo.svg`, or `logo.webp` in the `user-assets/` directory. The site will automatically detect and use your logo on page load.
+
+Recommended size: 64x64 pixels or larger. Transparent backgrounds work best.
+
 ### Build & Run
 
 1. Build the backend using esbuild.
