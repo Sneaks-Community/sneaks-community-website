@@ -46,7 +46,7 @@
     "motion": "^12.38.0",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "typescript-eslint": "^8.59.0"
+    "typescript-eslint": "^8.59.1"
   },
   "overrides": {
     "fast-xml-parser": "^5.5.12"
