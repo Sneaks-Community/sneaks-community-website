@@ -41,6 +41,30 @@ body {
     }
 }
 
+@keyframes ping-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    min-height: 8px;
+    background-color: #22c55e;
+    border-radius: 9999px;
+    margin-right: 6px;
+    animation: ping-green 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 /* Footer icon container background */
 .footer-icons-container {
     background-color: rgba(15, 23, 42, 0.06);
