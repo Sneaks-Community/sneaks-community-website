@@ -77,9 +77,11 @@ The Docker Compose setup includes a `user-assets/` volume mount that allows you 
 
 #### Custom Logo
 
-To replace the default crosshair icon in the header with your own logo, place an image file named `logo.png`, `logo.svg`, or `logo.webp` in the `user-assets/` directory. The site will automatically detect and use your logo on page load.
+To replace the default crosshair icon in the header with your own logo, place an image file named `logo.svg`, `logo.webp`, or `logo.png` in the `user-assets/` directory. The site will automatically detect and use your logo on page load.
 
 Recommended size: 64x64 pixels or larger. Transparent backgrounds work best.
+
+To comply with Open Graph Protocol standards, and to have a nice looking embed, including your desired logo in `user-assets/` folder as `/og-image.png` at 1200x630 px is also recommended.
 
 ### Build & Run
 
