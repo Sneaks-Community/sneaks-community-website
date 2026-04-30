@@ -11,4 +11,5 @@ public/lib
 public/tailwind.css
 config/config.json
 !config/config.json.example
-user-assets/
+user-assets/*
+!user-assets/*.gitkeep

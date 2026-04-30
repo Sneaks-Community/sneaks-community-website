@@ -157,7 +157,7 @@ function initMobileMenu() {
                 );
             }
         } else {
-            mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+            mobileMenu.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden'); // Restore scrolling
             mobileMenuBtn.innerHTML = '<i data-lucide="menu" class="w-5 h-5"></i>';
             lucide.createIcons();
