@@ -42,6 +42,11 @@ USER nodejs
 # Expose port 3000
 EXPOSE 3000
 
+# Set image metadata labels
+LABEL org.opencontainers.image.title="sneaks-community-website"
+LABEL org.opencontainers.image.description="Sneak's Community Website"
+LABEL org.opencontainers.image.source="https://github.com/Sneaks-Community/sneaks-community-website"
+
 # Set Node environment to production
 ENV NODE_ENV=production
 

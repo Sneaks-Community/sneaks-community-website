@@ -21,7 +21,7 @@ services:
       - ./config:/usr/src/app/config:ro
       - ./public:/usr/src/app/public:ro
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--no-cache", "--spider", "--no-verbose", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
