@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "tsx --env-file=.env src/index.ts",
     "build": "npm run build:lib && npm run build:css && npm run build:js",
-    "build:lib": "cp node_modules/motion/dist/motion.js public/lib/motion.js && cp node_modules/lucide/dist/umd/lucide.js public/lib/lucide.js",
+    "build:lib": "mkdir -p public/lib && cp node_modules/motion/dist/motion.js public/lib/motion.js && cp node_modules/lucide/dist/umd/lucide.js public/lib/lucide.js",
     "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
     "build:js": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --minify --outdir=dist",
     "start": "node --env-file=.env dist/index.js",
