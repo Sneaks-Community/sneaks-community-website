@@ -1,5 +1,5 @@
 /* style.css */
-/* Tailwind V4 via CDN handles most utility generation. 
+/* Tailwind V4 via CDN handles most utility generation.
    We only add any required custom global styling here. */
 
 html {
@@ -9,6 +9,12 @@ html {
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Logo container default size (CSP-compliant alternative to inline styles) */
+.logo-container-default {
+    height: 40px;
+    width: 40px;
 }
 
 /* Custom scrollbar */

@@ -344,44 +344,36 @@ if (typeof lucide !== 'undefined') {
     lucide.createIcons();
 }
 
-// Custom Logo Detection and Swap
-function initCustomLogo() {
+async function checkLogoExists(url) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+    } catch {
+        return false;
+    }
+}
+
+async function initCustomLogo() {
     const logoContainer = document.getElementById('logoContainer');
     const crosshairIcon = document.getElementById('crosshairIcon');
     
     if (!logoContainer || !crosshairIcon) { return; }
     
-    // Try to load custom logo from user-assets (takes precedence) or public/
-    const logoPaths = ['/user-assets/logo.png', '/logo.png', '/user-assets/logo.svg', '/logo.svg', '/user-assets/logo.webp', '/logo.webp'];
+    // Try to load custom logo from user-assets
+    const logoPaths = ['/logo.svg', '/logo.webp', '/logo.png'];
     
-    const tryLoadLogo = (remainingPaths) => {
-        if (remainingPaths.length === 0) {
-            // No logo found, keep crosshair as fallback
-            return;
-        }
-        
-        const [logoPath, ...restPaths] = remainingPaths;
-        const img = new Image();
-        img.onload = () => {
-            // Logo loaded successfully
+    for (const logoPath of logoPaths) {
+        if (await checkLogoExists(logoPath)) {
+            // Logo found, swap it in
             logoContainer.classList.remove('bg-blue-600', 'font-black');
             logoContainer.classList.add('has-logo');
             logoContainer.innerHTML = '';
             
-            // Create and append the logo image
             const logoImg = document.createElement('img');
             logoImg.src = logoPath;
             logoImg.alt = 'Logo';
-            logoImg.className = '';
             logoContainer.appendChild(logoImg);
-        };
-        img.onerror = () => {
-            // Try next path
-            tryLoadLogo(restPaths);
-        };
-        img.src = logoPath;
-    };
-    
-    // Start trying logo paths
-    tryLoadLogo(logoPaths);
+            return;
+        }
+    }
 }
