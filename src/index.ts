@@ -93,7 +93,7 @@ app.use(helmet({
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) ?? ['http://localhost:3000'];
 app.use(cors({
     origin: allowedOrigins,
-    methods: ['GET', 'POST'],
+    methods: ['GET'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
