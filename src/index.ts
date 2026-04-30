@@ -234,6 +234,11 @@ app.get('/api/status', statusLimiter, async (req, res) => {
     }
 });
 
+// Health check endpoint (must be before 404 handler)
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Express 404 handler for non-JSON API routes
 app.use((req, res) => {
     res.status(404).json({ success: false, message: 'Not found' });
@@ -243,11 +248,6 @@ app.use((req, res) => {
 app.use((error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error('Server error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
