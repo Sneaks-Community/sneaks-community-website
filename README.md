@@ -71,6 +71,10 @@ Update `config/config.json` directly (not the `.example` file) and restart the c
 docker compose restart web
 ```
 
+#### Hot-Loading Custom Assets
+
+The Docker Compose setup includes a `user-assets/` volume mount that allows you to add, remove, or modify static assets without rebuilding the Docker image. Files in `user-assets/` take precedence over built-in files in the `public/` directory.
+
 ### Build & Run
 
 1. Build the backend using esbuild.

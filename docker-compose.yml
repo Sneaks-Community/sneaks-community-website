@@ -19,7 +19,9 @@ services:
       - ALL
     volumes:
       - ./config:/usr/src/app/config:ro
-      - ./public:/usr/src/app/public:ro
+      # Mount user-assets directory for hot-loading custom assets
+      # This overlay takes precedence over built-in public/ files
+      - ./user-assets:/usr/src/app/user-assets:ro
     healthcheck:
       test: ["CMD", "wget", "--no-cache", "--spider", "--no-verbose", "http://localhost:3000/health"]
       interval: 30s

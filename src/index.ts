@@ -100,6 +100,12 @@ app.use(cors({
 // Enable gzip compression for all responses
 app.use(compression());
 
+// Serve static files from user-assets first (takes precedence), then built-in public/
+// This allows users to hot-load custom assets without rebuilding the Docker image
+const userAssetsPath = path.join(__dirname, '..', 'user-assets');
+if (fs.existsSync(userAssetsPath)) {
+    app.use(express.static(userAssetsPath));
+}
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.json({ limit: '10kb' }));
 
