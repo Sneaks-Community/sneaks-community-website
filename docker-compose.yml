@@ -21,7 +21,7 @@ services:
       # This overlay takes precedence over built-in public/ files
       - ./user-assets:/usr/src/app/user-assets:ro
     healthcheck:
-      test: ["CMD", "wget", "--no-cache", "--spider", "--no-verbose", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--spider", "--no-verbose", "http://127.0.0.1:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3

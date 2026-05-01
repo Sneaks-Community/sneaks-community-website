@@ -50,5 +50,9 @@ LABEL org.opencontainers.image.source="https://github.com/Sneaks-Community/sneak
 # Set Node environment to production
 ENV NODE_ENV=production
 
+# Health check: query the /health endpoint to verify the application is ready
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD wget --spider --no-verbose http://127.0.0.1:3000/health || exit 1
+
 # Start the server
 CMD ["node", "dist/index.js"]

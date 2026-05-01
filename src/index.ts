@@ -252,4 +252,12 @@ app.use((error: Error, req: express.Request, res: express.Response, _next: expre
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Sneak's Community Website running on http://localhost:${String(PORT)}`);
+    
+    // Signal readiness for process managers that support it (e.g., PM2 cluster mode)
+    if (process.send) {
+        process.send('ready');
+    }
+    
+    // Set clean exit code so the process terminates gracefully if needed
+    process.exitCode = 0;
 });
