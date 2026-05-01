@@ -1,8 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      target: production
+    image: ghcr.io/sneaks-community/sneaks-community-website:latest
     container_name: sneaks_community_web
     ports:
       - "3000:3000"
