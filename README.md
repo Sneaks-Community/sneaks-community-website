@@ -1,6 +1,6 @@
 # Sneak's Community Website
 
-A static landing page with an Express backend designed for gaming communities. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord widget integration.
+A lightweight static landing page with an Express backend designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord widget integration.
 
 ## Features
 
@@ -28,20 +28,21 @@ Available external links:
 
 ### Server Configuration
 
-Game servers are configured in `config/config.json`. Copy the `config.json.example` file and update with your actual server details:
+> [!WARNING]
+> HTTPS IS REQUIRED TO RUN THIS WEB APP PROPERLY
+
+Game servers are configured in `config/config.json`. Copy the `config.json.example` file and update with your actual server(s) details. **This file is required for the web app to run!**
 
 ```bash
 cp config/config.json.example config/config.json
 ```
-
-The server status system relies on the [gamedig](https://www.npmjs.com/package/gamedig) package.
 
 Example `config/config.json`:
 
 ```json
 {
   "community": {
-    "name": "Surf Community",
+    "name": "Example Community",
     "established": 2025,
     "discordLink": "https://discord.com/invite/YOUR_INVITE_LINK"
   },
