@@ -9,15 +9,17 @@ import rateLimit from 'express-rate-limit';
 import { GameDig } from 'gamedig';
 import helmet from 'helmet';
 import NodeCache from 'node-cache';
+import pinoHttp from 'pino-http';
 
+import { logger } from './logger.js';
 
 // Global error handlers to prevent unhandled rejections from crashing silently
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on('unhandledRejection', (reason) => {
+    logger.error({ err: reason }, 'Unhandled rejection');
 });
 
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
+    logger.fatal({ err: error }, 'Uncaught exception');
     process.exit(1);
 });
 
@@ -50,20 +52,21 @@ let config: AppConfig;
 try {
     const rawConfig = fs.readFileSync(configPath, 'utf-8');
     config = JSON.parse(rawConfig) as AppConfig;
+    logger.info({ serverCount: config.servers.length, configPath }, 'Configuration loaded successfully');
 } catch (error) {
-    console.error('Failed to load configuration:', error);
+    logger.fatal({ err: error }, 'Failed to load configuration');
     process.exit(1);
 }
 
 if (!Array.isArray(config.servers) || config.servers.length === 0) {
-    console.error('Invalid configuration: "servers" array is required and must not be empty');
+    logger.fatal('Invalid configuration: "servers" array is required and must not be empty');
     process.exit(1);
 }
 
 // Validate each server entry has required fields
 for (const server of config.servers) {
     if (!server.id || !server.host || !server.port || !server.type) {
-        console.error(`Invalid server config: missing required fields for server "${server.id || 'unknown'}"`);
+        logger.fatal({ serverId: server.id || 'unknown' }, `Invalid server config: missing required fields for server "${server.id || 'unknown'}"`);
         process.exit(1);
     }
 }
@@ -99,6 +102,17 @@ app.use(cors({
 
 // Enable gzip compression for all responses
 app.use(compression());
+
+// HTTP request logging with pino-http
+app.use(pinoHttp({
+    logger,
+    customLogLevel: (req, res, error) => {
+        if (res.statusCode >= 500 || error) return 'error';
+        if (res.statusCode >= 400) return 'warn';
+        return 'info';
+    },
+    customAttributeKeys: { req: 'request', res: 'response', err: 'error', responseTime: 'responseTimeMs' },
+}));
 
 // Serve static files from user-assets first (takes precedence), then built-in public/
 // This allows users to hot-load custom assets without rebuilding the Docker image
@@ -149,86 +163,92 @@ app.get('/api/config', (req, res) => {
 });
 
 // API Route for server status
- 
 app.get('/api/status', statusLimiter, async (req, res) => {
     try {
         const cachedStatus = cache.get('server_status');
         if (cachedStatus) {
+            const statusData = cachedStatus as ServerStatusData[];
+            logger.debug({ serverCount: statusData.length }, 'Server status returned from cache');
             res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
             return res.json({ success: true, fromCache: true, data: cachedStatus });
         }
 
+        logger.info({ serverCount: config.servers.length }, 'Cache miss, querying servers');
         updatePromise ??= (async () => {
-                try {
-                    const results = await Promise.allSettled(
-                        config.servers.map(async (server: ServerConfig) => {
-                            try {
-                                const state = await GameDig.query({
-                                    type: server.type,
-                                    host: server.host,
-                                    port: server.port,
-                                    maxRetries: 1,
-                                    socketTimeout: 5000,
-                                });
+            try {
+                const results = await Promise.allSettled(
+                    config.servers.map(async (server: ServerConfig) => {
+                        try {
+                            const state = await GameDig.query({
+                                type: server.type,
+                                host: server.host,
+                                port: server.port,
+                                maxRetries: 1,
+                                socketTimeout: 5000,
+                            });
 
-                                return {
-                                    id: server.id,
-                                    name: state.name || server.name,
-                                    map: state.map || 'N/A',
-                                    players: state.players.length,
-                                    maxplayers: state.maxplayers,
-                                    ping: state.ping,
-                                    status: 'online' as const,
-                                    host: server.host,
-                                    port: server.port,
-                                };
-                            } catch {
-                                // Return default offline data instead of result.reason (which could be an Error object)
-                                return {
-                                    id: server.id,
-                                    name: server.name,
-                                    map: 'N/A',
-                                    players: 0,
-                                    maxplayers: 0,
-                                    ping: 0,
-                                    status: 'offline' as const,
-                                    host: server.host,
-                                    port: server.port,
-                                };
-                            }
-                        })
-                    );
+                            logger.debug({ serverId: server.id, map: state.map, players: state.players.length, ping: state.ping }, `Server ${server.id} queried successfully`);
 
-                    // Safely extract data, never pass Error objects to the client
-                    const serversData: ServerStatusData[] = results.map(result => {
-                        if (result.status === 'fulfilled') {
-                            return result.value;
+                            return {
+                                id: server.id,
+                                name: state.name || server.name,
+                                map: state.map || 'N/A',
+                                players: state.players.length,
+                                maxplayers: state.maxplayers,
+                                ping: state.ping,
+                                status: 'online' as const,
+                                host: server.host,
+                                port: server.port,
+                            };
+                        } catch {
+                            logger.warn({ serverId: server.id, host: server.host, port: server.port }, `Server ${server.id} query failed`);
+
+                            // Return default offline data instead of result.reason (which could be an Error object)
+                            return {
+                                id: server.id,
+                                name: server.name,
+                                map: 'N/A',
+                                players: 0,
+                                maxplayers: 0,
+                                ping: 0,
+                                status: 'offline' as const,
+                                host: server.host,
+                                port: server.port,
+                            };
                         }
-                        // Fallback for rejected promises - use safe default object
-                        return {
-                            id: 'unknown',
-                            name: 'Unknown Server',
-                            map: 'N/A',
-                            players: 0,
-                            maxplayers: 0,
-                            ping: 0,
-                            status: 'offline' as const,
-                        };
-                    });
+                    })
+                );
 
-                    cache.set('server_status', serversData);
-                    return serversData;
-                } finally {
-                    // Always clear the promise, whether it succeeds or fails
-                    updatePromise = null;
-                }
-            })();
+                // Safely extract data, never pass Error objects to the client
+                const serversData: ServerStatusData[] = results.map(result => {
+                    if (result.status === 'fulfilled') {
+                        return result.value;
+                    }
+                    // Fallback for rejected promises - use safe default object
+                    return {
+                        id: 'unknown',
+                        name: 'Unknown Server',
+                        map: 'N/A',
+                        players: 0,
+                        maxplayers: 0,
+                        ping: 0,
+                        status: 'offline' as const,
+                    };
+                });
+
+                cache.set('server_status', serversData);
+                return serversData;
+            } finally {
+                // Always clear the promise, whether it succeeds or fails
+                updatePromise = null;
+            }
+        })();
 
         const serversData = await updatePromise;
         res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
         return res.json({ success: true, fromCache: false, data: serversData });
     } catch (error) {
-        console.error('Server status error:', error);
+        logger.error({ err: error }, 'Server status error');
         // Use 'message' property instead of 'error' for API clarity
         return res.status(500).json({ success: false, message: 'Failed to fetch server status' });
     }
@@ -245,19 +265,23 @@ app.use((req, res) => {
 });
 
 // Express error handling middleware (4-argument signature)
-app.use((error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error('Server error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    logger.error({ err: error }, 'Server error');
+    if (!res.headersSent) {
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    } else {
+        next(error);
+    }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Sneak's Community Website running on http://localhost:${String(PORT)}`);
-    
+    logger.info({ port: PORT, pid: process.pid, env: process.env.NODE_ENV ?? 'development' }, "Sneak's Community Website running");
+
     // Signal readiness for process managers that support it (e.g., PM2 cluster mode)
     if (process.send) {
         process.send('ready');
     }
-    
+
     // Set clean exit code so the process terminates gracefully if needed
     process.exitCode = 0;
 });

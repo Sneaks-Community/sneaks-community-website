@@ -36,19 +36,8 @@ export default tseslint.config(
       ...tseslint.configs.stylisticTypeChecked,
     ],
     rules: {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          vars: "all",
-          args: "after-used",
-          caughtErrorsIgnorePattern: "^_",
-          ignoreRestSiblings: true,
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-        },
-      ],
-
+      "no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-non-null-assertion": "error",
       "@typescript-eslint/consistent-type-imports": "error",
@@ -58,7 +47,10 @@ export default tseslint.config(
         { "checksVoidReturn": { "arguments": false } }
       ],
 
-      "import-x/no-unresolved": "error",
+      "import-x/no-unresolved": [
+        "error",
+        { ignore: ["^\\.\\/.+\\.js$"] },
+      ],
       "import-x/order": [
         "warn",
         {
@@ -75,8 +67,10 @@ export default tseslint.config(
       "unicorn/no-await-expression-member": "warn",
       "unicorn/prevent-abbreviations": [
         "error",
-        { "allowList": { "req": true, "res": true, "next": true } }
+        { "allowList": { "req": true, "res": true, "next": true, "LogFnFields": true } }
       ],
+
+      "no-console": "error",
     },
   },
 
