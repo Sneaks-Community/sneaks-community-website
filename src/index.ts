@@ -144,14 +144,17 @@ interface ServerStatusData {
     port?: number;
 }
 
-// Rate limiter for /api/status to prevent abuse
-const statusLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 30, // 30 requests per minute per IP
+// Global rate limiter for all /api/* endpoints
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requests per 15 minutes per IP
     message: { success: false, error: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+// Apply global rate limiter to all /api/* routes
+app.use('/api', apiLimiter);
 
 // API Route for config
 app.get('/api/config', (req, res) => {
@@ -164,7 +167,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // API Route for server status
-app.get('/api/status', statusLimiter, async (req, res) => {
+app.get('/api/status', async (req, res) => {
     try {
         const cachedStatus = cache.get('server_status');
         if (cachedStatus) {
@@ -255,8 +258,12 @@ app.get('/api/status', statusLimiter, async (req, res) => {
     }
 });
 
-// Health check endpoint (must be before 404 handler)
+// Health check endpoint — restricted to localhost only
 app.get('/health', (req, res) => {
+    const ip = req.ip;
+    if (ip !== '::1' && ip !== '127.0.0.1') {
+        return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
