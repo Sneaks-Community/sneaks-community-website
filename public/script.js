@@ -249,6 +249,22 @@ function initAnimations() {
         );
     }, { amount: 0.1 });
 
+    // Resources section
+    inView("#resources-header", (info) => {
+        const el = info.target || info;
+        if(el && el.classList) {el.classList.remove('opacity-0');}
+        animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
+    });
+
+    inView("#resources-grid", () => {
+        document.querySelectorAll("#resources-grid > a").forEach(el => el.classList.remove('opacity-0'));
+        animate(
+            "#resources-grid > a",
+            { opacity: [0, 1], y: [20, 0] },
+            { duration: 0.5, delay: stagger(0.15) }
+        );
+    }, { amount: 0.2 });
+
     // Rule card hover animations
     document.querySelectorAll('.rule-card').forEach(card => {
         card.addEventListener('mouseenter', () => {
