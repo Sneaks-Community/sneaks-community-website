@@ -81,7 +81,7 @@ app.use(helmet({
             scriptSrc: ["'self'"],
             styleSrc: ["'self'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            imgSrc: ["'self'", "data:", "https:"],
+            imgSrc: ["'self'", "https:"],
             frameSrc: ["https://discord.com"],
             connectSrc: ["'self'"],
             baseUri: ["'self'"],
