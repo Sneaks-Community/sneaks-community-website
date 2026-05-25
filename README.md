@@ -19,12 +19,15 @@ A lightweight static landing page with an Express backend designed for [Sneak's 
 ### Environment Variables
 
 Configure your environment by setting properties in your `.env` file (see `.env.example`).
-Available external links:
 
+- `NODE_ENV`
+- `PORT`
+- `LOG_LEVEL`
 - `STEAM_LINK`
 - `TWITCH_LINK`
 - `GITHUB_LINK`
 - `DISCORD_WIDGET_ID`
+- `ALLOWED_ORIGINS`
 
 ### Server Configuration
 

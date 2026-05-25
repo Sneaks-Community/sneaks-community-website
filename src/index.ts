@@ -108,6 +108,7 @@ app.use(pinoHttp({
     logger,
     customLogLevel: (req, res, error) => {
         if (res.statusCode >= 500 || error) return 'error';
+        if (res.statusCode === 404) return 'debug';
         if (res.statusCode >= 400) return 'warn';
         return 'info';
     },
@@ -210,7 +211,7 @@ app.get('/api/status', statusLimiter, async (req, res) => {
                                 map: 'N/A',
                                 players: 0,
                                 maxplayers: 0,
-                                ping: 0,
+                                ping: undefined,
                                 status: 'offline' as const,
                                 host: server.host,
                                 port: server.port,
@@ -231,7 +232,7 @@ app.get('/api/status', statusLimiter, async (req, res) => {
                         map: 'N/A',
                         players: 0,
                         maxplayers: 0,
-                        ping: 0,
+                        ping: undefined,
                         status: 'offline' as const,
                     };
                 });

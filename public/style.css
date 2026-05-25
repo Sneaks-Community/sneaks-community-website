@@ -143,7 +143,6 @@ body {
 
 /* Discord icons on blue buttons should always be white */
 .icon-discord.bg-blue-600,
-a.bg-blue-600 .icon-discord,
 a.bg-blue-600 .icon-discord {
     color: #FFFFFF;
 }
@@ -161,7 +160,6 @@ a.bg-blue-600 .icon-discord {
 /* Rule card hover animation */
 .rule-card {
     transform-origin: center center;
-    transform-box: fill-box;
     z-index: 1;
 }
 

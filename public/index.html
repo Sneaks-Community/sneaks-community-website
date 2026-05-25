@@ -65,6 +65,7 @@
                         <a href="#about" class="hover:text-blue-600 dark:hover:text-white transition-colors">About</a>
                         <a href="#servers" class="hover:text-blue-600 dark:hover:text-white transition-colors">Servers</a>
                         <a href="#community" class="hover:text-blue-600 dark:hover:text-white transition-colors">Community</a>
+                        <a href="#resources" class="hover:text-blue-600 dark:hover:text-white transition-colors">Resources</a>
                         <a href="#rules" class="hover:text-blue-600 dark:hover:text-white transition-colors">Rules</a>
                     </div>
                 </div>
@@ -96,6 +97,7 @@
             <a href="#about" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">About</a>
             <a href="#servers" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Servers</a>
             <a href="#community" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Community</a>
+            <a href="#resources" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Resources</a>
             <a href="#rules" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">Rules</a>
             <a href="#community" class="mobile-link mt-4 px-8 py-3 bg-blue-600 text-white rounded shadow-lg shadow-blue-900/20 flex items-center gap-2">
                 <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-discord align-bottom"><title>Discord</title><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg> JOIN DISCORD
@@ -212,6 +214,49 @@
                         <p class="text-sm text-slate-600 dark:text-slate-400">Face off in competitive 1v1 skill match-ups.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-24 border-y border-black/5 dark:border-white/5 bg-white dark:bg-[#08090b] relative overflow-hidden transition-colors duration-300">
+        <!-- Background accents -->
+        <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
+            <div class="absolute left-0 top-0 w-1/2 h-full bg-gradient-to-r from-blue-600/20 to-transparent"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 opacity-0" id="resources-header">
+                <h2 class="text-blue-600 dark:text-blue-400 font-semibold tracking-widest uppercase text-xs mb-2">TOOLS</h2>
+                <h3 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">RESOURCES</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" id="resources-grid">
+                <!-- Stats Card -->
+                <a href="https://stats.snksrv.com" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all hover:border-blue-500/50 opacity-0" id="resource-stats-card">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 dark:group-hover:bg-blue-500 transition-colors">
+                        <i data-lucide="bar-chart-2" class="text-blue-600 dark:text-blue-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Player Statistics</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View detailed player statistics across all servers. Track your performance, compare with others, and see your progress over time.</p>
+                    <div class="mt-6 flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm group-hover:gap-3 transition-all">
+                        View Stats
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </a>
+
+                <!-- Bans Card -->
+                <a href="https://bans.snksrv.com" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all hover:border-indigo-500/50 opacity-0" id="resource-bans-card">
+                    <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 transition-colors">
+                        <i data-lucide="shield-alert" class="text-indigo-600 dark:text-indigo-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Ban List</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View the comprehensive ban list. Administrators can also manage bans and enforcement actions from this dashboard.</p>
+                    <div class="mt-6 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm group-hover:gap-3 transition-all">
+                        View Bans
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
