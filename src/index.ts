@@ -130,6 +130,7 @@ app.set('trust proxy', 1);
 // Set up node-cache for server queries (60 seconds TTL)
 const cache = new NodeCache({ stdTTL: 60 });
 let updatePromise: Promise<ServerStatusData[]> | null = null;
+let isUpdating = false; // Mutex to prevent concurrent GameDig batch queries
 
 // Server status response type
 interface ServerStatusData {
@@ -178,6 +179,9 @@ app.get('/api/status', async (req, res) => {
         }
 
         logger.info({ serverCount: config.servers.length }, 'Cache miss, querying servers');
+        if (!isUpdating) {
+            isUpdating = true;
+        }
         updatePromise ??= (async () => {
             try {
                 const results = await Promise.allSettled(
@@ -243,7 +247,8 @@ app.get('/api/status', async (req, res) => {
                 cache.set('server_status', serversData);
                 return serversData;
             } finally {
-                // Always clear the promise, whether it succeeds or fails
+                // Always clear the mutex and promise, whether it succeeds or fails
+                isUpdating = false;
                 updatePromise = null;
             }
         })();
