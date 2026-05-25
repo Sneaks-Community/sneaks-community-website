@@ -14,7 +14,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 export const logger = pino({
   level: isDevelopment ? 'debug' : 'info',
   formatters: {
-    level: (label) => ({ level: label.toUpperCase() }),
+    level: (levelLabel) => ({ level: levelLabel.toUpperCase() }),
   },
   timestamp: pino.stdTimeFunctions.isoTime,
   ...(isDevelopment
