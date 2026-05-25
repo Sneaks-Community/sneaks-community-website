@@ -10,7 +10,13 @@ COPY package.json package-lock.json* ./
 RUN npm install
 
 # Copy application files
-COPY . .
+COPY src/ ./src/
+COPY public/ ./public/
+COPY config/ ./config/
+COPY user-assets/ ./user-assets/
+COPY tsconfig.json .
+COPY eslint.config.mjs .
+COPY .nvmrc .
 
 # Build the project (esbuild bundles the TypeScript server)
 RUN npm run build
@@ -30,6 +36,8 @@ RUN npm install --omit=dev
 COPY --from=builder /usr/src/app/dist ./dist
 # Copy the public static files (copied during build stage, already includes minified assets)
 COPY --from=builder /usr/src/app/public ./public
+# Copy user-assets (may contain custom overrides at runtime)
+COPY --from=builder /usr/src/app/user-assets ./user-assets
 # Note: config/ is mounted via volume at runtime, not baked into the image
 
 # Create non-root user for security

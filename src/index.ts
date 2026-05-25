@@ -81,7 +81,7 @@ app.use(helmet({
             scriptSrc: ["'self'"],
             styleSrc: ["'self'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            imgSrc: ["'self'", "data:", "https:"],
+            imgSrc: ["'self'", "https:"],
             frameSrc: ["https://discord.com"],
             connectSrc: ["'self'"],
             baseUri: ["'self'"],
@@ -130,6 +130,7 @@ app.set('trust proxy', 1);
 // Set up node-cache for server queries (60 seconds TTL)
 const cache = new NodeCache({ stdTTL: 60 });
 let updatePromise: Promise<ServerStatusData[]> | null = null;
+let isUpdating = false; // Mutex to prevent concurrent GameDig batch queries
 
 // Server status response type
 interface ServerStatusData {
@@ -144,14 +145,17 @@ interface ServerStatusData {
     port?: number;
 }
 
-// Rate limiter for /api/status to prevent abuse
-const statusLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 30, // 30 requests per minute per IP
+// Global rate limiter for all /api/* endpoints
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requests per 15 minutes per IP
     message: { success: false, error: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+// Apply global rate limiter to all /api/* routes
+app.use('/api', apiLimiter);
 
 // API Route for config
 app.get('/api/config', (req, res) => {
@@ -164,7 +168,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // API Route for server status
-app.get('/api/status', statusLimiter, async (req, res) => {
+app.get('/api/status', async (req, res) => {
     try {
         const cachedStatus = cache.get('server_status');
         if (cachedStatus) {
@@ -175,6 +179,9 @@ app.get('/api/status', statusLimiter, async (req, res) => {
         }
 
         logger.info({ serverCount: config.servers.length }, 'Cache miss, querying servers');
+        if (!isUpdating) {
+            isUpdating = true;
+        }
         updatePromise ??= (async () => {
             try {
                 const results = await Promise.allSettled(
@@ -240,7 +247,8 @@ app.get('/api/status', statusLimiter, async (req, res) => {
                 cache.set('server_status', serversData);
                 return serversData;
             } finally {
-                // Always clear the promise, whether it succeeds or fails
+                // Always clear the mutex and promise, whether it succeeds or fails
+                isUpdating = false;
                 updatePromise = null;
             }
         })();
@@ -255,8 +263,12 @@ app.get('/api/status', statusLimiter, async (req, res) => {
     }
 });
 
-// Health check endpoint (must be before 404 handler)
+// Health check endpoint — restricted to localhost only
 app.get('/health', (req, res) => {
+    const ip = req.ip;
+    if (ip !== '::1' && ip !== '127.0.0.1') {
+        return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
