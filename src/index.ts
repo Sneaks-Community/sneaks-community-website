@@ -210,7 +210,7 @@ app.get('/api/status', statusLimiter, async (req, res) => {
                                 map: 'N/A',
                                 players: 0,
                                 maxplayers: 0,
-                                ping: 0,
+                                ping: undefined,
                                 status: 'offline' as const,
                                 host: server.host,
                                 port: server.port,
@@ -231,7 +231,7 @@ app.get('/api/status', statusLimiter, async (req, res) => {
                         map: 'N/A',
                         players: 0,
                         maxplayers: 0,
-                        ping: 0,
+                        ping: undefined,
                         status: 'offline' as const,
                     };
                 });
