@@ -10,9 +10,10 @@ declare module 'pino' {
 }
 
 const isDevelopment = process.env.NODE_ENV === 'development';
+const logLevel = process.env.LOG_LEVEL || (isDevelopment ? 'debug' : 'info');
 
 export const logger = pino({
-  level: isDevelopment ? 'debug' : 'info',
+  level: logLevel,
   formatters: {
     level: (levelLabel) => ({ level: levelLabel.toUpperCase() }),
   },
