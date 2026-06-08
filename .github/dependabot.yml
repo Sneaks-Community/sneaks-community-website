@@ -22,7 +22,7 @@ updates:
     cooldown:
       default-days: 7
     groups:
-      github-actions-dependencies:
+      docker-dependencies:
         patterns:
           - "*"
     commit-message:
