@@ -121,7 +121,7 @@ const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
     app.use(express.static(userAssetsPath));
 }
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1h' }));
 app.use(express.json({ limit: '10kb' }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
