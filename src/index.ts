@@ -97,7 +97,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()
 app.use(cors({
     origin: allowedOrigins,
     methods: ['GET'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type'],
 }));
 
 // Enable gzip compression for all responses
