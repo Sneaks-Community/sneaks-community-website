@@ -6,6 +6,7 @@ function escapeHTML(str) {
 }
 
 const { animate, stagger, inView } = window.Motion;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Theme Initialization and Logic
 function initTheme() {
@@ -47,7 +48,7 @@ function initTheme() {
         }
         
         // Button animation
-        if (window.Motion && window.Motion.animate) {
+        if (window.Motion && window.Motion.animate && !prefersReducedMotion) {
             window.Motion.animate(themeToggleBtn, { rotate: [0, 180] }, { duration: 0.3 });
         }
     });
@@ -115,11 +116,18 @@ async function fetchServerStatus() {
             lucide.createIcons();
             
             // Animate Server Cards in with stagger
-            animate(
-                ".server-card", 
-                { opacity: [0, 1], y: [20, 0] },
-                { duration: 0.5, delay: stagger(0.1) }
-            );
+            if (!prefersReducedMotion) {
+                animate(
+                    ".server-card",
+                    { opacity: [0, 1], y: [20, 0] },
+                    { duration: 0.5, delay: stagger(0.1) }
+                );
+            } else {
+                // When reduced motion is preferred, make cards visible immediately
+                document.querySelectorAll(".server-card").forEach(el => {
+                    el.classList.remove('opacity-0', 'translate-y-4');
+                });
+            }
 
         }
     } catch (e) {
@@ -149,7 +157,7 @@ function initMobileMenu() {
             lucide.createIcons();
             
             // Animate links in
-            if (window.Motion && window.Motion.animate && window.Motion.stagger) {
+            if (window.Motion && window.Motion.animate && window.Motion.stagger && !prefersReducedMotion) {
                 window.Motion.animate(
                     mobileLinks,
                     { opacity: [0, 1], y: [20, 0] },
@@ -188,96 +196,120 @@ function initAnimations() {
 
     // Hero Section Reveal
     document.querySelectorAll("#hero-content > *").forEach(el => el.classList.remove('opacity-0'));
-    animate("#hero-content > *", 
-        { opacity: [0, 1], y: [40, 0], scale: [0.95, 1] }, 
-        { duration: 0.8, delay: stagger(0.15), easing: "ease-out" }
-    );
+    if (!prefersReducedMotion) {
+        animate("#hero-content > *",
+            { opacity: [0, 1], y: [40, 0], scale: [0.95, 1] },
+            { duration: 0.8, delay: stagger(0.15), easing: "ease-out" }
+        );
+    }
     
     // About Section
     inView("#about-text", (info) => {
         const el = info.target || info;
         if(el && el.classList) {el.classList.remove('opacity-0');}
-        animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
+        if (!prefersReducedMotion) {
+            animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
+        }
     });
-
+    
     inView("#about-features", () => {
         document.querySelectorAll("#about-features > div").forEach(el => el.classList.remove('opacity-0'));
-        animate(
-            "#about-features > div", 
-            { opacity: [0, 1], y: [20, 0] }, 
-            { duration: 0.5, delay: stagger(0.15) }
-        );
+        if (!prefersReducedMotion) {
+            animate(
+                "#about-features > div",
+                { opacity: [0, 1], y: [20, 0] },
+                { duration: 0.5, delay: stagger(0.15) }
+            );
+        }
     }, { amount: 0.2 });
 
     // Server list header
     inView("#servers-header", (info) => {
         const el = info.target || info;
         if(el && el.classList) {el.classList.remove('opacity-0');}
-        animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
+        if (!prefersReducedMotion) {
+            animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
+        }
     });
 
     // Community section
     inView("#community-text", (info) => {
         const el = info.target || info;
         if(el && el.classList) {el.classList.remove('opacity-0');}
-        animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
+        if (!prefersReducedMotion) {
+            animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
+        }
     });
 
     inView("#discord-widget", (info) => {
         const el = info.target || info;
         if(el && el.classList) {el.classList.remove('opacity-0');}
-        animate(el, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.6 });
+        if (!prefersReducedMotion) {
+            animate(el, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.6 });
+        }
     });
 
     // Community Rules
     inView("#community-rules-grid", () => {
         document.querySelectorAll("#community-rules-grid .rule-card").forEach(el => el.classList.remove('opacity-0'));
-        animate(
-            "#community-rules-grid .rule-card",
-            { opacity: [0, 1], y: [20, 0] },
-            { duration: 0.4, delay: stagger(0.08) }
-        );
+        if (!prefersReducedMotion) {
+            animate(
+                "#community-rules-grid .rule-card",
+                { opacity: [0, 1], y: [20, 0] },
+                { duration: 0.4, delay: stagger(0.08) }
+            );
+        }
     }, { amount: 0.1 });
 
     // Timer Rules
     inView("#timer-rules-grid", () => {
         document.querySelectorAll("#timer-rules-grid .rule-card").forEach(el => el.classList.remove('opacity-0'));
-        animate(
-            "#timer-rules-grid .rule-card",
-            { opacity: [0, 1], y: [20, 0] },
-            { duration: 0.4, delay: stagger(0.08) }
-        );
+        if (!prefersReducedMotion) {
+            animate(
+                "#timer-rules-grid .rule-card",
+                { opacity: [0, 1], y: [20, 0] },
+                { duration: 0.4, delay: stagger(0.08) }
+            );
+        }
     }, { amount: 0.1 });
 
     // Resources section
     inView("#resources-header", (info) => {
         const el = info.target || info;
         if(el && el.classList) {el.classList.remove('opacity-0');}
-        animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
+        if (!prefersReducedMotion) {
+            animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
+        }
     });
-
+    
     inView("#resources-grid", () => {
         document.querySelectorAll("#resources-grid > a").forEach(el => el.classList.remove('opacity-0'));
-        animate(
-            "#resources-grid > a",
-            { opacity: [0, 1], y: [20, 0] },
-            { duration: 0.5, delay: stagger(0.15) }
-        );
+        if (!prefersReducedMotion) {
+            animate(
+                "#resources-grid > a",
+                { opacity: [0, 1], y: [20, 0] },
+                { duration: 0.5, delay: stagger(0.15) }
+            );
+        }
     }, { amount: 0.2 });
 
     // Rule card hover animations
     document.querySelectorAll('.rule-card').forEach(card => {
         card.addEventListener('mouseenter', () => {
-            animate(card,
-                { scale: 1.05 },
-                { duration: 0.2, ease: "ease-out" }
-            );
+            if (!prefersReducedMotion) {
+                animate(card,
+                    { scale: 1.05 },
+                    { duration: 0.2, ease: "ease-out" }
+                );
+            }
         });
         card.addEventListener('mouseleave', () => {
-            animate(card,
-                { scale: 1 },
-                { duration: 0.2, ease: "ease-out" }
-            );
+            if (!prefersReducedMotion) {
+                animate(card,
+                    { scale: 1 },
+                    { duration: 0.2, ease: "ease-out" }
+                );
+            }
         });
     });
 }

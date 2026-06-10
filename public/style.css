@@ -34,8 +34,17 @@ body {
 }
 
 /* Hide empty server cards while loading */
-[data-loading="true"] {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+@media (prefers-reduced-motion: no-preference) {
+    [data-loading="true"] {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+}
+
+/* Respect prefers-reduced-motion for pulse animation */
+@media (prefers-reduced-motion: reduce) {
+    [data-loading="true"] {
+        animation: none;
+    }
 }
 
 @keyframes pulse {
@@ -59,6 +68,13 @@ body {
     }
 }
 
+/* Status dot animation - only apply when user prefers motion */
+@media (prefers-reduced-motion: no-preference) {
+    .status-dot {
+        animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+}
+
 .status-dot {
     display: inline-block;
     width: 8px;
@@ -68,7 +84,13 @@ body {
     background-color: #22c55e;
     border-radius: 9999px;
     margin-right: 6px;
-    animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Explicitly disable animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .status-dot {
+        animation: none;
+    }
 }
 
 /* Footer icon container background */
