@@ -73,7 +73,7 @@ async function fetchServerStatus() {
                     playerPercentage = (currentPlayers / maxPlayers) * 100;
                 }
                 
-                const serverName = escapeHTML(`${server.name}`.toUpperCase());
+                const serverName = escapeHTML(`${server.name}`);
                 const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
                 const serverMap = escapeHTML(`${server.map || 'N/A'}`);
                 
