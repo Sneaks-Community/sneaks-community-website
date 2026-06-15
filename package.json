@@ -13,6 +13,7 @@
     "build:js": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --minify --outdir=dist",
     "start": "node --env-file=.env dist/index.js",
     "clean": "rm -rf dist && rm -f public/tailwind.css && rm -f public/lib/*.js",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
