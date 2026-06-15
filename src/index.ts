@@ -37,11 +37,6 @@ interface ServerConfig {
 }
 
 interface AppConfig {
-    community: {
-        name: string;
-        established: number;
-        discordLink: string;
-    };
     servers: ServerConfig[];
 }
 
@@ -63,12 +58,38 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
     process.exit(1);
 }
 
+// Community branding used to render the page title and headings, configured via
+// environment variables (with fallbacks) like the social links below.
+const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
+const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
+
 // Validate each server entry has required fields
 for (const server of config.servers) {
     if (!server.id || !server.host || !server.port || !server.type) {
         logger.fatal({ serverId: server.id || 'unknown' }, `Invalid server config: missing required fields for server "${server.id || 'unknown'}"`);
         process.exit(1);
     }
+}
+
+// Pre-render index.html with community branding. The values are fixed for the process
+// lifetime (the container is restarted to pick up env changes), so render once at startup.
+const escapeHtml = (value: string): string =>
+    value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+
+const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
+let renderedIndexHtml: string;
+try {
+    renderedIndexHtml = fs.readFileSync(indexHtmlPath, 'utf-8')
+        .replaceAll('{{communityName}}', escapeHtml(communityName))
+        .replaceAll('{{established}}', String(communityEstablished));
+} catch (error) {
+    logger.fatal({ err: error }, 'Failed to read index.html template');
+    process.exit(1);
 }
 
 const app = express();
@@ -121,16 +142,20 @@ const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
     app.use(express.static(userAssetsPath));
 }
+// Serve the config-branded index for the root and direct requests. Registered after the
+// user-assets mount (so a user-supplied index.html still wins) and before the public mount.
+app.get(['/', '/index.html'], (req, res) => {
+    res.type('html').send(renderedIndexHtml);
+});
 app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1h' }));
-app.use(express.json({ limit: '10kb' }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
 app.set('trust proxy', 1);
 
 // Set up node-cache for server queries (60 seconds TTL)
 const cache = new NodeCache({ stdTTL: 60 });
+// Single-flight guard: concurrent cache-miss requests share one in-flight GameDig batch query
 let updatePromise: Promise<ServerStatusData[]> | null = null;
-let isUpdating = false; // Mutex to prevent concurrent GameDig batch queries
 
 // Server status response type
 interface ServerStatusData {
@@ -179,12 +204,9 @@ app.get('/api/status', async (req, res) => {
         }
 
         logger.info({ serverCount: config.servers.length }, 'Cache miss, querying servers');
-        if (!isUpdating) {
-            isUpdating = true;
-        }
         updatePromise ??= (async () => {
             try {
-                const results = await Promise.allSettled(
+                const serversData: ServerStatusData[] = await Promise.all(
                     config.servers.map(async (server: ServerConfig) => {
                         try {
                             const state = await GameDig.query({
@@ -227,28 +249,10 @@ app.get('/api/status', async (req, res) => {
                     })
                 );
 
-                // Safely extract data, never pass Error objects to the client
-                const serversData: ServerStatusData[] = results.map(result => {
-                    if (result.status === 'fulfilled') {
-                        return result.value;
-                    }
-                    // Fallback for rejected promises - use safe default object
-                    return {
-                        id: 'unknown',
-                        name: 'Unknown Server',
-                        map: 'N/A',
-                        players: 0,
-                        maxplayers: 0,
-                        ping: undefined,
-                        status: 'offline' as const,
-                    };
-                });
-
                 cache.set('server_status', serversData);
                 return serversData;
             } finally {
-                // Always clear the mutex and promise, whether it succeeds or fails
-                isUpdating = false;
+                // Always clear the in-flight promise, whether it succeeds or fails
                 updatePromise = null;
             }
         })();
