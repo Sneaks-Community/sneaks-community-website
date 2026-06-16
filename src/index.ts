@@ -80,14 +80,20 @@ const escapeHtml = (value: string): string =>
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
 
-const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
-let renderedIndexHtml: string;
-try {
-    renderedIndexHtml = fs.readFileSync(indexHtmlPath, 'utf-8')
+const renderBranding = (html: string): string =>
+    html
         .replaceAll('{{communityName}}', escapeHtml(communityName))
         .replaceAll('{{established}}', String(communityEstablished));
+
+const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
+const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
+let renderedIndexHtml: string;
+let rendered404Html: string;
+try {
+    renderedIndexHtml = renderBranding(fs.readFileSync(indexHtmlPath, 'utf-8'));
+    rendered404Html = renderBranding(fs.readFileSync(notFoundHtmlPath, 'utf-8'));
 } catch (error) {
-    logger.fatal({ err: error }, 'Failed to read index.html template');
+    logger.fatal({ err: error }, 'Failed to read HTML template');
     process.exit(1);
 }
 
@@ -275,9 +281,14 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Express 404 handler for non-JSON API routes
+// 404 handler: serve the branded HTML page to browsers, JSON to API/non-HTML clients
 app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Not found' });
+    res.status(404);
+    if (req.path.startsWith('/api/') || !req.accepts('html')) {
+        res.json({ success: false, message: 'Not found' });
+    } else {
+        res.type('html').send(rendered404Html);
+    }
 });
 
 // Express error handling middleware (4-argument signature)
