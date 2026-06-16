@@ -9,7 +9,9 @@ coverage/
 plans/
 public/lib
 public/tailwind.css
+public/fonts
 config/config.json
 !config/config.json.example
 user-assets/*
 !user-assets/*.gitkeep
+public/favicon.ico

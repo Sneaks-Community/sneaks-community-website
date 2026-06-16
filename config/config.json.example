@@ -1,9 +1,4 @@
 {
-  "community": {
-    "name": "Sneak's Community",
-    "established": 2015,
-    "discordLink": "https://discord.com/invite/YOUR_INVITE_LINK"
-  },
   "servers": [
     {
       "id": "example_server",

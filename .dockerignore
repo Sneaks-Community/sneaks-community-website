@@ -9,5 +9,6 @@ coverage/
 !.env.example
 public/lib
 public/tailwind.css
+public/fonts
 public/favicon.ico
 config.json

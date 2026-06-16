@@ -23,6 +23,8 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 - `NODE_ENV`
 - `PORT`
 - `LOG_LEVEL`
+- `COMMUNITY_NAME` — community name shown in the page title, header, and footer (default: `Sneak's Community`)
+- `COMMUNITY_ESTABLISHED` — founding year shown in the title/meta tags (default: `2015`)
 - `STEAM_LINK`
 - `TWITCH_LINK`
 - `GITHUB_LINK`
@@ -44,11 +46,6 @@ Example `config/config.json`:
 
 ```json
 {
-  "community": {
-    "name": "Example Community",
-    "established": 2025,
-    "discordLink": "https://discord.com/invite/YOUR_INVITE_LINK"
-  },
   "servers": [
     {
       "id": "surf_tier1",

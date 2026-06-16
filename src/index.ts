@@ -8,7 +8,6 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { GameDig } from 'gamedig';
 import helmet from 'helmet';
-import NodeCache from 'node-cache';
 import pinoHttp from 'pino-http';
 
 import { logger } from './logger.js';
@@ -37,11 +36,6 @@ interface ServerConfig {
 }
 
 interface AppConfig {
-    community: {
-        name: string;
-        established: number;
-        discordLink: string;
-    };
     servers: ServerConfig[];
 }
 
@@ -63,12 +57,44 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
     process.exit(1);
 }
 
+// Community branding used to render the page title and headings, configured via
+// environment variables (with fallbacks) like the social links below.
+const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
+const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
+
 // Validate each server entry has required fields
 for (const server of config.servers) {
     if (!server.id || !server.host || !server.port || !server.type) {
         logger.fatal({ serverId: server.id || 'unknown' }, `Invalid server config: missing required fields for server "${server.id || 'unknown'}"`);
         process.exit(1);
     }
+}
+
+// Pre-render index.html with community branding. The values are fixed for the process
+// lifetime (the container is restarted to pick up env changes), so render once at startup.
+const escapeHtml = (value: string): string =>
+    value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+
+const renderBranding = (html: string): string =>
+    html
+        .replaceAll('{{communityName}}', escapeHtml(communityName))
+        .replaceAll('{{established}}', String(communityEstablished));
+
+const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
+const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
+let renderedIndexHtml: string;
+let rendered404Html: string;
+try {
+    renderedIndexHtml = renderBranding(fs.readFileSync(indexHtmlPath, 'utf-8'));
+    rendered404Html = renderBranding(fs.readFileSync(notFoundHtmlPath, 'utf-8'));
+} catch (error) {
+    logger.fatal({ err: error }, 'Failed to read HTML template');
+    process.exit(1);
 }
 
 const app = express();
@@ -79,8 +105,8 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'"],
-            styleSrc: ["'self'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            styleSrc: ["'self'"],
+            fontSrc: ["'self'"],
             imgSrc: ["'self'", "https:"],
             frameSrc: ["https://discord.com"],
             connectSrc: ["'self'"],
@@ -121,16 +147,21 @@ const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
     app.use(express.static(userAssetsPath));
 }
+// Serve the config-branded index for the root and direct requests. Registered after the
+// user-assets mount (so a user-supplied index.html still wins) and before the public mount.
+app.get(['/', '/index.html'], (req, res) => {
+    res.type('html').send(renderedIndexHtml);
+});
 app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1h' }));
-app.use(express.json({ limit: '10kb' }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
 app.set('trust proxy', 1);
 
-// Set up node-cache for server queries (60 seconds TTL)
-const cache = new NodeCache({ stdTTL: 60 });
+// In-memory cache for server queries (60 seconds TTL)
+const CACHE_TTL_MS = 60_000;
+let cached: { data: ServerStatusData[]; expires: number } | null = null;
+// Single-flight guard: concurrent cache-miss requests share one in-flight GameDig batch query
 let updatePromise: Promise<ServerStatusData[]> | null = null;
-let isUpdating = false; // Mutex to prevent concurrent GameDig batch queries
 
 // Server status response type
 interface ServerStatusData {
@@ -170,21 +201,17 @@ app.get('/api/config', (req, res) => {
 // API Route for server status
 app.get('/api/status', async (req, res) => {
     try {
-        const cachedStatus = cache.get('server_status');
+        const cachedStatus = cached && cached.expires > Date.now() ? cached.data : null;
         if (cachedStatus) {
-            const statusData = cachedStatus as ServerStatusData[];
-            logger.debug({ serverCount: statusData.length }, 'Server status returned from cache');
+            logger.debug({ serverCount: cachedStatus.length }, 'Server status returned from cache');
             res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
             return res.json({ success: true, fromCache: true, data: cachedStatus });
         }
 
         logger.info({ serverCount: config.servers.length }, 'Cache miss, querying servers');
-        if (!isUpdating) {
-            isUpdating = true;
-        }
         updatePromise ??= (async () => {
             try {
-                const results = await Promise.allSettled(
+                const serversData: ServerStatusData[] = await Promise.all(
                     config.servers.map(async (server: ServerConfig) => {
                         try {
                             const state = await GameDig.query({
@@ -227,28 +254,10 @@ app.get('/api/status', async (req, res) => {
                     })
                 );
 
-                // Safely extract data, never pass Error objects to the client
-                const serversData: ServerStatusData[] = results.map(result => {
-                    if (result.status === 'fulfilled') {
-                        return result.value;
-                    }
-                    // Fallback for rejected promises - use safe default object
-                    return {
-                        id: 'unknown',
-                        name: 'Unknown Server',
-                        map: 'N/A',
-                        players: 0,
-                        maxplayers: 0,
-                        ping: undefined,
-                        status: 'offline' as const,
-                    };
-                });
-
-                cache.set('server_status', serversData);
+                cached = { data: serversData, expires: Date.now() + CACHE_TTL_MS };
                 return serversData;
             } finally {
-                // Always clear the mutex and promise, whether it succeeds or fails
-                isUpdating = false;
+                // Always clear the in-flight promise, whether it succeeds or fails
                 updatePromise = null;
             }
         })();
@@ -272,9 +281,14 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Express 404 handler for non-JSON API routes
+// 404 handler: serve the branded HTML page to browsers, JSON to API/non-HTML clients
 app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Not found' });
+    res.status(404);
+    if (req.path.startsWith('/api/') || !req.accepts('html')) {
+        res.json({ success: false, message: 'Not found' });
+    } else {
+        res.type('html').send(rendered404Html);
+    }
 });
 
 // Express error handling middleware (4-argument signature)

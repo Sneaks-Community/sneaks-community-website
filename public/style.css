@@ -2,6 +2,27 @@
 /* Tailwind V4 via CDN handles most utility generation.
    We only add any required custom global styling here. */
 
+/* ------------------------------------------------------------------ */
+/* Self-hosted fonts (variable woff2, served same-origin).             */
+/* Copied from node_modules by `npm run build:lib` — zero external      */
+/* font requests. Geist = display/headings, Inter = body.              */
+/* ------------------------------------------------------------------ */
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("/fonts/inter.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Geist";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("/fonts/geist.woff2") format("woff2");
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -25,17 +46,26 @@ body {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #52525b; /* zinc-600 */
+    background: #357192; /* brand-600 */
     border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #3f3f46; /* zinc-700 */
+    background: #2a5d79; /* brand-700 */
 }
 
 /* Hide empty server cards while loading */
-[data-loading="true"] {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+@media (prefers-reduced-motion: no-preference) {
+    [data-loading="true"] {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+}
+
+/* Respect prefers-reduced-motion for pulse animation */
+@media (prefers-reduced-motion: reduce) {
+    [data-loading="true"] {
+        animation: none;
+    }
 }
 
 @keyframes pulse {
@@ -59,6 +89,13 @@ body {
     }
 }
 
+/* Status dot animation - only apply when user prefers motion */
+@media (prefers-reduced-motion: no-preference) {
+    .status-dot {
+        animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+}
+
 .status-dot {
     display: inline-block;
     width: 8px;
@@ -68,7 +105,13 @@ body {
     background-color: #22c55e;
     border-radius: 9999px;
     margin-right: 6px;
-    animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Explicitly disable animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .status-dot {
+        animation: none;
+    }
 }
 
 /* Footer icon container background */
@@ -141,9 +184,9 @@ body {
     color: currentColor;
 }
 
-/* Discord icons on blue buttons should always be white */
-.icon-discord.bg-blue-600,
-a.bg-blue-600 .icon-discord {
+/* Discord icons on the brand CTA should always be white */
+.icon-discord.bg-brand-500,
+a.bg-brand-500 .icon-discord {
     color: #FFFFFF;
 }
 
@@ -163,12 +206,154 @@ a.bg-blue-600 .icon-discord {
     z-index: 1;
 }
 
+.rule-card {
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+}
+
 .rule-card:hover {
-    border-color: rgba(59, 130, 246, 0.5);
+    border-color: rgba(65, 137, 175, 0.5);
 }
 
 .dark .rule-card:hover {
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color: rgba(99, 162, 196, 0.45);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .rule-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 26px -12px rgba(65, 137, 175, 0.40);
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Layered hero / section backgrounds (CSP-safe: all same-origin)      */
+/* ------------------------------------------------------------------ */
+
+/* Soft mesh-gradient glow in brand tones. Subtle in light mode,
+   richer against the near-black dark surface. */
+.brand-glow {
+    background:
+        radial-gradient(55% 50% at 18% 0%, rgba(65, 137, 175, 0.10), transparent 70%),
+        radial-gradient(45% 45% at 85% 15%, rgba(99, 162, 196, 0.08), transparent 70%),
+        radial-gradient(40% 45% at 60% 95%, rgba(42, 93, 121, 0.08), transparent 70%);
+}
+
+.dark .brand-glow {
+    background:
+        radial-gradient(55% 50% at 18% 0%, rgba(65, 137, 175, 0.22), transparent 70%),
+        radial-gradient(45% 45% at 85% 15%, rgba(99, 162, 196, 0.14), transparent 70%),
+        radial-gradient(40% 45% at 60% 95%, rgba(42, 93, 121, 0.20), transparent 70%);
+}
+
+/* Faint structural grid, masked to fade out toward the edges. */
+.bg-grid {
+    background-image:
+        linear-gradient(to right, rgba(65, 137, 175, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(65, 137, 175, 0.07) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
+    mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
+}
+
+.dark .bg-grid {
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+/* Fine film grain to keep gradients from looking sterile/digital. */
+.bg-grain {
+    background-image: url("/grain.svg");
+    background-repeat: repeat;
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+}
+
+.dark .bg-grain {
+    opacity: 0.05;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .bg-grain {
+        animation: grain-shift 8s steps(6) infinite;
+    }
+}
+
+/* Tiny positional jitter makes the grain read as film, not a static tile.
+   Animating background-position (not transform) keeps full edge coverage. */
+@keyframes grain-shift {
+    0%, 100% { background-position: 0 0; }
+    20% { background-position: -12px 8px; }
+    40% { background-position: 8px -12px; }
+    60% { background-position: -8px -8px; }
+    80% { background-position: 12px 8px; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared card hover: gentle lift + brand glow (replaces JS scale)     */
+/* ------------------------------------------------------------------ */
+.card-hover {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 34px -12px rgba(65, 137, 175, 0.40);
+        border-color: rgba(65, 137, 175, 0.5);
+    }
+
+    .dark .card-hover:hover {
+        box-shadow: 0 16px 40px -14px rgba(65, 137, 175, 0.55);
+        border-color: rgba(99, 162, 196, 0.45);
+    }
+}
+
+/* Nav solidifies slightly once the user scrolls past the hero top */
+nav.nav-scrolled {
+    background-color: rgba(255, 255, 255, 0.92);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.dark nav.nav-scrolled {
+    background-color: rgba(8, 9, 11, 0.75);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Primary CTA brand glow */
+.btn-glow {
+    box-shadow: 0 8px 24px -8px rgba(65, 137, 175, 0.55);
+}
+
+.btn-glow:hover {
+    box-shadow: 0 10px 30px -8px rgba(65, 137, 175, 0.75);
+}
+
+/* Hero headline word reveal: each word sits in an overflow-clipped
+   wrapper so the JS-driven translateY reads as a "mask up" reveal. */
+.reveal-line {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.12em; /* room for descenders inside the clip */
+}
+
+.reveal-word {
+    display: inline-block;
+    transform: translateY(110%); /* hidden below the clip; JS animates to 0 */
+    will-change: transform;
+}
+
+/* No-JS / reduced-motion users must still see the headline. */
+@media (prefers-reduced-motion: reduce) {
+    .reveal-word {
+        transform: none;
+    }
 }
 
 /* Custom logo styling */
