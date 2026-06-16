@@ -8,7 +8,6 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { GameDig } from 'gamedig';
 import helmet from 'helmet';
-import NodeCache from 'node-cache';
 import pinoHttp from 'pino-http';
 
 import { logger } from './logger.js';
@@ -152,8 +151,9 @@ app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1h' }));
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
 app.set('trust proxy', 1);
 
-// Set up node-cache for server queries (60 seconds TTL)
-const cache = new NodeCache({ stdTTL: 60 });
+// In-memory cache for server queries (60 seconds TTL)
+const CACHE_TTL_MS = 60_000;
+let cached: { data: ServerStatusData[]; expires: number } | null = null;
 // Single-flight guard: concurrent cache-miss requests share one in-flight GameDig batch query
 let updatePromise: Promise<ServerStatusData[]> | null = null;
 
@@ -195,10 +195,9 @@ app.get('/api/config', (req, res) => {
 // API Route for server status
 app.get('/api/status', async (req, res) => {
     try {
-        const cachedStatus = cache.get('server_status');
+        const cachedStatus = cached && cached.expires > Date.now() ? cached.data : null;
         if (cachedStatus) {
-            const statusData = cachedStatus as ServerStatusData[];
-            logger.debug({ serverCount: statusData.length }, 'Server status returned from cache');
+            logger.debug({ serverCount: cachedStatus.length }, 'Server status returned from cache');
             res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
             return res.json({ success: true, fromCache: true, data: cachedStatus });
         }
@@ -249,7 +248,7 @@ app.get('/api/status', async (req, res) => {
                     })
                 );
 
-                cache.set('server_status', serversData);
+                cached = { data: serversData, expires: Date.now() + CACHE_TTL_MS };
                 return serversData;
             } finally {
                 // Always clear the in-flight promise, whether it succeeds or fails
