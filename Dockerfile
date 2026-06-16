@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 
 # Install all dependencies (including devDependencies) for build
-RUN npm install
+RUN npm ci
 
 # Copy application files
 COPY src/ ./src/
@@ -30,7 +30,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 
 # Install only production dependencies
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
 # Copy the build output from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist

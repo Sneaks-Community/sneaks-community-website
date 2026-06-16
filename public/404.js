@@ -134,7 +134,7 @@ async function initCustomLogo() {
     for (const logoPath of logoPaths) {
         if (await checkLogoExists(logoPath)) {
             // Logo found, swap it in
-            logoContainer.classList.remove('bg-blue-600', 'font-black');
+            logoContainer.classList.remove('bg-brand-500', 'font-black');
             logoContainer.classList.add('has-logo');
             logoContainer.innerHTML = '';
 
