@@ -54,7 +54,7 @@ EXPOSE 3000
 LABEL org.opencontainers.image.title="sneaks-community-website"
 LABEL org.opencontainers.image.description="Sneak's Community Website"
 LABEL org.opencontainers.image.source="https://github.com/Sneaks-Community/sneaks-community-website"
-LABEL org.opencontainers.image.version="0.2.0"
+LABEL org.opencontainers.image.version="0.3.0"
 
 # Set Node environment to production
 ENV NODE_ENV=production
