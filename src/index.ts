@@ -179,7 +179,7 @@ interface ServerStatusData {
 // Global rate limiter for all /api/* endpoints
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per 15 minutes per IP
+    max: 60, // 60 requests per 15 minutes per IP
     message: { success: false, error: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
