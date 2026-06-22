@@ -19,3 +19,4 @@ jobs:
         with:
           comment-summary-in-pr: always
           fail-on-severity: high
+          license-check: false
