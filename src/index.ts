@@ -136,7 +136,7 @@ app.use(pinoHttp({
         if (res.statusCode >= 500 || error) return 'error';
         if (res.statusCode === 404) return 'debug';
         if (res.statusCode >= 400) return 'warn';
-        return 'info';
+        return 'debug';
     },
     customAttributeKeys: { req: 'request', res: 'response', err: 'error', responseTime: 'responseTimeMs' },
 }));
