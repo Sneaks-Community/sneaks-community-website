@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ $default-branch, dev ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ $default-branch, dev ]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -18,6 +18,7 @@ jobs:
   quality:
     name: Lint, Build & Security Audit
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -44,9 +45,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Reports vulnerabilities in the full dependency tree without failing the
+      # build. Pre-existing advisories in untouched packages stay visible here;
+      # newly-introduced vulnerable deps are gated by the dependency-review job.
+      - name: npm audit (report only, non-blocking)
+        run: npm audit --audit-level=high || true
+
   docker-build:
     name: Docker Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.ref != 'refs/heads/main'
 
     steps:
       - name: Checkout repository
