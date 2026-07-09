@@ -15,8 +15,6 @@ COPY public/ ./public/
 COPY config/ ./config/
 COPY user-assets/ ./user-assets/
 COPY tsconfig.json .
-COPY eslint.config.mjs .
-COPY .nvmrc .
 
 # Build the project (esbuild bundles the TypeScript server)
 RUN npm run build
