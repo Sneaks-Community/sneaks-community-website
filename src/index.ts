@@ -302,7 +302,7 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     logger.info({ port: PORT, pid: process.pid, env: process.env.NODE_ENV ?? 'development' }, "Sneak's Community Website running");
 
     // Signal readiness for process managers that support it (e.g., PM2 cluster mode)
@@ -313,3 +313,32 @@ app.listen(PORT, '0.0.0.0', () => {
     // Set clean exit code so the process terminates gracefully if needed
     process.exitCode = 0;
 });
+
+// Graceful shutdown: on docker stop / redeploy, stop accepting new connections and
+// let in-flight requests (e.g. an active GameDig batch) finish before exiting.
+let shuttingDown = false;
+const shutdown = (signal: NodeJS.Signals) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    logger.info({ signal }, 'Received shutdown signal, closing server');
+
+    // Force-exit safety net below Docker's default 10s stop grace period, so a hung
+    // keep-alive connection can't wedge server.close() and trigger SIGKILL instead.
+    const forceExit = setTimeout(() => {
+        logger.error('Shutdown timed out, forcing exit');
+        process.exit(1);
+    }, 8000);
+    forceExit.unref();
+
+    server.close((error) => {
+        if (error) {
+            logger.error({ err: error }, 'Error during server shutdown');
+            process.exit(1);
+        }
+        logger.info('Server closed cleanly');
+        process.exit(0);
+    });
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
