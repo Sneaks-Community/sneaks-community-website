@@ -180,7 +180,7 @@ interface ServerStatusData {
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 60, // 60 requests per 15 minutes per IP
-    message: { success: false, error: 'Too many requests, please try again later' },
+    message: { success: false, message: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -276,7 +276,7 @@ app.get('/api/status', async (req, res) => {
 app.get('/health', (req, res) => {
     const ip = req.ip;
     if (ip !== '::1' && ip !== '127.0.0.1') {
-        return res.status(403).json({ success: false, error: 'Forbidden' });
+        return res.status(403).json({ success: false, message: 'Forbidden' });
     }
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
