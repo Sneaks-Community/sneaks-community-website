@@ -28,7 +28,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 
 # Install only production dependencies
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
 
 # Copy the build output from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
