@@ -5,8 +5,21 @@ function escapeHTML(str) {
     return div.innerHTML;
 }
 
-const { animate, stagger, inView, scroll } = window.Motion;
+// Motion is a progressive enhancement loaded from /lib/motion.js. If it fails to load,
+// window.Motion is undefined — so read it defensively. Destructuring it directly would
+// throw here at module scope and take down every feature on the page (theme, menu, etc.).
+const Motion = window.Motion ?? {};
+const { animate, stagger, inView, scroll } = Motion;
+const motionReady = typeof animate === 'function';
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Treat a missing animation library like reduced-motion: reveal content statically, skip animation.
+const animationsOff = prefersReducedMotion || !motionReady;
+
+// Render Lucide icons only if the library loaded. A missing icon set must degrade to no
+// glyphs, never throw and abort the surrounding logic (e.g. the mobile menu toggle).
+function renderIcons() {
+    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+}
 
 // Animate a number from 0 up to its target (easeOutCubic) via rAF.
 function countUp(el, target, duration = 900) {
@@ -131,10 +144,10 @@ async function fetchServerStatus() {
                 }
             });
             
-            lucide.createIcons();
+            renderIcons();
             
             // Animate Server Cards in with stagger
-            if (!prefersReducedMotion) {
+            if (!animationsOff) {
                 animate(
                     ".server-card",
                     { opacity: [0, 1], y: [20, 0] },
@@ -179,7 +192,7 @@ function initMobileMenu() {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
             document.body.classList.add('overflow-hidden'); // Prevent scrolling
             mobileMenuBtn.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
-            lucide.createIcons();
+            renderIcons();
             
             // Animate links in
             if (window.Motion && window.Motion.animate && window.Motion.stagger && !prefersReducedMotion) {
@@ -193,7 +206,7 @@ function initMobileMenu() {
             mobileMenu.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden'); // Restore scrolling
             mobileMenuBtn.innerHTML = '<i data-lucide="menu" class="w-5 h-5"></i>';
-            lucide.createIcons();
+            renderIcons();
         }
     };
     
@@ -221,7 +234,7 @@ function initAnimations() {
     const heroWords = document.querySelectorAll("#hero-title .reveal-word");
     const heroRest = document.querySelectorAll("#hero-content > p, #hero-content > div");
     heroRest.forEach(el => el.classList.remove('opacity-0'));
-    if (!prefersReducedMotion) {
+    if (!animationsOff) {
         animate(heroWords,
             { y: ['110%', '0%'] },
             { duration: 0.9, delay: stagger(0.12), ease: [0.22, 1, 0.36, 1] }
@@ -247,7 +260,20 @@ function initAnimations() {
             scroll(animate(heroContent, { y: [0, 70], opacity: [1, 0] }, { ease: 'linear' }), scrollOpts);
         }
     }
-    
+
+    // The scroll-triggered reveals below are a progressive enhancement. Without Motion,
+    // reveal these sections immediately so none stay stuck at opacity-0, then bail out
+    // before dereferencing the undefined inView.
+    if (!motionReady) {
+        [
+            '#about-text', '#about-features > div', '#servers-header',
+            '#community-text', '#discord-widget',
+            '#community-rules-grid .rule-card', '#timer-rules-grid .rule-card',
+            '#resources-header', '#resources-grid > a',
+        ].forEach(sel => document.querySelectorAll(sel).forEach(el => el.classList.remove('opacity-0')));
+        return;
+    }
+
     // About Section
     inView("#about-text", (info) => {
         const el = info.target || info;

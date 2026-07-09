@@ -4,6 +4,12 @@
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Render Lucide icons only if the library loaded. A missing icon set must degrade to no
+// glyphs, never throw and abort the surrounding logic (e.g. the mobile menu toggle).
+function renderIcons() {
+    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+}
+
 // Theme Initialization and Logic
 function initTheme() {
     const htmlClassList = document.documentElement.classList;
@@ -63,7 +69,7 @@ function initMobileMenu() {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
             document.body.classList.add('overflow-hidden'); // Prevent scrolling
             mobileMenuBtn.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
-            lucide.createIcons();
+            renderIcons();
 
             // Animate links in
             if (window.Motion && window.Motion.animate && window.Motion.stagger && !prefersReducedMotion) {
@@ -77,7 +83,7 @@ function initMobileMenu() {
             mobileMenu.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden'); // Restore scrolling
             mobileMenuBtn.innerHTML = '<i data-lucide="menu" class="w-5 h-5"></i>';
-            lucide.createIcons();
+            renderIcons();
         }
     };
 
