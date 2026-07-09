@@ -1,6 +1,12 @@
 {
   "name": "sneaks-community-website",
   "version": "0.3.2",
+  "description": "A lightweight landing page for gaming communities.",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sneaks-Community/sneaks-community-website.git"
+  },
   "type": "module",
   "engines": {
     "node": ">=24.0.0"

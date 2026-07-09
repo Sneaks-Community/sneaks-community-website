@@ -1,6 +1,6 @@
 # Sneak's Community Website
 
-A lightweight static landing page with an Express backend designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord widget integration.
+A lightweight static landing page designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord widget integration.
 
 ## Features
 
