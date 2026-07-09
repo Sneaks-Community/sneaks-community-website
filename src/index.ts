@@ -145,7 +145,7 @@ app.use(pinoHttp({
 // This allows users to hot-load custom assets without rebuilding the Docker image
 const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
-    app.use(express.static(userAssetsPath));
+    app.use(express.static(userAssetsPath, { maxAge: '1h' }));
 }
 // Serve the config-branded index for the root and direct requests. Registered after the
 // user-assets mount (so a user-supplied index.html still wins) and before the public mount.
