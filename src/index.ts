@@ -179,7 +179,7 @@ interface ServerStatusData {
 // Global rate limiter for all /api/* endpoints
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 60, // 60 requests per 15 minutes per IP
+    max: 240, // 240 requests per 15 minutes per IP (headroom for client polling + shared/CGNAT IPs)
     message: { success: false, message: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
@@ -190,6 +190,7 @@ app.use('/api', apiLimiter);
 
 // API Route for config
 app.get('/api/config', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=300');
     res.json({
         steamLink: process.env.STEAM_LINK ?? "https://steamcommunity.com/groups/sneakscommunity",
         twitchLink: process.env.TWITCH_LINK ?? "https://twitch.tv/snksrv",
