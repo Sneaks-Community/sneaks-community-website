@@ -54,29 +54,6 @@ body {
     background: #2a5d79; /* brand-700 */
 }
 
-/* Hide empty server cards while loading */
-@media (prefers-reduced-motion: no-preference) {
-    [data-loading="true"] {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-}
-
-/* Respect prefers-reduced-motion for pulse animation */
-@media (prefers-reduced-motion: reduce) {
-    [data-loading="true"] {
-        animation: none;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: .5;
-    }
-}
-
 @keyframes ping-green {
     0% {
         box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
