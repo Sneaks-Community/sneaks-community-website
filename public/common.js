@@ -38,25 +38,11 @@ function initTheme() {
         localStorage.setItem('theme', newTheme);
         applyTheme(newTheme);
 
-        // Update Discord widget theme (no-op on pages without the widget)
-        if (window.__discordWidgetId) {
-            updateDiscordWidget(window.__discordWidgetId);
-        }
-
         // Button animation
         if (window.Motion && window.Motion.animate && !prefersReducedMotion) {
             window.Motion.animate(themeToggleBtn, { rotate: [0, 180] }, { duration: 0.3 });
         }
     });
-}
-
-// Update Discord widget iframe with current theme (no-op on pages without the iframe)
-function updateDiscordWidget(widgetId) {
-    const iframe = document.getElementById('discord-iframe');
-    if (iframe && widgetId) {
-        const isDark = document.documentElement.classList.contains('dark');
-        iframe.src = `https://discord.com/widget?id=${widgetId}&theme=${isDark ? 'dark' : 'light'}`;
-    }
 }
 
 // Mobile Menu Logic

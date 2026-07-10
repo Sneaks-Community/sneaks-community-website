@@ -1,11 +1,11 @@
 # Sneak's Community Website
 
-A lightweight static landing page designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord widget integration.
+A lightweight static landing page designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord community link.
 
 ## Features
 
 - **Server Status Dashboard:** Automatically pings a list of configurable servers via GameDig ([supported games](https://github.com/gamedig/node-gamedig/blob/master/GAMES_LIST.md)) to query live status, player counts, and maps.
-- **Configurable External Links:** Manage social media, community platforms, and Discord Widget ID through environment variables.
+- **Configurable External Links:** Manage social media, community platforms, and the Discord invite link through environment variables.
 - **Dark/Light Mode Theme:** Beautiful user interface featuring motion animations and a togglabe theme.
 - **Caching Mechanism:** Implements data caching to avoid spamming server queries.
 - **API First:** Exposes backend JSON endpoints for status queries or external configs.
@@ -23,12 +23,12 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 - `NODE_ENV`
 - `PORT`
 - `LOG_LEVEL`
-- `COMMUNITY_NAME` — community name shown in the page title, header, and footer (default: `Sneak's Community`)
-- `COMMUNITY_ESTABLISHED` — founding year shown in the title/meta tags (default: `2015`)
+- `COMMUNITY_NAME`
+- `COMMUNITY_ESTABLISHED`
 - `STEAM_LINK`
 - `TWITCH_LINK`
 - `GITHUB_LINK`
-- `DISCORD_WIDGET_ID`
+- `DISCORD_LINK`
 - `ALLOWED_ORIGINS`
 
 ### Server Configuration

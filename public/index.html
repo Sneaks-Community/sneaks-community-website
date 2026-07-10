@@ -107,7 +107,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-menu"/></svg>
                     </button>
                     <!-- CTA -->
-                    <a href="#community" class="hidden sm:flex items-center px-6 py-2 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all text-sm gap-2">
+                    <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center px-6 py-2 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all text-sm gap-2">
                         <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
                     </a>
                 </div>
@@ -124,7 +124,7 @@
             <a href="#community" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Community</a>
             <a href="#resources" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Resources</a>
             <a href="#rules" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Rules</a>
-            <a href="#community" class="mobile-link mt-4 px-8 py-3 bg-brand-500 text-white rounded-lg btn-glow flex items-center gap-2">
+            <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="mobile-link mt-4 px-8 py-3 bg-brand-500 text-white rounded-lg btn-glow flex items-center gap-2">
                 <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
             </a>
         </div>
@@ -152,7 +152,7 @@
                 <a href="#servers" class="px-8 py-3 bg-slate-200 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-900 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> VIEW SERVERS
                 </a>
-                <a href="#community" class="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all flex items-center justify-center gap-2">
+                <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all flex items-center justify-center gap-2">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
                 </a>
             </div>
@@ -340,8 +340,19 @@
                     </div>
                 </div>
                 
-                <div id="discord-widget" class="flex justify-center lg:justify-end">
-                    <iframe id="discord-iframe" src="" width="350" height="500" title="Discord Server Widget" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" class="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40"></iframe>
+                <div id="discord-widget" class="flex justify-center lg:justify-end opacity-0">
+                    <div class="w-full max-w-[350px] flex flex-col items-center text-center gap-6 p-10 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40">
+                        <div class="w-16 h-16 rounded-2xl bg-brand-500/10 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 icon-discord"><title>Discord</title><use href="#icon-discord"/></svg>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white tracking-tight">JOIN THE CONVERSATION</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Hundreds of members online. Find a squad, hang out, and jump into the action on our Discord.</p>
+                        </div>
+                        <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

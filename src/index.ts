@@ -61,6 +61,9 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
 // environment variables (with fallbacks) like the social links below.
 const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
 const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
+// Discord invite URL used by the "JOIN DISCORD" CTAs and the community Join card.
+// Set DISCORD_LINK to your server's invite (e.g. https://discord.gg/yourinvite).
+const discordLink = (process.env.DISCORD_LINK ?? '').trim() || "https://discord.gg/snksrv";
 
 // Validate each server entry has required fields
 for (const server of config.servers) {
@@ -83,7 +86,8 @@ const escapeHtml = (value: string): string =>
 const renderBranding = (html: string): string =>
     html
         .replaceAll('{{communityName}}', escapeHtml(communityName))
-        .replaceAll('{{established}}', String(communityEstablished));
+        .replaceAll('{{established}}', String(communityEstablished))
+        .replaceAll('{{discordLink}}', escapeHtml(discordLink));
 
 const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
 const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
@@ -108,7 +112,8 @@ app.use(helmet({
             styleSrc: ["'self'"],
             fontSrc: ["'self'"],
             imgSrc: ["'self'"],
-            frameSrc: ["https://discord.com"],
+            frameSrc: ["'none'"],
+            frameAncestors: ["'none'"],
             connectSrc: ["'self'"],
             baseUri: ["'self'"],
             formAction: ["'self'"],
@@ -195,7 +200,7 @@ app.get('/api/config', (req, res) => {
         steamLink: process.env.STEAM_LINK ?? "https://steamcommunity.com/groups/sneakscommunity",
         twitchLink: process.env.TWITCH_LINK ?? "https://twitch.tv/snksrv",
         githubLink: process.env.GITHUB_LINK ?? "https://github.com/Sneaks-Community",
-        discordWidgetId: process.env.DISCORD_WIDGET_ID ?? "",
+        discordLink,
     });
 });
 

@@ -293,12 +293,6 @@ async function fetchConfig() {
         setLink('link-steam-footer', config.steamLink);
         setLink('link-twitch-footer', config.twitchLink);
         setLink('link-github-footer', config.githubLink);
-
-        const iframe = document.getElementById('discord-iframe');
-        if (iframe && config.discordWidgetId) {
-            window.__discordWidgetId = config.discordWidgetId;
-            updateDiscordWidget(config.discordWidgetId);
-        }
     } catch (e) {
         console.error('Error fetching config:', e);
     }
