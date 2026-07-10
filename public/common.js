@@ -4,12 +4,6 @@
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Render Lucide icons only if the library loaded. A missing icon set must degrade to no
-// glyphs, never throw and abort the surrounding logic (e.g. the mobile menu toggle).
-function renderIcons() {
-    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
-}
-
 // Theme Initialization and Logic
 function initTheme() {
     const htmlClassList = document.documentElement.classList;
@@ -82,8 +76,7 @@ function initMobileMenu() {
         if (isMenuOpen) {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
             document.body.classList.add('overflow-hidden'); // Prevent scrolling
-            mobileMenuBtn.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
-            renderIcons();
+            mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-x"/></svg>';
 
             // Animate links in
             if (window.Motion && window.Motion.animate && window.Motion.stagger && !prefersReducedMotion) {
@@ -96,8 +89,7 @@ function initMobileMenu() {
         } else {
             mobileMenu.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden'); // Restore scrolling
-            mobileMenuBtn.innerHTML = '<i data-lucide="menu" class="w-5 h-5"></i>';
-            renderIcons();
+            mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-menu"/></svg>';
         }
     };
 
@@ -154,6 +146,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Set current year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
-
-// Initialize Lucide icons
-renderIcons();

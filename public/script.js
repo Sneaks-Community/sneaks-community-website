@@ -96,8 +96,6 @@ async function fetchServerStatus() {
                 }
             });
 
-            renderIcons();
-
             // Animate Server Cards in with stagger
             if (!animationsOff) {
                 animate(
