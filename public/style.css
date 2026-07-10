@@ -1,26 +1,22 @@
-/* style.css */
-/* Tailwind V4 via CDN handles most utility generation.
-   We only add any required custom global styling here. */
-
 /* ------------------------------------------------------------------ */
 /* Self-hosted fonts (variable woff2, served same-origin).             */
 /* Copied from node_modules by `npm run build:lib` — zero external      */
-/* font requests. Geist = display/headings, Inter = body.              */
+/* font requests. Space Grotesk = display/headings, Manrope = body.    */
 /* ------------------------------------------------------------------ */
 @font-face {
-    font-family: "Inter";
+    font-family: "Manrope";
     font-style: normal;
-    font-weight: 100 900;
+    font-weight: 200 800;
     font-display: swap;
-    src: url("/fonts/inter.woff2") format("woff2");
+    src: url("/fonts/manrope.woff2") format("woff2");
 }
 
 @font-face {
-    font-family: "Geist";
+    font-family: "Space Grotesk";
     font-style: normal;
-    font-weight: 100 900;
+    font-weight: 300 700;
     font-display: swap;
-    src: url("/fonts/geist.woff2") format("woff2");
+    src: url("/fonts/space-grotesk.woff2") format("woff2");
 }
 
 html {
@@ -317,13 +313,22 @@ nav.nav-scrolled {
     display: inline-block;
     overflow: hidden;
     vertical-align: top;
-    padding-bottom: 0.12em; /* room for descenders inside the clip */
+    /* Room for descenders inside the overflow clip. The negative margin cancels
+       the added box height so the tight hero line-spacing is unchanged. */
+    padding-bottom: 0.35em;
+    margin-bottom: -0.23em;
 }
 
 .reveal-word {
     display: inline-block;
     transform: translateY(110%); /* hidden below the clip; JS animates to 0 */
     will-change: transform;
+    /* The gradient words use `bg-clip-text`, which only paints the gradient
+       inside this box; with the tight leading, Space Grotesk descenders
+       ('y'/'g'/'p'/'j'/'q' reach 0.2em below the baseline) fall outside it and
+       disappear. Extend the paint box downward and cancel it in layout. */
+    padding-bottom: 0.3em;
+    margin-bottom: -0.3em;
 }
 
 /* No-JS / reduced-motion users must still see the headline. */

@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "tsx --env-file=.env src/index.ts",
     "build": "npm run build:lib && npm run build:css && npm run build:js",
-    "build:lib": "mkdir -p public/lib public/fonts && cp node_modules/motion/dist/motion.js public/lib/motion.js && cp node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2 public/fonts/geist.woff2 && cp node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2 public/fonts/inter.woff2",
+    "build:lib": "mkdir -p public/lib public/fonts && cp node_modules/motion/dist/motion.js public/lib/motion.js && cp node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2 public/fonts/space-grotesk.woff2 && cp node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2 public/fonts/manrope.woff2",
     "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
     "build:js": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --minify --outdir=dist",
     "start": "node --env-file=.env dist/index.js",
@@ -34,8 +34,8 @@
     "pino-http": "^11.0.0"
   },
   "devDependencies": {
-    "@fontsource-variable/geist": "^5.2.9",
-    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/manrope": "^5.2.8",
+    "@fontsource-variable/space-grotesk": "^5.2.10",
     "@tailwindcss/cli": "^4.3.2",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
