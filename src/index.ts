@@ -229,13 +229,16 @@ if (fs.existsSync(userAssetsPath)) {
 // Serve the config-branded index for the root and direct requests. Registered after the
 // user-assets mount (so a user-supplied index.html still wins) and before the public mount.
 app.get(['/', '/index.html'], (req, res) => {
+    res.set('Cache-Control', 'public, max-age=300');
     res.type('html').send(renderedIndexHtml);
 });
 // Serve the site-URL-branded robots.txt / sitemap.xml before the static mount so they win.
 app.get('/robots.txt', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=86400');
     res.type('text/plain').send(renderedRobotsTxt);
 });
 app.get('/sitemap.xml', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=86400');
     res.type('application/xml').send(renderedSitemapXml);
 });
 app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1d' }));
