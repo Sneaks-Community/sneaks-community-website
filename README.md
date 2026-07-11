@@ -1,11 +1,11 @@
 # Sneak's Community Website
 
-A lightweight static landing page with an Express backend designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord widget integration.
+A lightweight static landing page designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord community link.
 
 ## Features
 
 - **Server Status Dashboard:** Automatically pings a list of configurable servers via GameDig ([supported games](https://github.com/gamedig/node-gamedig/blob/master/GAMES_LIST.md)) to query live status, player counts, and maps.
-- **Configurable External Links:** Manage social media, community platforms, and Discord Widget ID through environment variables.
+- **Configurable External Links:** Manage social media, community platforms, and the Discord invite link through environment variables.
 - **Dark/Light Mode Theme:** Beautiful user interface featuring motion animations and a togglabe theme.
 - **Caching Mechanism:** Implements data caching to avoid spamming server queries.
 - **API First:** Exposes backend JSON endpoints for status queries or external configs.
@@ -20,16 +20,30 @@ A lightweight static landing page with an Express backend designed for [Sneak's 
 
 Configure your environment by setting properties in your `.env` file (see `.env.example`).
 
-- `NODE_ENV`
-- `PORT`
-- `LOG_LEVEL`
-- `COMMUNITY_NAME` — community name shown in the page title, header, and footer (default: `Sneak's Community`)
-- `COMMUNITY_ESTABLISHED` — founding year shown in the title/meta tags (default: `2015`)
-- `STEAM_LINK`
-- `TWITCH_LINK`
-- `GITHUB_LINK`
-- `DISCORD_WIDGET_ID`
-- `ALLOWED_ORIGINS`
+> [!NOTE]
+> These values are read **at container start** and injected into the page templates — so on a
+> precompiled Docker image you only need to change the env and restart (`docker compose up -d`),
+> **no rebuild required**. Every variable falls back to a sensible default when unset.
+
+| Variable | Purpose |
+| --- | --- |
+| `NODE_ENV` | Node environment (`production` / `development`) |
+| `PORT` | Port to listen on (default `3000`) |
+| `LOG_LEVEL` | Pino log level |
+| `COMMUNITY_NAME` | Community name used in the title, headings and footer |
+| `COMMUNITY_ESTABLISHED` | Founding year shown in the title/OG tags |
+| `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` |
+| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) |
+| `META_KEYWORDS` | SEO meta keywords |
+| `HERO_TAGLINE` | Hero subtitle line |
+| `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs |
+| `STEAM_LINK` | Steam group/community link |
+| `TWITCH_LINK` | Twitch channel link |
+| `GITHUB_LINK` | GitHub organization/repo link |
+| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs |
+| `STATS_LINK` | "Player Statistics" resource card destination |
+| `BANS_LINK` | "Ban List" resource card destination |
+| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list |
 
 ### Server Configuration
 

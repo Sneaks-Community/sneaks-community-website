@@ -90,8 +90,10 @@ export default tseslint.config(
       globals: {
         ...globals.browser,
         ...globals.es2023,
-        lucide: "readonly",
         Motion: "readonly",
+        // Shared helpers defined in common.js and consumed by the page scripts.
+        prefersReducedMotion: "readonly",
+        updateDiscordWidget: "readonly",
       },
     },
     rules: {

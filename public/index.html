@@ -8,17 +8,17 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>{{communityName}} | Since {{established}}</title>
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.">
-    <meta name="keywords" content="sneak community, gaming, cs2, csgo, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community">
+    <meta name="description" content="{{metaDescription}}">
+    <meta name="keywords" content="{{metaKeywords}}">
     <meta name="author" content="{{communityName}}">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://snksrv.com/">
+    <link rel="canonical" href="{{siteUrl}}/">
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://snksrv.com/">
+    <meta property="og:url" content="{{siteUrl}}/">
     <meta property="og:title" content="{{communityName}} | Gaming Community Since {{established}}">
-    <meta property="og:description" content="An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more.">
-    <meta property="og:image" content="/og-image.png">
+    <meta property="og:description" content="{{metaDescription}}">
+    <meta property="og:image" content="{{siteUrl}}/og-image.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -26,21 +26,20 @@
     <meta property="og:site_name" content="{{communityName}}">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://snksrv.com/">
+    <meta name="twitter:url" content="{{siteUrl}}/">
     <meta name="twitter:title" content="{{communityName}} | Gaming Community Since {{established}}">
-    <meta name="twitter:description" content="An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more.">
-    <meta name="twitter:image" content="/og-image.png">
+    <meta name="twitter:description" content="{{metaDescription}}">
+    <meta name="twitter:image" content="{{siteUrl}}/og-image.png">
     <meta name="twitter:image:width" content="1200">
     <meta name="twitter:image:height" content="630">
+    <script type="application/ld+json">{{structuredData}}</script>
     <!-- Self-hosted fonts: preload for performance (@font-face lives in /style.css) -->
-    <link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Tailwind CSS (compiled) -->
     <link rel="stylesheet" href="/tailwind.css">
     <!-- Motion.dev (self-hosted) -->
-    <script src="/lib/motion.js"></script>
-    <!-- Icons (Lucide - self-hosted) -->
-    <script src="/lib/lucide.js"></script>
+    <script src="/lib/motion.js" defer></script>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -52,6 +51,25 @@
         <symbol id="icon-steam" viewBox="0 0 24 24"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></symbol>
         <symbol id="icon-twitch" viewBox="0 0 24 24"><path fill="currentColor" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></symbol>
         <symbol id="icon-github" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></symbol>
+        <!-- UI icon sprite (extracted from Lucide v1.23.0, ISC): each icon defined once, referenced via <use> below -->
+        <symbol id="icon-crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></symbol>
+        <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol>
+        <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+        <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+        <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol>
+        <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+        <symbol id="icon-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+        <symbol id="icon-waves" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12q2.5 2 5 0t5 0 5 0 5 0"/><path d="M2 19q2.5 2 5 0t5 0 5 0 5 0"/><path d="M2 5q2.5 2 5 0t5 0 5 0 5 0"/></symbol>
+        <symbol id="icon-unlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></symbol>
+        <symbol id="icon-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></symbol>
+        <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+        <symbol id="icon-shield-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+        <symbol id="icon-globe-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/><path d="M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17"/><path d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"/><circle cx="12" cy="12" r="10"/></symbol>
+        <symbol id="icon-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/></symbol>
+        <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+        <symbol id="icon-bar-chart-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6"/><path d="M12 21V3"/><path d="M19 21V9"/></symbol>
+        <!-- KZ Climb: custom filled silhouette (not from Lucide); inherits color via currentColor -->
+        <symbol id="icon-kz-climb" viewBox="8.2 10.8 89 89"><path fill="currentColor" transform="matrix(.5156245 0 0 .51562447 -19.5 -22.8)" d="m93.6 220.2-1.3-1.4-.7-1.4-1-2.4-.4-1 .3-.1.2-.2v-.7q-.1-1.5-1-2.6l-1.2-.2-.5-1.8-.9-2-.5-1.7s-.2-.8-.1-1.2q0-.8.6-1.4l.7-.2.6-.2 1.4-1.1h.8l1.7-1 .7.4h1.8l.7-.7 1-1q-.3-2.3 0-4.4l.3-.4 2.8-2 .4-2 .3-2 1.4-2.2 1.4-2.2 2-2 2.1-2.2 1.6-.7 1.5-.8V176c0-.7-.1-2-.3-2.8l-.4-2c0-.5.3-.5.2-.8-.4-.9-.4-2.8-.5-3.8l-.1-1.8.4-.6c.3-.2.7-.9.8-1.3l.3-.9-.2-.8-.4-2v-2.8c-.1-1.4-.6-2.6-.6-3.3s.5-3.4.6-6l.1-4.7-.6-1-.6-1v-1.7c-1.8-.3-2.7-.2-3.3-.8q-.6-.6-.7-1.3V135c0-.8 0-1.8-.2-2.2l-.1-.6-1.1.1-1.1.1-.8-.3-2.2-1.6-1.4-1.2.1-.5.2-.4-1.4-.7-1.5-.7h-1.8l-.4-1c-.3-.6-.5-1.7-.6-2.5l-.2-1.5.4-.3q.5-.3.5-.7t1.2-1.4l1.2-1.2 1.7.1 1.7.2.1-1.2q.1-1.2.4-2.2l.4-2.4v-1.4l1.3-2.8 1.3-2.8.2-2.7.3-2.8.4-.6.3-.6v-1.5l.4-.4.4-.3 2 .2c1.2 0 2.8.3 3.7.5l1.6.4h4.5l1 .8a4 4 0 0 0 1.6.8h.5l.1-.4.2-.4-.4-.3c-.6-.3-1.3-1.6-1.3-2.2l.4-1.2 1-2 .7-1.2v-2.1l.6-.9 1.6-1.6 4.2-3.7 3-3 1.2-.2q1.1-.1 1.5-.4l1.5-.4 1.1-.1 1.8.6 1.8.6 2 1.5c2.1 1.5 4.9 4.2 5.8 5.6q.5.8 0 1.8-.3.8-1 1.3l-.7.3-1 1c-.2 0-.1.5-.2.6l-.6.4-.5.1c-.4.2-.5.8-.8.8h-.6l.2.8v1h.3q.3 0 .3 1c0 .2-.4 1-.8 1.4q-1 1-1.9 2.2v.7q-.2.4-.8.8l-.6.5.4.7a51 51 0 0 0 4.3 4.9l4 4 1.2.2h1.2l1.1-.4c1.9-.7 2.7-.8 4-1l1.8-.8c1.1-.6 2-.4 2-.4 1.1-.6 1.7-.8 2.8-.7h1.8l.5-1.2h-1.2v-.8l.8-.1.8-.2 1-1.4h.5v.4l12 1q0-.2.6-.4h.7v.7l1 .1.1-.7 14.4 1.1.2.3v.9l-.2 2-.3.2-14.4-1.1.1-.8h-.6v1.6l-5-.4-1.1 2.2q-.1.4-.4.3l-2.8-.5-1.6-.2v.3l1.5.9 1.4.6.2.6.2.6-.4.4-.3.3-.2-.1-.3-.2-.5.5q-.5.5-.5 1v.4l-1.1.9-2 1.5-1 .6-.8-.2q-.8-.1-1.7-.8l-1.5-.7-.6-.2-.5.1-.5.2-.2.7q0 .7-.3 1.3c-.6.8-1 .7-2 .6l-1.6-.3-1.1.8-1.1.8-1.8.5-1.8.6-3 .1c-1.5 0-3 .2-3 .3l-2.2-.2-1.8-.4v.7c0 .7.5 2.6 1.2 4.2l.3.9v3.5l-.4.6v1.6l-.3.4 1.4.3c1.3.3 1.3.3 1 .8l-.4.4h8l2.2 1.5 4.5 3.4 1 .7h1.3l1.4 1c.6.4.8 1.3 1.2 1.7l.5.7.4-.1.4-.2 1.2 1.8 1.3 1.8.4 1.4.4 1.3-.2 1.8-.1 1.9-.7 1.7q-.7 1.7-1 1.8l-.2.5q0 .4-.3.8a21 21 0 0 0-2.3 5.5l-.4.8-1.2 2-1 1.2v1.4l-.1 1.5-.3.8a6 6 0 0 1-2.1 3l-.9.5-.5 2.4-.4 2.5.2 1.5.3 1.5.9 1.2.9 1.2s3.8 1.3 5.2 2.7q.3.6.2.7c0 .2.7.4.7 1l-.1 1.3s-.2 1.6-5 1.8q-3.2 0-7-2l.1-1-2.5-1.1-1.7.6-1.6-.7a19 19 0 0 1-4.7-2.4l-.4-.5.6-1.6c.3-.9.1-1.3.3-1.7.1-.2.3 0 .5-.3q.2-1.7 1.5-2.9l1-1.2v-2.7l.6-1.1.5-1.1-.6-.5-.6-.4.2-1.8.1-1.9.4-.6.4-.7.2-3 .2-3 .5-2a24 24 0 0 1 3-6.6l.5-.7-4.3-.3-4.7-.3.4 1.2c.3.9.5 2.3 0 3-1.1-.4-2-1.8-2.5-2.9l-.5-.8h-1q-1 0-1.6.2l-.4.2-2 2.7-4 6-1.4 1.5s.5.2.5.5l-.8 2.2-.5 1.6-.3 3.3c-.2 1.8-.4 3.5-.6 3.8l-.2.5.5.1.6.2-.2.7-.4 1.8-.3 1.1.3.4.3.4-.1 1.1c-.3 1.7-1 3.7-1.6 4.7-1.4 2.1-4 4.1-6.6 5l-2.3 1.1-1.6 1.1-.7.5-.3 1.2-.4 1.2-.8 1.1-1.6 2.3-.7 1h-1v.5q-.1.6-.5 1.1l-.5.7-.9-.3-.9-.3-.3.4-4.6 6q-1 1-1.1 1.7l-.2.6.4 1.6c.2 1 .8 2.6 1 3.8q.7 2.9-.4 4v.6l-.7.6-.7.5c-2.2.2-3.8-1.4-5.2-2.8m77-108.2q-1 0-1-1v-1q-1.2 0-1.3.2l-.1.4h.5q.5 0 .3.6l-.2.7 2.4.5c.2 0 1.2-2.2 1.2-2.2l-2-.2s-.5.2-.5.9q0 1 .6 1"/></symbol>
     </svg>
 
     <!-- Navigation -->
@@ -59,12 +77,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
             <div class="flex items-center justify-between h-full">
                 <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center space-x-3 cursor-pointer select-none">
+                <a href="#home" class="flex-shrink-0 flex items-center space-x-3 cursor-pointer select-none">
                     <div id="logoContainer" class="flex-shrink-0 logo-container-default bg-brand-500 rounded-lg flex items-center justify-center font-black text-white overflow-hidden">
-                        <i id="crosshairIcon" data-lucide="crosshair" class="w-5 h-5"></i>
+                        <svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-crosshair"/></svg>
                     </div>
                     <span class="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block uppercase">{{communityName}}</span>
-                </div>
+                </a>
                 
                 <!-- Links -->
                 <div class="hidden md:block select-none">
@@ -82,15 +100,15 @@
                 <div class="flex items-center space-x-4 border-l border-black/10 dark:border-white/10 pl-4 sm:pl-8">
                     <!-- Theme Toggle -->
                     <button id="themeToggle" aria-label="Toggle Theme" class="p-2 rounded-full bg-slate-200/50 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-white transition-colors focus:outline-none" title="Toggle Theme">
-                        <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
-                        <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 hidden dark:block"><use href="#icon-moon"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 block dark:hidden"><use href="#icon-sun"/></svg>
                     </button>
                     <!-- Mobile Menu Toggle -->
                     <button id="mobileMenuBtn" aria-label="Toggle Mobile Menu" class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-800 dark:text-white transition-colors focus:outline-none">
-                        <i data-lucide="menu" class="w-5 h-5"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-menu"/></svg>
                     </button>
                     <!-- CTA -->
-                    <a href="#community" class="hidden sm:flex items-center px-6 py-2 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all text-sm gap-2">
+                    <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center px-6 py-2 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all text-sm gap-2">
                         <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
                     </a>
                 </div>
@@ -107,12 +125,13 @@
             <a href="#community" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Community</a>
             <a href="#resources" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Resources</a>
             <a href="#rules" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Rules</a>
-            <a href="#community" class="mobile-link mt-4 px-8 py-3 bg-brand-500 text-white rounded-lg btn-glow flex items-center gap-2">
+            <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="mobile-link mt-4 px-8 py-3 bg-brand-500 text-white rounded-lg btn-glow flex items-center gap-2">
                 <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
             </a>
         </div>
     </div>
 
+    <main>
     <!-- Hero Section -->
     <header id="home" class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden flex flex-col justify-center min-h-[75vh]">
         <!-- Layered background: structural grid + brand mesh glow + film grain -->
@@ -129,13 +148,13 @@
                 <span class="reveal-line"><span class="reveal-word text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-brand-300 dark:from-brand-400 dark:to-brand-200">{{communityName}}</span></span>
             </h1>
             <p class="mt-4 max-w-lg text-lg text-slate-600 dark:text-slate-400 mx-auto mb-10 leading-relaxed opacity-0">
-                An open and fun gaming community for all. No application. No membership. Just fun and friends.
+                {{heroTagline}}
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 opacity-0">
                 <a href="#servers" class="px-8 py-3 bg-slate-200 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-900 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> VIEW SERVERS
                 </a>
-                <a href="#community" class="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all flex items-center justify-center gap-2">
+                <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all flex items-center justify-center gap-2">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
                 </a>
             </div>
@@ -152,30 +171,30 @@
                         <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">OVER A DECADE OF GAMING.</h3>
                     </div>
                     <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Founded in 2015, Sneak's Community started as a single CS:GO Minigames server. Over the years, our community evolved and has grown through many games, and we found our true home hosting Counter-Strike: Global Offensive servers, while providing a welcoming environment for all games.
+                        {{aboutParagraph1}}
                     </p>
                     <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.
+                        {{aboutParagraph2}}
                     </p>
                 </div>
                 <div id="about-features" class="grid sm:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover opacity-0">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
-                            <i data-lucide="unlock" class="text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-unlock"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Zero Friction</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">No applications or vetting processes. Jump directly into the action.</p>
                     </div>
                     <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover opacity-0">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
-                            <i data-lucide="clock" class="text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-clock"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Longevity</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">Over 10 years of continuous operation, we are dedicated to gaming.</p>
                     </div>
                     <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm sm:col-span-2 transition-all card-hover opacity-0">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
-                            <i data-lucide="globe-2" class="text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-globe-2"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Global Reach</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">Servers in the US with an international community, serving nearly 2 million unique players from over 200 countries and territories.</p>
@@ -210,35 +229,35 @@
                 <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-8 text-center" id="modes-grid">
                     <div class="space-y-1">
                         <div class="flex justify-center mb-2">
-                            <i data-lucide="waves" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-waves"/></svg>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">Surf</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Surf triangles on over 1000 maps. Tiers 1-6.</p>
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-center mb-2">
-                            <i data-lucide="mountain" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="8.2 10.8 89 89" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-kz-climb"/></svg>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">KZ Climb</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Scale towering structures and master technical movement.</p>
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-center mb-2">
-                            <i data-lucide="arrow-up" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-arrow-up"/></svg>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">Bhop</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Hop, skip and jump your way through maps.</p>
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-center mb-2">
-                            <i data-lucide="crosshair" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-crosshair"/></svg>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">1v1 Arenas</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Face off in competitive 1v1 skill match-ups.</p>
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-center mb-2">
-                            <i data-lucide="crosshair" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-crosshair"/></svg>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">Retakes</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Compete in a fast-paced 5v5 site retake scenario!</p>
@@ -263,28 +282,28 @@
 
             <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" id="resources-grid">
                 <!-- Stats Card -->
-                <a href="https://stats.snksrv.com" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-stats-card">
+                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-stats-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
-                        <i data-lucide="bar-chart-2" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-bar-chart-2"/></svg>
                     </div>
                     <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Player Statistics</h4>
                     <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View detailed player statistics across all servers. Track your performance, compare with others, and see your progress over time.</p>
                     <div class="mt-6 flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold text-sm group-hover:gap-3 transition-all">
                         View Stats
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4"><use href="#icon-arrow-right"/></svg>
                     </div>
                 </a>
 
                 <!-- Bans Card -->
-                <a href="https://bans.snksrv.com" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-bans-card">
+                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-bans-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
-                        <i data-lucide="shield-alert" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-shield-alert"/></svg>
                     </div>
                     <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Ban List</h4>
                     <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View the comprehensive ban list. Administrators can also manage bans and enforcement actions from this dashboard.</p>
                     <div class="mt-6 flex items-center gap-2 text-brand-700 dark:text-brand-300 font-bold text-sm group-hover:gap-3 transition-all">
                         View Bans
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4"><use href="#icon-arrow-right"/></svg>
                     </div>
                 </a>
             </div>
@@ -308,23 +327,34 @@
                         Our Discord is our primary hub. With hundreds of members online at any given time, it's the best place to find a squad, hang out, and be a part of the community.
                     </p>
                     <div class="grid grid-cols-2 gap-4 pt-4">
-                        <a id="link-steam-community" href="https://steamcommunity.com/groups/sneaks" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-steam-community" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 transition-all group shadow-sm dark:shadow-none">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"><title>Steam</title><use href="#icon-steam"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">Steam Group</span>
                         </a>
-                        <a id="link-twitch-community" href="https://twitch.tv/snksrv" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-[#9146FF] transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-twitch-community" href="{{twitchLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-[#9146FF] transition-all group shadow-sm dark:shadow-none">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-twitch"><title>Twitch</title><use href="#icon-twitch"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">Twitch</span>
                         </a>
-                        <a id="link-github-community" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-slate-800 dark:hover:border-white transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-github-community" href="{{githubLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-slate-800 dark:hover:border-white transition-all group shadow-sm dark:shadow-none">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"><title>GitHub</title><use href="#icon-github"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">GitHub</span>
                         </a>
                     </div>
                 </div>
                 
-                <div id="discord-widget" class="flex justify-center lg:justify-end">
-                    <iframe id="discord-iframe" src="" width="350" height="500" title="Discord Server Widget" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" class="rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40"></iframe>
+                <div id="discord-widget" class="flex justify-center lg:justify-end opacity-0">
+                    <div class="w-full max-w-[350px] flex flex-col items-center text-center gap-6 p-10 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40">
+                        <div class="w-16 h-16 rounded-2xl bg-brand-500/10 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 icon-discord"><title>Discord</title><use href="#icon-discord"/></svg>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white tracking-tight">JOIN THE CONVERSATION</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">Hundreds of members online. Find a squad, hang out, and jump into the action on our Discord.</p>
+                        </div>
+                        <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-500 hover:bg-brand-400 text-white font-bold rounded-lg btn-glow transition-all">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -336,7 +366,7 @@
             <div class="text-center max-w-3xl mx-auto mb-12">
                 <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">COMMUNITY RULES</h2>
                 <p class="text-base text-slate-600 dark:text-slate-400">
-                    Sneak's Community is built on mutual respect. We strive to maintain a safe and enjoyable environment for everyone.
+                    {{communityName}} is built on mutual respect. We strive to maintain a safe and enjoyable environment for everyone.
                 </p>
             </div>
             
@@ -344,7 +374,7 @@
                 <!-- Community Rules -->
                 <div>
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <i data-lucide="shield" class="w-4 h-4 text-brand-600 dark:text-brand-400"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-brand-600 dark:text-brand-400"><use href="#icon-shield"/></svg>
                         Community Rules
                     </h3>
                     <div class="grid grid-cols-2 gap-2 overflow-visible" id="community-rules-grid">
@@ -403,7 +433,7 @@
                 <!-- Timer Rules -->
                 <div>
                     <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                        <i data-lucide="timer" class="w-4 h-4 text-brand-700 dark:text-brand-300"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-brand-700 dark:text-brand-300"><use href="#icon-timer"/></svg>
                         Timer Rules
                     </h3>
                     <div class="grid grid-cols-2 gap-2" id="timer-rules-grid">
@@ -434,24 +464,25 @@
             
             <div class="mt-10 text-center">
                 <div class="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 text-xs bg-white dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/10">
-                    <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3.5 h-3.5"><use href="#icon-flag"/></svg>
                     <span>See something wrong? File a report on Discord.</span>
                 </div>
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer class="h-16 border-t border-black/5 dark:border-white/5 bg-slate-100 dark:bg-black/40 flex items-center justify-between px-8 z-20 transition-colors duration-300">
         <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8">
             <div class="flex gap-4 footer-icons-container">
-                <a id="link-steam-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
+                <a id="link-steam-footer" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>Steam</title><use href="#icon-steam"/></svg>
                 </a>
-                <a id="link-twitch-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="twitch">
+                <a id="link-twitch-footer" href="{{twitchLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="twitch">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10 icon-twitch"><title>Twitch</title><use href="#icon-twitch"/></svg>
                 </a>
-                <a id="link-github-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="github">
+                <a id="link-github-footer" href="{{githubLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="github">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>GitHub</title><use href="#icon-github"/></svg>
                 </a>
             </div>
@@ -459,7 +490,8 @@
         </div>
     </footer>
 
-    <!-- Init script -->
-    <script src="/script.js"></script>
+    <!-- Init scripts -->
+    <script src="/common.js" defer></script>
+    <script src="/script.js" defer></script>
 </body>
 </html>

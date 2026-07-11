@@ -15,8 +15,6 @@ COPY public/ ./public/
 COPY config/ ./config/
 COPY user-assets/ ./user-assets/
 COPY tsconfig.json .
-COPY eslint.config.mjs .
-COPY .nvmrc .
 
 # Build the project (esbuild bundles the TypeScript server)
 RUN npm run build
@@ -30,7 +28,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 
 # Install only production dependencies
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
 
 # Copy the build output from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist

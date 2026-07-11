@@ -1,3 +1,7 @@
+// Homepage-specific logic: server status grid, scroll animations, config link set,
+// scroll spy. Shared logic (theme, mobile menu, custom logo, icons) lives in common.js,
+// which loads before this file.
+
 // Client-side HTML escape function (replaces server-side escape-html package)
 function escapeHTML(str) {
     const div = document.createElement('div');
@@ -5,8 +9,15 @@ function escapeHTML(str) {
     return div.innerHTML;
 }
 
-const { animate, stagger, inView, scroll } = window.Motion;
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Motion is a progressive enhancement loaded from /lib/motion.js. If it fails to load,
+// window.Motion is undefined — so read it defensively. Destructuring it directly would
+// throw here at module scope and take down every feature on the page (theme, menu, etc.).
+const Motion = window.Motion ?? {};
+const { animate, stagger, inView, scroll } = Motion;
+const motionReady = typeof animate === 'function';
+// prefersReducedMotion is declared in common.js (loaded first). Treat a missing animation
+// library like reduced-motion: reveal content statically, skip animation.
+const animationsOff = prefersReducedMotion || !motionReady;
 
 // Animate a number from 0 up to its target (easeOutCubic) via rAF.
 function countUp(el, target, duration = 900) {
@@ -22,62 +33,16 @@ function countUp(el, target, duration = 900) {
     requestAnimationFrame(step);
 }
 
-// Theme Initialization and Logic
-function initTheme() {
-    const htmlClassList = document.documentElement.classList;
-    const themeToggleBtn = document.getElementById('themeToggle');
-    
-    const getSystemTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    
-    const applyTheme = (theme) => {
-        if (theme === 'dark') {
-            htmlClassList.add('dark');
-        } else {
-            htmlClassList.remove('dark');
-        }
-    };
-
-    // Initialize based on saved preference or system default
-    const storedTheme = localStorage.getItem('theme');
-    applyTheme(storedTheme || getSystemTheme());
-
-    // Listen to system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-            applyTheme(e.matches ? 'dark' : 'light');
-        }
-    });
-
-    // Toggle button event overrides system preference
-    themeToggleBtn.addEventListener('click', () => {
-        const isDark = htmlClassList.contains('dark');
-        const newTheme = isDark ? 'light' : 'dark';
-        
-        localStorage.setItem('theme', newTheme);
-        applyTheme(newTheme);
-        
-        // Update Discord widget theme
-        if (window.__discordWidgetId) {
-            updateDiscordWidget(window.__discordWidgetId);
-        }
-        
-        // Button animation
-        if (window.Motion && window.Motion.animate && !prefersReducedMotion) {
-            window.Motion.animate(themeToggleBtn, { rotate: [0, 180] }, { duration: 0.3 });
-        }
-    });
-}
-
 async function fetchServerStatus() {
     const grid = document.getElementById('server-grid');
-    
+
     try {
         const res = await fetch('/api/status');
         const data = await res.json();
-        
+
         if (data.success && data.data) {
             grid.innerHTML = ''; // Specific clear removing skeletons
-            
+
             data.data.forEach((server) => {
                 const card = document.createElement('div');
                 const maxPlayers = Number(server.maxplayers) || 0;
@@ -86,11 +51,11 @@ async function fetchServerStatus() {
                 if (maxPlayers > 0) {
                     playerPercentage = (currentPlayers / maxPlayers) * 100;
                 }
-                
+
                 const serverName = escapeHTML(`${server.name}`);
                 const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
                 const serverMap = escapeHTML(`${server.map || 'N/A'}`);
-                
+
                 card.className = "group bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 p-4 rounded-2xl transition-all cursor-pointer server-card card-hover opacity-0 translate-y-4 shadow-sm dark:shadow-none";
 
                 const connectLink = `steam://connect/${server.host}:${server.port}`;
@@ -119,10 +84,10 @@ async function fetchServerStatus() {
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">${serverMap}</span>
                     </div>
                 `;
-                
+
                 grid.appendChild(card);
             });
-            
+
             // Apply CSS custom property for player bar widths (CSP-compliant)
             document.querySelectorAll('.server-bar').forEach(bar => {
                 const width = bar.getAttribute('data-bar-width');
@@ -130,11 +95,9 @@ async function fetchServerStatus() {
                     bar.style.setProperty('--bar-width', width + '%');
                 }
             });
-            
-            lucide.createIcons();
-            
+
             // Animate Server Cards in with stagger
-            if (!prefersReducedMotion) {
+            if (!animationsOff) {
                 animate(
                     ".server-card",
                     { opacity: [0, 1], y: [20, 0] },
@@ -161,52 +124,6 @@ async function fetchServerStatus() {
     }
 }
 
-// Mobile Menu Logic
-function initMobileMenu() {
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileLinks = document.querySelectorAll('.mobile-link');
-    
-    // Safety check just in case elements are missing
-    if (!mobileMenuBtn || !mobileMenu) {return;}
-    
-    let isMenuOpen = false;
-
-    const toggleMenu = () => {
-        isMenuOpen = !isMenuOpen;
-        
-        if (isMenuOpen) {
-            mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
-            document.body.classList.add('overflow-hidden'); // Prevent scrolling
-            mobileMenuBtn.innerHTML = '<i data-lucide="x" class="w-5 h-5"></i>';
-            lucide.createIcons();
-            
-            // Animate links in
-            if (window.Motion && window.Motion.animate && window.Motion.stagger && !prefersReducedMotion) {
-                window.Motion.animate(
-                    mobileLinks,
-                    { opacity: [0, 1], y: [20, 0] },
-                    { duration: 0.4, delay: window.Motion.stagger(0.1) }
-                );
-            }
-        } else {
-            mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-            document.body.classList.remove('overflow-hidden'); // Restore scrolling
-            mobileMenuBtn.innerHTML = '<i data-lucide="menu" class="w-5 h-5"></i>';
-            lucide.createIcons();
-        }
-    };
-    
-    mobileMenuBtn.addEventListener('click', toggleMenu);
-    
-    // Close when a link inside is clicked
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (isMenuOpen) {toggleMenu();}
-        });
-    });
-}
-
 // Animations specific logic
 function initAnimations() {
     // Nav bar: condense / solidify on scroll
@@ -221,7 +138,7 @@ function initAnimations() {
     const heroWords = document.querySelectorAll("#hero-title .reveal-word");
     const heroRest = document.querySelectorAll("#hero-content > p, #hero-content > div");
     heroRest.forEach(el => el.classList.remove('opacity-0'));
-    if (!prefersReducedMotion) {
+    if (!animationsOff) {
         animate(heroWords,
             { y: ['110%', '0%'] },
             { duration: 0.9, delay: stagger(0.12), ease: [0.22, 1, 0.36, 1] }
@@ -247,7 +164,20 @@ function initAnimations() {
             scroll(animate(heroContent, { y: [0, 70], opacity: [1, 0] }, { ease: 'linear' }), scrollOpts);
         }
     }
-    
+
+    // The scroll-triggered reveals below are a progressive enhancement. Without Motion,
+    // reveal these sections immediately so none stay stuck at opacity-0, then bail out
+    // before dereferencing the undefined inView.
+    if (!motionReady) {
+        [
+            '#about-text', '#about-features > div', '#servers-header',
+            '#community-text', '#discord-widget',
+            '#community-rules-grid .rule-card', '#timer-rules-grid .rule-card',
+            '#resources-header', '#resources-grid > a',
+        ].forEach(sel => document.querySelectorAll(sel).forEach(el => el.classList.remove('opacity-0')));
+        return;
+    }
+
     // About Section
     inView("#about-text", (info) => {
         const el = info.target || info;
@@ -256,7 +186,7 @@ function initAnimations() {
             animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
         }
     });
-    
+
     inView("#about-features", () => {
         document.querySelectorAll("#about-features > div").forEach(el => el.classList.remove('opacity-0'));
         if (!prefersReducedMotion) {
@@ -326,7 +256,7 @@ function initAnimations() {
             animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
         }
     });
-    
+
     inView("#resources-grid", () => {
         document.querySelectorAll("#resources-grid > a").forEach(el => el.classList.remove('opacity-0'));
         if (!prefersReducedMotion) {
@@ -348,7 +278,7 @@ async function fetchConfig() {
         const res = await fetch('/api/config');
         if (!res.ok) {throw new Error('Failed to fetch config');}
         const config = await res.json();
-        
+
         const setLink = (id, url) => {
             if (!url || url === '#') {return;}
             const el = document.getElementById(id);
@@ -363,23 +293,8 @@ async function fetchConfig() {
         setLink('link-steam-footer', config.steamLink);
         setLink('link-twitch-footer', config.twitchLink);
         setLink('link-github-footer', config.githubLink);
-
-        const iframe = document.getElementById('discord-iframe');
-        if (iframe && config.discordWidgetId) {
-            window.__discordWidgetId = config.discordWidgetId;
-            updateDiscordWidget(config.discordWidgetId);
-        }
     } catch (e) {
         console.error('Error fetching config:', e);
-    }
-}
-
-// Update Discord widget iframe with current theme
-function updateDiscordWidget(widgetId) {
-    const iframe = document.getElementById('discord-iframe');
-    if (iframe && widgetId) {
-        const isDark = document.documentElement.classList.contains('dark');
-        iframe.src = `https://discord.com/widget?id=${widgetId}&theme=${isDark ? 'dark' : 'light'}`;
     }
 }
 
@@ -401,55 +316,10 @@ function initScrollSpy() {
     sections.forEach((section) => observer.observe(section));
 }
 
-// Main Initialization
+// Main Initialization (homepage-specific; shared init runs from common.js)
 document.addEventListener("DOMContentLoaded", () => {
-    initTheme();
-    initMobileMenu();
     initAnimations();
     initScrollSpy();
-    initCustomLogo();
     fetchServerStatus();
     fetchConfig();
 });
-
-// Set current year in footer
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// Initialize Lucide icons
-if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-}
-
-async function checkLogoExists(url) {
-    try {
-        const response = await fetch(url, { method: 'HEAD' });
-        return response.ok;
-    } catch {
-        return false;
-    }
-}
-
-async function initCustomLogo() {
-    const logoContainer = document.getElementById('logoContainer');
-    const crosshairIcon = document.getElementById('crosshairIcon');
-    
-    if (!logoContainer || !crosshairIcon) { return; }
-    
-    // Try to load custom logo from user-assets
-    const logoPaths = ['/logo.svg', '/logo.webp', '/logo.png'];
-    
-    for (const logoPath of logoPaths) {
-        if (await checkLogoExists(logoPath)) {
-            // Logo found, swap it in
-            logoContainer.classList.remove('bg-brand-500', 'font-black');
-            logoContainer.classList.add('has-logo');
-            logoContainer.innerHTML = '';
-            
-            const logoImg = document.createElement('img');
-            logoImg.src = logoPath;
-            logoImg.alt = 'Logo';
-            logoContainer.appendChild(logoImg);
-            return;
-        }
-    }
-}

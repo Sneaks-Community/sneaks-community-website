@@ -57,10 +57,65 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
     process.exit(1);
 }
 
-// Community branding used to render the page title and headings, configured via
-// environment variables (with fallbacks) like the social links below.
+// Community branding used to render the page title, headings, SEO metadata, links and a
+// few identity-specific prose fields. All are configured via environment variables (with
+// fallbacks to the current defaults) and injected into the HTML templates at startup, so a
+// precompiled image only needs an env change + restart — no rebuild. See renderBranding().
 const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
 const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
+// Discord invite URL used by the "JOIN DISCORD" CTAs and the community Join card.
+// Set DISCORD_LINK to your server's invite (e.g. https://discord.gg/yourinvite).
+const discordLink = (process.env.DISCORD_LINK ?? '').trim() || "https://discord.gg/snksrv";
+
+// External social/community links. Shared by the server-rendered anchors (so no-JS visitors
+// get correct links) and the /api/config endpoint (which the client uses for the same links).
+const steamLink = (process.env.STEAM_LINK ?? '').trim() || 'https://steamcommunity.com/groups/sneakscommunity';
+const twitchLink = (process.env.TWITCH_LINK ?? '').trim() || 'https://twitch.tv/snksrv';
+const githubLink = (process.env.GITHUB_LINK ?? '').trim() || 'https://github.com/Sneaks-Community';
+
+// Resource-card destinations (Player Statistics / Ban List).
+const statsLink = (process.env.STATS_LINK ?? '').trim() || 'https://stats.snksrv.com';
+const bansLink = (process.env.BANS_LINK ?? '').trim() || 'https://bans.snksrv.com';
+
+// Canonical site origin. Trailing slash(es) stripped so `{{siteUrl}}/` and
+// `{{siteUrl}}/og-image.png` compose cleanly in the templates.
+const siteUrl = ((process.env.SITE_URL ?? '').trim() || 'https://snksrv.com').replace(/\/+$/, '');
+
+// SEO metadata and a few identity-specific prose fields.
+const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
+    || "Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.";
+const metaKeywords = (process.env.META_KEYWORDS ?? '').trim()
+    || 'sneak community, gaming, cs2, csgo, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community';
+const heroTagline = (process.env.HERO_TAGLINE ?? '').trim()
+    || 'An open and fun gaming community for all. No application. No membership. Just fun and friends.';
+const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
+    || "Founded in 2015, Sneak's Community started as a single CS:GO Minigames server. Over the years, our community evolved and has grown through many games, and we found our true home hosting Counter-Strike: Global Offensive servers, while providing a welcoming environment for all games.";
+const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
+    || "Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.";
+
+// Structured data (JSON-LD) for search engines: Organization + WebSite. Built from the same
+// branding values as the meta tags and serialized here rather than templated into the HTML —
+// renderBranding() HTML-escapes its values ('"' -> '&quot;'), which is invalid inside a
+// <script type="application/ld+json"> block (parsed as JSON, not HTML). JSON.stringify already
+// produces JSON-safe strings; we additionally escape '<' so a value can't break out of the
+// </script> element. Injected raw via the {{structuredData}} token in renderBranding().
+const structuredData = JSON.stringify([
+    {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: communityName,
+        url: `${siteUrl}/`,
+        logo: `${siteUrl}/og-image.png`,
+        description: metaDescription,
+        sameAs: [discordLink, steamLink, twitchLink, githubLink],
+    },
+    {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: communityName,
+        url: `${siteUrl}/`,
+    },
+]).replaceAll('<', '\\u003c');
 
 // Validate each server entry has required fields
 for (const server of config.servers) {
@@ -83,15 +138,38 @@ const escapeHtml = (value: string): string =>
 const renderBranding = (html: string): string =>
     html
         .replaceAll('{{communityName}}', escapeHtml(communityName))
-        .replaceAll('{{established}}', String(communityEstablished));
+        .replaceAll('{{established}}', String(communityEstablished))
+        .replaceAll('{{discordLink}}', escapeHtml(discordLink))
+        .replaceAll('{{siteUrl}}', escapeHtml(siteUrl))
+        .replaceAll('{{metaDescription}}', escapeHtml(metaDescription))
+        .replaceAll('{{metaKeywords}}', escapeHtml(metaKeywords))
+        .replaceAll('{{steamLink}}', escapeHtml(steamLink))
+        .replaceAll('{{twitchLink}}', escapeHtml(twitchLink))
+        .replaceAll('{{githubLink}}', escapeHtml(githubLink))
+        .replaceAll('{{statsLink}}', escapeHtml(statsLink))
+        .replaceAll('{{bansLink}}', escapeHtml(bansLink))
+        .replaceAll('{{heroTagline}}', escapeHtml(heroTagline))
+        .replaceAll('{{aboutParagraph1}}', escapeHtml(aboutParagraph1))
+        .replaceAll('{{aboutParagraph2}}', escapeHtml(aboutParagraph2))
+        // Injected raw (already JSON-safe); a function replacer avoids replaceAll's special
+        // '$' substitution patterns mangling the serialized JSON.
+        .replaceAll('{{structuredData}}', () => structuredData);
 
 const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
 const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
+// robots.txt and sitemap.xml are plain-text/XML, not HTML, so the site origin is injected
+// raw (a bare origin has no HTML-special chars, and HTML-escaping '&' would corrupt them).
+const robotsTxtPath = path.join(__dirname, '..', 'public', 'robots.txt');
+const sitemapXmlPath = path.join(__dirname, '..', 'public', 'sitemap.xml');
 let renderedIndexHtml: string;
 let rendered404Html: string;
+let renderedRobotsTxt: string;
+let renderedSitemapXml: string;
 try {
     renderedIndexHtml = renderBranding(fs.readFileSync(indexHtmlPath, 'utf-8'));
     rendered404Html = renderBranding(fs.readFileSync(notFoundHtmlPath, 'utf-8'));
+    renderedRobotsTxt = fs.readFileSync(robotsTxtPath, 'utf-8').replaceAll('{{siteUrl}}', siteUrl);
+    renderedSitemapXml = fs.readFileSync(sitemapXmlPath, 'utf-8').replaceAll('{{siteUrl}}', siteUrl);
 } catch (error) {
     logger.fatal({ err: error }, 'Failed to read HTML template');
     process.exit(1);
@@ -107,8 +185,9 @@ app.use(helmet({
             scriptSrc: ["'self'"],
             styleSrc: ["'self'"],
             fontSrc: ["'self'"],
-            imgSrc: ["'self'", "https:"],
-            frameSrc: ["https://discord.com"],
+            imgSrc: ["'self'"],
+            frameSrc: ["'none'"],
+            frameAncestors: ["'none'"],
             connectSrc: ["'self'"],
             baseUri: ["'self'"],
             formAction: ["'self'"],
@@ -145,14 +224,24 @@ app.use(pinoHttp({
 // This allows users to hot-load custom assets without rebuilding the Docker image
 const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
-    app.use(express.static(userAssetsPath));
+    app.use(express.static(userAssetsPath, { maxAge: '1d' }));
 }
 // Serve the config-branded index for the root and direct requests. Registered after the
 // user-assets mount (so a user-supplied index.html still wins) and before the public mount.
 app.get(['/', '/index.html'], (req, res) => {
+    res.set('Cache-Control', 'public, max-age=300');
     res.type('html').send(renderedIndexHtml);
 });
-app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1h' }));
+// Serve the site-URL-branded robots.txt / sitemap.xml before the static mount so they win.
+app.get('/robots.txt', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.type('text/plain').send(renderedRobotsTxt);
+});
+app.get('/sitemap.xml', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.type('application/xml').send(renderedSitemapXml);
+});
+app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1d' }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
 app.set('trust proxy', 1);
@@ -179,8 +268,8 @@ interface ServerStatusData {
 // Global rate limiter for all /api/* endpoints
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 60, // 60 requests per 15 minutes per IP
-    message: { success: false, error: 'Too many requests, please try again later' },
+    max: 240, // 240 requests per 15 minutes per IP (headroom for client polling + shared/CGNAT IPs)
+    message: { success: false, message: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -190,11 +279,12 @@ app.use('/api', apiLimiter);
 
 // API Route for config
 app.get('/api/config', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=300');
     res.json({
-        steamLink: process.env.STEAM_LINK ?? "https://steamcommunity.com/groups/sneakscommunity",
-        twitchLink: process.env.TWITCH_LINK ?? "https://twitch.tv/snksrv",
-        githubLink: process.env.GITHUB_LINK ?? "https://github.com/Sneaks-Community",
-        discordWidgetId: process.env.DISCORD_WIDGET_ID ?? "",
+        steamLink,
+        twitchLink,
+        githubLink,
+        discordLink,
     });
 });
 
@@ -276,7 +366,7 @@ app.get('/api/status', async (req, res) => {
 app.get('/health', (req, res) => {
     const ip = req.ip;
     if (ip !== '::1' && ip !== '127.0.0.1') {
-        return res.status(403).json({ success: false, error: 'Forbidden' });
+        return res.status(403).json({ success: false, message: 'Forbidden' });
     }
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -301,7 +391,7 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     logger.info({ port: PORT, pid: process.pid, env: process.env.NODE_ENV ?? 'development' }, "Sneak's Community Website running");
 
     // Signal readiness for process managers that support it (e.g., PM2 cluster mode)
@@ -312,3 +402,32 @@ app.listen(PORT, '0.0.0.0', () => {
     // Set clean exit code so the process terminates gracefully if needed
     process.exitCode = 0;
 });
+
+// Graceful shutdown: on docker stop / redeploy, stop accepting new connections and
+// let in-flight requests (e.g. an active GameDig batch) finish before exiting.
+let shuttingDown = false;
+const shutdown = (signal: NodeJS.Signals) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    logger.info({ signal }, 'Received shutdown signal, closing server');
+
+    // Force-exit safety net below Docker's default 10s stop grace period, so a hung
+    // keep-alive connection can't wedge server.close() and trigger SIGKILL instead.
+    const forceExit = setTimeout(() => {
+        logger.error('Shutdown timed out, forcing exit');
+        process.exit(1);
+    }, 8000);
+    forceExit.unref();
+
+    server.close((error) => {
+        if (error) {
+            logger.error({ err: error }, 'Error during server shutdown');
+            process.exit(1);
+        }
+        logger.info('Server closed cleanly');
+        process.exit(0);
+    });
+};
+
+process.on('SIGTERM', () => { shutdown('SIGTERM'); });
+process.on('SIGINT', () => { shutdown('SIGINT'); });
