@@ -93,6 +93,30 @@ const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
 const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
     || "Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.";
 
+// Structured data (JSON-LD) for search engines: Organization + WebSite. Built from the same
+// branding values as the meta tags and serialized here rather than templated into the HTML —
+// renderBranding() HTML-escapes its values ('"' -> '&quot;'), which is invalid inside a
+// <script type="application/ld+json"> block (parsed as JSON, not HTML). JSON.stringify already
+// produces JSON-safe strings; we additionally escape '<' so a value can't break out of the
+// </script> element. Injected raw via the {{structuredData}} token in renderBranding().
+const structuredData = JSON.stringify([
+    {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: communityName,
+        url: `${siteUrl}/`,
+        logo: `${siteUrl}/og-image.png`,
+        description: metaDescription,
+        sameAs: [discordLink, steamLink, twitchLink, githubLink],
+    },
+    {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: communityName,
+        url: `${siteUrl}/`,
+    },
+]).replaceAll('<', '\\u003c');
+
 // Validate each server entry has required fields
 for (const server of config.servers) {
     if (!server.id || !server.host || !server.port || !server.type) {
@@ -126,7 +150,10 @@ const renderBranding = (html: string): string =>
         .replaceAll('{{bansLink}}', escapeHtml(bansLink))
         .replaceAll('{{heroTagline}}', escapeHtml(heroTagline))
         .replaceAll('{{aboutParagraph1}}', escapeHtml(aboutParagraph1))
-        .replaceAll('{{aboutParagraph2}}', escapeHtml(aboutParagraph2));
+        .replaceAll('{{aboutParagraph2}}', escapeHtml(aboutParagraph2))
+        // Injected raw (already JSON-safe); a function replacer avoids replaceAll's special
+        // '$' substitution patterns mangling the serialized JSON.
+        .replaceAll('{{structuredData}}', () => structuredData);
 
 const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
 const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
