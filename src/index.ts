@@ -57,13 +57,41 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
     process.exit(1);
 }
 
-// Community branding used to render the page title and headings, configured via
-// environment variables (with fallbacks) like the social links below.
+// Community branding used to render the page title, headings, SEO metadata, links and a
+// few identity-specific prose fields. All are configured via environment variables (with
+// fallbacks to the current defaults) and injected into the HTML templates at startup, so a
+// precompiled image only needs an env change + restart — no rebuild. See renderBranding().
 const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
 const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
 // Discord invite URL used by the "JOIN DISCORD" CTAs and the community Join card.
 // Set DISCORD_LINK to your server's invite (e.g. https://discord.gg/yourinvite).
 const discordLink = (process.env.DISCORD_LINK ?? '').trim() || "https://discord.gg/snksrv";
+
+// External social/community links. Shared by the server-rendered anchors (so no-JS visitors
+// get correct links) and the /api/config endpoint (which the client uses for the same links).
+const steamLink = (process.env.STEAM_LINK ?? '').trim() || 'https://steamcommunity.com/groups/sneakscommunity';
+const twitchLink = (process.env.TWITCH_LINK ?? '').trim() || 'https://twitch.tv/snksrv';
+const githubLink = (process.env.GITHUB_LINK ?? '').trim() || 'https://github.com/Sneaks-Community';
+
+// Resource-card destinations (Player Statistics / Ban List).
+const statsLink = (process.env.STATS_LINK ?? '').trim() || 'https://stats.snksrv.com';
+const bansLink = (process.env.BANS_LINK ?? '').trim() || 'https://bans.snksrv.com';
+
+// Canonical site origin. Trailing slash(es) stripped so `{{siteUrl}}/` and
+// `{{siteUrl}}/og-image.png` compose cleanly in the templates.
+const siteUrl = ((process.env.SITE_URL ?? '').trim() || 'https://snksrv.com').replace(/\/+$/, '');
+
+// SEO metadata and a few identity-specific prose fields.
+const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
+    || "Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.";
+const metaKeywords = (process.env.META_KEYWORDS ?? '').trim()
+    || 'sneak community, gaming, cs2, csgo, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community';
+const heroTagline = (process.env.HERO_TAGLINE ?? '').trim()
+    || 'An open and fun gaming community for all. No application. No membership. Just fun and friends.';
+const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
+    || "Founded in 2015, Sneak's Community started as a single CS:GO Minigames server. Over the years, our community evolved and has grown through many games, and we found our true home hosting Counter-Strike: Global Offensive servers, while providing a welcoming environment for all games.";
+const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
+    || "Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.";
 
 // Validate each server entry has required fields
 for (const server of config.servers) {
@@ -87,15 +115,34 @@ const renderBranding = (html: string): string =>
     html
         .replaceAll('{{communityName}}', escapeHtml(communityName))
         .replaceAll('{{established}}', String(communityEstablished))
-        .replaceAll('{{discordLink}}', escapeHtml(discordLink));
+        .replaceAll('{{discordLink}}', escapeHtml(discordLink))
+        .replaceAll('{{siteUrl}}', escapeHtml(siteUrl))
+        .replaceAll('{{metaDescription}}', escapeHtml(metaDescription))
+        .replaceAll('{{metaKeywords}}', escapeHtml(metaKeywords))
+        .replaceAll('{{steamLink}}', escapeHtml(steamLink))
+        .replaceAll('{{twitchLink}}', escapeHtml(twitchLink))
+        .replaceAll('{{githubLink}}', escapeHtml(githubLink))
+        .replaceAll('{{statsLink}}', escapeHtml(statsLink))
+        .replaceAll('{{bansLink}}', escapeHtml(bansLink))
+        .replaceAll('{{heroTagline}}', escapeHtml(heroTagline))
+        .replaceAll('{{aboutParagraph1}}', escapeHtml(aboutParagraph1))
+        .replaceAll('{{aboutParagraph2}}', escapeHtml(aboutParagraph2));
 
 const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
 const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
+// robots.txt and sitemap.xml are plain-text/XML, not HTML, so the site origin is injected
+// raw (a bare origin has no HTML-special chars, and HTML-escaping '&' would corrupt them).
+const robotsTxtPath = path.join(__dirname, '..', 'public', 'robots.txt');
+const sitemapXmlPath = path.join(__dirname, '..', 'public', 'sitemap.xml');
 let renderedIndexHtml: string;
 let rendered404Html: string;
+let renderedRobotsTxt: string;
+let renderedSitemapXml: string;
 try {
     renderedIndexHtml = renderBranding(fs.readFileSync(indexHtmlPath, 'utf-8'));
     rendered404Html = renderBranding(fs.readFileSync(notFoundHtmlPath, 'utf-8'));
+    renderedRobotsTxt = fs.readFileSync(robotsTxtPath, 'utf-8').replaceAll('{{siteUrl}}', siteUrl);
+    renderedSitemapXml = fs.readFileSync(sitemapXmlPath, 'utf-8').replaceAll('{{siteUrl}}', siteUrl);
 } catch (error) {
     logger.fatal({ err: error }, 'Failed to read HTML template');
     process.exit(1);
@@ -157,6 +204,13 @@ if (fs.existsSync(userAssetsPath)) {
 app.get(['/', '/index.html'], (req, res) => {
     res.type('html').send(renderedIndexHtml);
 });
+// Serve the site-URL-branded robots.txt / sitemap.xml before the static mount so they win.
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain').send(renderedRobotsTxt);
+});
+app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml').send(renderedSitemapXml);
+});
 app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1d' }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
@@ -197,9 +251,9 @@ app.use('/api', apiLimiter);
 app.get('/api/config', (req, res) => {
     res.set('Cache-Control', 'public, max-age=300');
     res.json({
-        steamLink: process.env.STEAM_LINK ?? "https://steamcommunity.com/groups/sneakscommunity",
-        twitchLink: process.env.TWITCH_LINK ?? "https://twitch.tv/snksrv",
-        githubLink: process.env.GITHUB_LINK ?? "https://github.com/Sneaks-Community",
+        steamLink,
+        twitchLink,
+        githubLink,
         discordLink,
     });
 });

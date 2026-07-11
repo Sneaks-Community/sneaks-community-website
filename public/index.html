@@ -8,17 +8,17 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>{{communityName}} | Since {{established}}</title>
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.">
-    <meta name="keywords" content="sneak community, gaming, cs2, csgo, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community">
+    <meta name="description" content="{{metaDescription}}">
+    <meta name="keywords" content="{{metaKeywords}}">
     <meta name="author" content="{{communityName}}">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://snksrv.com/">
+    <link rel="canonical" href="{{siteUrl}}/">
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://snksrv.com/">
+    <meta property="og:url" content="{{siteUrl}}/">
     <meta property="og:title" content="{{communityName}} | Gaming Community Since {{established}}">
-    <meta property="og:description" content="An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more.">
-    <meta property="og:image" content="/og-image.png">
+    <meta property="og:description" content="{{metaDescription}}">
+    <meta property="og:image" content="{{siteUrl}}/og-image.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -26,10 +26,10 @@
     <meta property="og:site_name" content="{{communityName}}">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://snksrv.com/">
+    <meta name="twitter:url" content="{{siteUrl}}/">
     <meta name="twitter:title" content="{{communityName}} | Gaming Community Since {{established}}">
-    <meta name="twitter:description" content="An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more.">
-    <meta name="twitter:image" content="/og-image.png">
+    <meta name="twitter:description" content="{{metaDescription}}">
+    <meta name="twitter:image" content="{{siteUrl}}/og-image.png">
     <meta name="twitter:image:width" content="1200">
     <meta name="twitter:image:height" content="630">
     <!-- Self-hosted fonts: preload for performance (@font-face lives in /style.css) -->
@@ -146,7 +146,7 @@
                 <span class="reveal-line"><span class="reveal-word text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-brand-300 dark:from-brand-400 dark:to-brand-200">{{communityName}}</span></span>
             </h1>
             <p class="mt-4 max-w-lg text-lg text-slate-600 dark:text-slate-400 mx-auto mb-10 leading-relaxed opacity-0">
-                An open and fun gaming community for all. No application. No membership. Just fun and friends.
+                {{heroTagline}}
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 opacity-0">
                 <a href="#servers" class="px-8 py-3 bg-slate-200 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2">
@@ -169,10 +169,10 @@
                         <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">OVER A DECADE OF GAMING.</h3>
                     </div>
                     <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Founded in 2015, Sneak's Community started as a single CS:GO Minigames server. Over the years, our community evolved and has grown through many games, and we found our true home hosting Counter-Strike: Global Offensive servers, while providing a welcoming environment for all games.
+                        {{aboutParagraph1}}
                     </p>
                     <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.
+                        {{aboutParagraph2}}
                     </p>
                 </div>
                 <div id="about-features" class="grid sm:grid-cols-2 gap-6">
@@ -280,7 +280,7 @@
 
             <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" id="resources-grid">
                 <!-- Stats Card -->
-                <a href="https://stats.snksrv.com" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-stats-card">
+                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-stats-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-bar-chart-2"/></svg>
                     </div>
@@ -293,7 +293,7 @@
                 </a>
 
                 <!-- Bans Card -->
-                <a href="https://bans.snksrv.com" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-bans-card">
+                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-bans-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-shield-alert"/></svg>
                     </div>
@@ -325,15 +325,15 @@
                         Our Discord is our primary hub. With hundreds of members online at any given time, it's the best place to find a squad, hang out, and be a part of the community.
                     </p>
                     <div class="grid grid-cols-2 gap-4 pt-4">
-                        <a id="link-steam-community" href="https://steamcommunity.com/groups/sneaks" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-steam-community" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 transition-all group shadow-sm dark:shadow-none">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"><title>Steam</title><use href="#icon-steam"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">Steam Group</span>
                         </a>
-                        <a id="link-twitch-community" href="https://twitch.tv/snksrv" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-[#9146FF] transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-twitch-community" href="{{twitchLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-[#9146FF] transition-all group shadow-sm dark:shadow-none">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-twitch"><title>Twitch</title><use href="#icon-twitch"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">Twitch</span>
                         </a>
-                        <a id="link-github-community" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-slate-800 dark:hover:border-white transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-github-community" href="{{githubLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-slate-800 dark:hover:border-white transition-all group shadow-sm dark:shadow-none">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"><title>GitHub</title><use href="#icon-github"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">GitHub</span>
                         </a>
@@ -364,7 +364,7 @@
             <div class="text-center max-w-3xl mx-auto mb-12">
                 <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">COMMUNITY RULES</h2>
                 <p class="text-base text-slate-600 dark:text-slate-400">
-                    Sneak's Community is built on mutual respect. We strive to maintain a safe and enjoyable environment for everyone.
+                    {{communityName}} is built on mutual respect. We strive to maintain a safe and enjoyable environment for everyone.
                 </p>
             </div>
             
@@ -473,13 +473,13 @@
     <footer class="h-16 border-t border-black/5 dark:border-white/5 bg-slate-100 dark:bg-black/40 flex items-center justify-between px-8 z-20 transition-colors duration-300">
         <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8">
             <div class="flex gap-4 footer-icons-container">
-                <a id="link-steam-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
+                <a id="link-steam-footer" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>Steam</title><use href="#icon-steam"/></svg>
                 </a>
-                <a id="link-twitch-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="twitch">
+                <a id="link-twitch-footer" href="{{twitchLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="twitch">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10 icon-twitch"><title>Twitch</title><use href="#icon-twitch"/></svg>
                 </a>
-                <a id="link-github-footer" href="#" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="github">
+                <a id="link-github-footer" href="{{githubLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="github">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>GitHub</title><use href="#icon-github"/></svg>
                 </a>
             </div>

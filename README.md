@@ -20,16 +20,30 @@ A lightweight static landing page designed for [Sneak's Community](https://snksr
 
 Configure your environment by setting properties in your `.env` file (see `.env.example`).
 
-- `NODE_ENV`
-- `PORT`
-- `LOG_LEVEL`
-- `COMMUNITY_NAME`
-- `COMMUNITY_ESTABLISHED`
-- `STEAM_LINK`
-- `TWITCH_LINK`
-- `GITHUB_LINK`
-- `DISCORD_LINK`
-- `ALLOWED_ORIGINS`
+> [!NOTE]
+> These values are read **at container start** and injected into the page templates — so on a
+> precompiled Docker image you only need to change the env and restart (`docker compose up -d`),
+> **no rebuild required**. Every variable falls back to a sensible default when unset.
+
+| Variable | Purpose |
+| --- | --- |
+| `NODE_ENV` | Node environment (`production` / `development`) |
+| `PORT` | Port to listen on (default `3000`) |
+| `LOG_LEVEL` | Pino log level |
+| `COMMUNITY_NAME` | Community name used in the title, headings and footer |
+| `COMMUNITY_ESTABLISHED` | Founding year shown in the title/OG tags |
+| `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` |
+| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) |
+| `META_KEYWORDS` | SEO meta keywords |
+| `HERO_TAGLINE` | Hero subtitle line |
+| `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs |
+| `STEAM_LINK` | Steam group/community link |
+| `TWITCH_LINK` | Twitch channel link |
+| `GITHUB_LINK` | GitHub organization/repo link |
+| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs |
+| `STATS_LINK` | "Player Statistics" resource card destination |
+| `BANS_LINK` | "Ban List" resource card destination |
+| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list |
 
 ### Server Configuration
 
