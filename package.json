@@ -41,7 +41,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/gamedig": "^5.0.3",
-    "@types/node": "^24.13.3",
+    "@types/node": "^26.1.0",
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",
     "esbuild": "^0.28.1",
