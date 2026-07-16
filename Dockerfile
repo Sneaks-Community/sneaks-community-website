@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -20,7 +20,7 @@ COPY tsconfig.json .
 RUN npm run build
 
 # Stage 2: Production environment
-FROM node:24-alpine AS production
+FROM node:25-alpine AS production
 
 WORKDIR /usr/src/app
 
