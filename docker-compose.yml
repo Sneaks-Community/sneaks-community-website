@@ -11,6 +11,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+    read_only: true
     security_opt:
       - "apparmor=docker-default"
       - "no-new-privileges=true"
