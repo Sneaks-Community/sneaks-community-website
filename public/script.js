@@ -35,6 +35,7 @@ function countUp(el, target, duration = 900) {
 
 async function fetchServerStatus() {
     const grid = document.getElementById('server-grid');
+    grid.setAttribute('aria-busy', 'true');
 
     try {
         const res = await fetch('/api/status');
@@ -48,7 +49,8 @@ async function fetchServerStatus() {
             grid.innerHTML = ''; // Specific clear removing skeletons
 
             data.data.forEach((server) => {
-                const card = document.createElement('div');
+                // Anchor (not div) so cards are keyboard-focusable and announce their destination.
+                const card = document.createElement('a');
                 const maxPlayers = Number(server.maxplayers) || 0;
                 const currentPlayers = Number(server.players) || 0;
                 let playerPercentage = 0;
@@ -60,10 +62,10 @@ async function fetchServerStatus() {
                 const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
                 const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
-                card.className = "group bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 p-4 rounded-2xl transition-all cursor-pointer server-card card-hover opacity-0 translate-y-4 shadow-sm dark:shadow-none";
+                card.className = "group block bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 p-4 rounded-2xl transition-all cursor-pointer server-card card-hover opacity-0 translate-y-4 shadow-sm dark:shadow-none";
 
-                const connectLink = `steam://connect/${server.host}:${server.port}`;
-                card.onclick = () => window.location.href = connectLink;
+                card.href = `steam://connect/${server.host}:${server.port}`;
+                card.setAttribute('aria-label', `Connect to ${server.name}`);
 
                 const onlineCount = server.status === 'online'
                     ? `<span class="player-count" data-target="${currentPlayers}">0</span>/${escapeHTML(server.maxplayers || '?')}`
@@ -124,7 +126,9 @@ async function fetchServerStatus() {
         }
     } catch (e) {
         console.error("Failed to fetch servers", e);
-        grid.innerHTML = '<div class="col-span-full text-center text-red-500 py-8">Failed to contact server API. Please try again later.</div>';
+        grid.innerHTML = '<div role="status" class="col-span-full text-center text-red-500 py-8">Failed to contact server API. Please try again later.</div>';
+    } finally {
+        grid.setAttribute('aria-busy', 'false');
     }
 }
 
