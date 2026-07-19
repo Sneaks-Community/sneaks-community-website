@@ -3,7 +3,8 @@ services:
     image: ghcr.io/sneaks-community/sneaks-community-website:latest
     container_name: sneaks_community_web
     ports:
-      - "3000:3000"
+      # Bind to loopback only; terminate HTTPS with a reverse proxy in front (set TRUST_PROXY).
+      - "127.0.0.1:3000:3000"
     restart: unless-stopped
     env_file:
       - .env

@@ -178,6 +178,18 @@ try {
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// trust proxy config: only enable behind a trusted reverse proxy, or clients can spoof
+// X-Forwarded-For to bypass the /health IP guard and the rate limiter. Default off.
+// Accepts: false (default), true, a hop count (e.g. "1"), or a comma-separated IP/CIDR list.
+function parseTrustProxy(raw: string | undefined): boolean | number | string {
+    const value = (raw ?? '').trim();
+    if (value === '' || value.toLowerCase() === 'false') return false;
+    if (value.toLowerCase() === 'true') return true;
+    if (/^\d+$/.test(value)) return Number(value);
+    return value;
+}
+const TRUST_PROXY = parseTrustProxy(process.env.TRUST_PROXY);
+
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -244,7 +256,7 @@ app.get('/sitemap.xml', (req, res) => {
 app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1d' }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
-app.set('trust proxy', 1);
+app.set('trust proxy', TRUST_PROXY);
 
 // In-memory cache for server queries (60 seconds TTL)
 const CACHE_TTL_MS = 60_000;

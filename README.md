@@ -44,6 +44,7 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `STATS_LINK` | "Player Statistics" resource card destination |
 | `BANS_LINK` | "Ban List" resource card destination |
 | `ALLOWED_ORIGINS` | Comma-separated CORS allow-list |
+| `TRUST_PROXY` | Trust `X-Forwarded-For` for the client IP. **Only enable behind a trusted reverse proxy** — otherwise clients can spoof their IP to evade the rate limiter and the `/health` guard. `false` (default), `true`, a hop count (e.g. `1`), or a comma-separated IP/CIDR list |
 
 ### Server Configuration
 
