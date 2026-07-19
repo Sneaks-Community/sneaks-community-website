@@ -398,9 +398,6 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     if (process.send) {
         process.send('ready');
     }
-
-    // Set clean exit code so the process terminates gracefully if needed
-    process.exitCode = 0;
 });
 
 // Graceful shutdown: on docker stop / redeploy, stop accepting new connections and
@@ -427,6 +424,9 @@ const shutdown = (signal: NodeJS.Signals) => {
         logger.info('Server closed cleanly');
         process.exit(0);
     });
+
+    // Close idle keep-alive sockets so shutdown doesn't wait on the force-exit timer.
+    server.closeIdleConnections();
 };
 
 process.on('SIGTERM', () => { shutdown('SIGTERM'); });
