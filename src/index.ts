@@ -316,7 +316,7 @@ app.get('/api/status', async (req, res) => {
 
                             return {
                                 id: server.id,
-                                name: state.name || server.name || server.id,
+                                name: state.name || (server.name ?? server.id),
                                 map: state.map || 'N/A',
                                 players: state.players.length,
                                 maxplayers: state.maxplayers,

@@ -20,22 +20,24 @@ function initTheme() {
     };
 
     // Initialize based on saved preference or system default
-    const storedTheme = localStorage.getItem('theme');
+    const storedTheme = window.safeStorage.get('theme');
     applyTheme(storedTheme || getSystemTheme());
 
     // Listen to system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
+        if (!window.safeStorage.get('theme')) {
             applyTheme(e.matches ? 'dark' : 'light');
         }
     });
+
+    if (!themeToggleBtn) { return; }
 
     // Toggle button event overrides system preference
     themeToggleBtn.addEventListener('click', () => {
         const isDark = htmlClassList.contains('dark');
         const newTheme = isDark ? 'light' : 'dark';
 
-        localStorage.setItem('theme', newTheme);
+        window.safeStorage.set('theme', newTheme);
         applyTheme(newTheme);
 
         // Button animation
