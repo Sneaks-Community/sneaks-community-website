@@ -135,25 +135,31 @@ const escapeHtml = (value: string): string =>
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
 
+// Token values, already fully escaped (or JSON-safe for structuredData). Substituted via a
+// single function-replacer pass so replaceAll's '$' patterns ($$, $&, ...) in values can't
+// mangle the output or re-inject the matched token.
+const brandingTokens = new Map<string, string>([
+    ['communityName', escapeHtml(communityName)],
+    ['established', String(communityEstablished)],
+    ['discordLink', escapeHtml(discordLink)],
+    ['siteUrl', escapeHtml(siteUrl)],
+    ['metaDescription', escapeHtml(metaDescription)],
+    ['metaKeywords', escapeHtml(metaKeywords)],
+    ['steamLink', escapeHtml(steamLink)],
+    ['twitchLink', escapeHtml(twitchLink)],
+    ['githubLink', escapeHtml(githubLink)],
+    ['statsLink', escapeHtml(statsLink)],
+    ['bansLink', escapeHtml(bansLink)],
+    ['heroTagline', escapeHtml(heroTagline)],
+    ['aboutParagraph1', escapeHtml(aboutParagraph1)],
+    ['aboutParagraph2', escapeHtml(aboutParagraph2)],
+    ['structuredData', structuredData],
+]);
+
 const renderBranding = (html: string): string =>
-    html
-        .replaceAll('{{communityName}}', escapeHtml(communityName))
-        .replaceAll('{{established}}', String(communityEstablished))
-        .replaceAll('{{discordLink}}', escapeHtml(discordLink))
-        .replaceAll('{{siteUrl}}', escapeHtml(siteUrl))
-        .replaceAll('{{metaDescription}}', escapeHtml(metaDescription))
-        .replaceAll('{{metaKeywords}}', escapeHtml(metaKeywords))
-        .replaceAll('{{steamLink}}', escapeHtml(steamLink))
-        .replaceAll('{{twitchLink}}', escapeHtml(twitchLink))
-        .replaceAll('{{githubLink}}', escapeHtml(githubLink))
-        .replaceAll('{{statsLink}}', escapeHtml(statsLink))
-        .replaceAll('{{bansLink}}', escapeHtml(bansLink))
-        .replaceAll('{{heroTagline}}', escapeHtml(heroTagline))
-        .replaceAll('{{aboutParagraph1}}', escapeHtml(aboutParagraph1))
-        .replaceAll('{{aboutParagraph2}}', escapeHtml(aboutParagraph2))
-        // Injected raw (already JSON-safe); a function replacer avoids replaceAll's special
-        // '$' substitution patterns mangling the serialized JSON.
-        .replaceAll('{{structuredData}}', () => structuredData);
+    html.replace(/\{\{(\w+)\}\}/g, (match, token: string) =>
+        brandingTokens.get(token) ?? match
+    );
 
 const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
 const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
@@ -168,8 +174,8 @@ let renderedSitemapXml: string;
 try {
     renderedIndexHtml = renderBranding(fs.readFileSync(indexHtmlPath, 'utf-8'));
     rendered404Html = renderBranding(fs.readFileSync(notFoundHtmlPath, 'utf-8'));
-    renderedRobotsTxt = fs.readFileSync(robotsTxtPath, 'utf-8').replaceAll('{{siteUrl}}', siteUrl);
-    renderedSitemapXml = fs.readFileSync(sitemapXmlPath, 'utf-8').replaceAll('{{siteUrl}}', siteUrl);
+    renderedRobotsTxt = fs.readFileSync(robotsTxtPath, 'utf-8').replaceAll('{{siteUrl}}', () => siteUrl);
+    renderedSitemapXml = fs.readFileSync(sitemapXmlPath, 'utf-8').replaceAll('{{siteUrl}}', () => siteUrl);
 } catch (error) {
     logger.fatal({ err: error }, 'Failed to read HTML template');
     process.exit(1);
