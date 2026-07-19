@@ -316,7 +316,7 @@ app.get('/api/status', async (req, res) => {
 
                             return {
                                 id: server.id,
-                                name: state.name || server.name,
+                                name: state.name || server.name || server.id,
                                 map: state.map || 'N/A',
                                 players: state.players.length,
                                 maxplayers: state.maxplayers,
@@ -331,7 +331,7 @@ app.get('/api/status', async (req, res) => {
                             // Return default offline data instead of result.reason (which could be an Error object)
                             return {
                                 id: server.id,
-                                name: server.name,
+                                name: server.name ?? server.id,
                                 map: 'N/A',
                                 players: 0,
                                 maxplayers: 0,
