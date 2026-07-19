@@ -77,9 +77,24 @@ const githubLink = (process.env.GITHUB_LINK ?? '').trim() || 'https://github.com
 const statsLink = (process.env.STATS_LINK ?? '').trim() || 'https://stats.snksrv.com';
 const bansLink = (process.env.BANS_LINK ?? '').trim() || 'https://bans.snksrv.com';
 
-// Canonical site origin. Trailing slash(es) stripped so `{{siteUrl}}/` and
-// `{{siteUrl}}/og-image.png` compose cleanly in the templates.
-const siteUrl = ((process.env.SITE_URL ?? '').trim() || 'https://snksrv.com').replace(/\/+$/, '');
+// Canonical site origin, injected raw into sitemap.xml/robots.txt and composed as
+// `{{siteUrl}}/...` in the templates, so it must be a clean http(s) origin (no path, query,
+// or hash). Parse with URL and fall back to the default with a loud warning if it isn't.
+const DEFAULT_SITE_URL = 'https://snksrv.com';
+function resolveSiteUrl(raw: string | undefined): string {
+    const value = (raw ?? '').trim();
+    if (value === '') return DEFAULT_SITE_URL;
+    try {
+        const url = new URL(value);
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('protocol must be http(s)');
+        if (url.search || url.hash || (url.pathname !== '/' && url.pathname !== '')) throw new Error('must be a bare origin');
+        return url.origin;
+    } catch (error) {
+        logger.warn({ err: error, siteUrl: value }, `Invalid SITE_URL, falling back to ${DEFAULT_SITE_URL}`);
+        return DEFAULT_SITE_URL;
+    }
+}
+const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 
 // SEO metadata and a few identity-specific prose fields.
 const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
@@ -117,12 +132,22 @@ const structuredData = JSON.stringify([
     },
 ]).replaceAll('<', '\\u003c');
 
-// Validate each server entry has required fields
+// Validate each server entry: required non-empty strings, a port in the valid range, and
+// unique ids across the config (values come from JSON, so types are checked at runtime).
+const seenServerIds = new Set<string>();
 for (const server of config.servers) {
-    if (!server.id || !server.host || !server.port || !server.type) {
-        logger.fatal({ serverId: server.id || 'unknown' }, `Invalid server config: missing required fields for server "${server.id || 'unknown'}"`);
+    const label = server.id || 'unknown';
+    const fail = (reason: string): never => {
+        logger.fatal({ serverId: label }, `Invalid server config for "${label}": ${reason}`);
         process.exit(1);
-    }
+    };
+
+    if (typeof server.id !== 'string' || !server.id.trim()) fail('id must be a non-empty string');
+    if (typeof server.host !== 'string' || !server.host.trim()) fail('host must be a non-empty string');
+    if (typeof server.type !== 'string' || !server.type.trim()) fail('type must be a non-empty string');
+    if (!Number.isInteger(server.port) || server.port < 1 || server.port > 65535) fail('port must be an integer between 1 and 65535');
+    if (seenServerIds.has(server.id)) fail('duplicate id');
+    seenServerIds.add(server.id);
 }
 
 // Pre-render index.html with community branding. The values are fixed for the process
