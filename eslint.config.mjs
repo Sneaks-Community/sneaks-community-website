@@ -93,7 +93,6 @@ export default tseslint.config(
         Motion: "readonly",
         // Shared helpers defined in common.js and consumed by the page scripts.
         prefersReducedMotion: "readonly",
-        updateDiscordWidget: "readonly",
       },
     },
     rules: {
