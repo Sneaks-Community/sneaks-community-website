@@ -15,6 +15,8 @@ const effectiveLogLevel = logLevel?.length ? logLevel : (isDevelopment ? 'debug'
 
 export const logger = pino({
   level: effectiveLogLevel,
+  // Redact sensitive request headers from pino-http logs
+  redact: ['request.headers.cookie', 'request.headers.authorization'],
   formatters: {
     level: (levelLabel) => ({ level: levelLabel.toUpperCase() }),
   },
