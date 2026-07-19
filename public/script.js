@@ -38,9 +38,13 @@ async function fetchServerStatus() {
 
     try {
         const res = await fetch('/api/status');
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
 
-        if (data.success && data.data) {
+        if (!res.ok || !data || !data.success || !data.data) {
+            throw new Error(`API responded ${res.status}`);
+        }
+
+        {
             grid.innerHTML = ''; // Specific clear removing skeletons
 
             data.data.forEach((server) => {
