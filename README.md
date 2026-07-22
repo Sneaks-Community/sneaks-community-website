@@ -87,6 +87,27 @@ Update `config/config.json` directly (not the `.example` file) and restart the c
 docker compose restart web
 ```
 
+#### Image Variants (root / non-root)
+
+The [`Dockerfile`](Dockerfile) is a distroless (`gcr.io/distroless/nodejs`) multi-stage build with two production targets:
+
+| Target | User | Published tags |
+| --- | --- | --- |
+| `production-root` | root (uid 0) | `latest`, `<version>`, `dev` |
+| `production` | non-root (uid 65532) | `latest-nonroot`, `<version>-nonroot`, `dev-nonroot` |
+
+Build either locally with `--target`:
+
+```bash
+# Root image
+docker build --target production-root -t sneaks-community-website:root .
+
+# Non-root image (recommended; used by docker-compose.yml)
+docker build --target production -t sneaks-community-website:nonroot .
+```
+
+The non-root variant is the default in [`docker-compose.yml`](docker-compose.yml) and suits its hardened runtime (`read_only`, `cap_drop: ALL`, `no-new-privileges`).
+
 #### Hot-Loading Custom Assets
 
 The Docker Compose setup includes a `user-assets/` volume mount that allows you to add, remove, or modify static assets without rebuilding the Docker image. Files in `user-assets/` take precedence over built-in files in the `public/` directory.
