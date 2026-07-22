@@ -14,7 +14,7 @@ A lightweight static landing page designed for [Sneak's Community](https://snksr
 
 ### Prerequisites
 
-- Node.js (v24+)
+- Node.js (v26+)
 
 ### Environment Variables
 
