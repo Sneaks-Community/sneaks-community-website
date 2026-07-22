@@ -54,6 +54,9 @@ jobs:
     timeout-minutes: 20
     if: github.ref != 'refs/heads/main'
 
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -70,3 +73,52 @@ jobs:
           tags: sneaks-community-website:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        id: trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        timeout-minutes: 10
+        with:
+          scan-type: image
+          image-ref: professional-portfolio:test
+          scanners: vuln,secret
+          format: table
+          output: trivy-report.txt
+          exit-code: '1'
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          vuln-type: os,library
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      # Report is written to a file above, so surface it. Both steps run even when
+      # the scan fails (exit 1), so the report is always visible; the job still fails.
+      - name: Trivy report to job summary
+        if: always()
+        run: |
+          {
+            echo '### 🛡️ Trivy image scan'
+            echo '```'
+            cat trivy-report.txt 2>/dev/null || echo 'No report produced.'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Hand the report to trivy-pr-comment workflow via artifact
+      - name: Stage Trivy PR artifact
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          echo "${{ github.event.pull_request.number }}" > pr-number.txt
+          echo "${{ steps.trivy.outcome }}" > trivy-outcome.txt
+
+      - name: Upload Trivy PR artifact
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-pr-report
+          path: |
+            trivy-report.txt
+            pr-number.txt
+            trivy-outcome.txt
+          if-no-files-found: warn
+          retention-days: 1
