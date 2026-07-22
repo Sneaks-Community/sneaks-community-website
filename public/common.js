@@ -91,45 +91,10 @@ function initMobileMenu() {
     });
 }
 
-async function checkLogoExists(url) {
-    try {
-        const response = await fetch(url, { method: 'HEAD' });
-        return response.ok;
-    } catch {
-        return false;
-    }
-}
-
-async function initCustomLogo() {
-    const logoContainer = document.getElementById('logoContainer');
-    const crosshairIcon = document.getElementById('crosshairIcon');
-
-    if (!logoContainer || !crosshairIcon) { return; }
-
-    // Try to load custom logo from user-assets
-    const logoPaths = ['/logo.svg', '/logo.webp', '/logo.png'];
-
-    for (const logoPath of logoPaths) {
-        if (await checkLogoExists(logoPath)) {
-            // Logo found, swap it in
-            logoContainer.classList.remove('bg-brand-500', 'font-black');
-            logoContainer.classList.add('has-logo');
-            logoContainer.innerHTML = '';
-
-            const logoImg = document.createElement('img');
-            logoImg.src = logoPath;
-            logoImg.alt = 'Logo';
-            logoContainer.appendChild(logoImg);
-            return;
-        }
-    }
-}
-
 // Shared init shared by every page. Page-specific init runs from each page's own script.
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initMobileMenu();
-    initCustomLogo();
 });
 
 // Set current year in footer

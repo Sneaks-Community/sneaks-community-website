@@ -160,6 +160,19 @@ const escapeHtml = (value: string): string =>
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
 
+// Detect a user-supplied logo at startup (user-assets/logo.{svg,webp,png}, in priority order)
+const userAssetsPath = path.join(__dirname, '..', 'user-assets');
+const detectLogoPath = (): string | null => {
+    // Checked with literal filenames (not a loop variable) so the analyzer can fold the path,
+    // matching the trusted-constant fs access already used for the user-assets mount below.
+    if (fs.existsSync(path.join(userAssetsPath, 'logo.svg'))) return '/logo.svg';
+    if (fs.existsSync(path.join(userAssetsPath, 'logo.webp'))) return '/logo.webp';
+    if (fs.existsSync(path.join(userAssetsPath, 'logo.png'))) return '/logo.png';
+    return null;
+};
+const logoPath = detectLogoPath();
+if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
+
 // Token values, already fully escaped (or JSON-safe for structuredData). Substituted via a
 // single function-replacer pass so replaceAll's '$' patterns ($$, $&, ...) in values can't
 // mangle the output or re-inject the matched token.
@@ -179,6 +192,12 @@ const brandingTokens = new Map<string, string>([
     ['aboutParagraph1', escapeHtml(aboutParagraph1)],
     ['aboutParagraph2', escapeHtml(aboutParagraph2)],
     ['structuredData', structuredData],
+    // Logo tokens are trusted HTML markup (not user text), so they are injected raw. logoPath is
+    // one of three fixed internal filenames, so there is nothing to escape.
+    ['logoContainerClass', logoPath ? 'has-logo' : 'bg-brand-500 font-black'],
+    ['logoContainerInner', logoPath
+        ? `<img src="${logoPath}" alt="Logo">`
+        : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-crosshair"/></svg>'],
 ]);
 
 const renderBranding = (html: string): string =>
@@ -275,7 +294,6 @@ function setStaticCacheHeaders(res: express.Response, filePath: string): void {
 
 // Serve static files from user-assets first (takes precedence), then built-in public/
 // This allows users to hot-load custom assets without rebuilding the Docker image
-const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
     app.use(express.static(userAssetsPath, { setHeaders: setStaticCacheHeaders }));
 }
