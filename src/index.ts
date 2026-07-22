@@ -263,11 +263,21 @@ app.use(pinoHttp({
     customAttributeKeys: { req: 'request', res: 'response', err: 'error', responseTime: 'responseTimeMs' },
 }));
 
+// Cache tiers for static assets
+const STATIC_SHORT_MAX_AGE = 300; // 5 minutes
+const STATIC_LONG_MAX_AGE = 86_400; // 1 day
+const LONG_CACHE_RE = /\.(?:woff2?|ttf|otf|eot|png|jpe?g|gif|webp|avif|ico|svg)$/i;
+function setStaticCacheHeaders(res: express.Response, filePath: string): void {
+    const isVendorLibrary = filePath.includes(`${path.sep}lib${path.sep}`); // e.g. lib/motion.js
+    const maxAge = LONG_CACHE_RE.test(filePath) || isVendorLibrary ? STATIC_LONG_MAX_AGE : STATIC_SHORT_MAX_AGE;
+    res.setHeader('Cache-Control', `public, max-age=${String(maxAge)}`);
+}
+
 // Serve static files from user-assets first (takes precedence), then built-in public/
 // This allows users to hot-load custom assets without rebuilding the Docker image
 const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 if (fs.existsSync(userAssetsPath)) {
-    app.use(express.static(userAssetsPath, { maxAge: '1d' }));
+    app.use(express.static(userAssetsPath, { setHeaders: setStaticCacheHeaders }));
 }
 // Serve the config-branded index for the root and direct requests. Registered after the
 // user-assets mount (so a user-supplied index.html still wins) and before the public mount.
@@ -284,7 +294,7 @@ app.get('/sitemap.xml', (req, res) => {
     res.set('Cache-Control', 'public, max-age=86400');
     res.type('application/xml').send(renderedSitemapXml);
 });
-app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: '1d' }));
+app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
 app.set('trust proxy', TRUST_PROXY);
