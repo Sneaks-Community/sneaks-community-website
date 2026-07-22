@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:26-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -19,31 +19,32 @@ COPY tsconfig.json .
 # Build the project (esbuild bundles the TypeScript server)
 RUN npm run build
 
-# Stage 2: Production environment
-FROM node:24-alpine AS production
+# Stage 2: Production dependencies only
+FROM node:26-alpine AS deps
 
 WORKDIR /usr/src/app
 
-# Only copy the essential package files
 COPY package.json package-lock.json* ./
 
-# Install only production dependencies
 RUN npm ci --omit=dev --ignore-scripts
 
-# Copy the build output from the builder stage
+# Stage 3: Root production image (distroless)
+FROM gcr.io/distroless/nodejs26-debian13:latest AS production-root
+
+WORKDIR /usr/src/app
+
+# Set Node environment to production
+ENV NODE_ENV=production
+
+# Production dependencies from the deps stage
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+# The build output from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
-# Copy the public static files (copied during build stage, already includes minified assets)
+# The public static files (copied during build stage, already includes minified assets)
 COPY --from=builder /usr/src/app/public ./public
-# Copy user-assets (may contain custom overrides at runtime)
+# user-assets (may contain custom overrides at runtime)
 COPY --from=builder /usr/src/app/user-assets ./user-assets
 # Note: config/ is mounted via volume at runtime, not baked into the image
-
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nodejs
-
-# Switch to non-root user
-USER nodejs
 
 # Expose port 3000
 EXPOSE 3000
@@ -53,12 +54,17 @@ LABEL org.opencontainers.image.title="sneaks-community-website"
 LABEL org.opencontainers.image.description="Sneak's Community Website"
 LABEL org.opencontainers.image.source="https://github.com/Sneaks-Community/sneaks-community-website"
 
-# Set Node environment to production
-ENV NODE_ENV=production
-
-# Health check: query the /health endpoint to verify the application is ready
+# Health check: query the /health endpoint to verify the application is ready.
+# Distroless has no wget/shell, so use node's built-in fetch (no dependencies).
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-  CMD wget --spider --no-verbose http://127.0.0.1:3000/health || exit 1
+  CMD ["/nodejs/bin/node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
 
-# Start the server
-CMD ["node", "dist/index.js"]
+# node is the ENTRYPOINT in the distroless image; pass the bundle as its argument
+CMD ["dist/index.js"]
+
+# Stage 4: Non-root production image (default)
+# Identical to the root image but runs as the built-in "nonroot" user
+# (uid 65532). This is the recommended default; see docker-compose.yml.
+FROM production-root AS production
+
+USER nonroot

@@ -49,13 +49,22 @@ jobs:
         run: npm audit --audit-level=high || true
 
   docker-build:
-    name: Docker Build
+    name: Docker Build (${{ matrix.variant }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     if: github.ref != 'refs/heads/main'
 
     permissions:
       contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: nonroot
+            target: production
+          - variant: root
+            target: production-root
 
     steps:
       - name: Checkout repository
@@ -64,15 +73,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.2.0
 
-      - name: Build Docker image (production stage)
+      - name: Build Docker image (${{ matrix.target }} stage)
         uses: docker/build-push-action@v7.3.0
         with:
           context: .
           push: false
-          target: production
-          tags: sneaks-community-website:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          target: ${{ matrix.target }}
+          tags: sneaks-community-website:test-${{ matrix.variant }}
+          load: true
+          cache-from: type=gha,scope=${{ matrix.variant }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
 
       - name: Run Trivy vulnerability scanner
         id: trivy
@@ -80,7 +90,7 @@ jobs:
         timeout-minutes: 10
         with:
           scan-type: image
-          image-ref: sneaks-community-website:test
+          image-ref: sneaks-community-website:test-${{ matrix.variant }}
           scanners: vuln,secret
           format: table
           output: trivy-report.txt
@@ -98,13 +108,13 @@ jobs:
         if: always()
         run: |
           {
-            echo '### 🛡️ Trivy image scan'
+            echo "### 🛡️ Trivy image scan (${{ matrix.variant }})"
             echo '```'
             cat trivy-report.txt 2>/dev/null || echo 'No report produced.'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # Hand the report to trivy-pr-comment workflow via artifact
+      # Hand the report to trivy-pr-comment workflow via artifact (one per variant)
       - name: Stage Trivy PR artifact
         if: always() && github.event_name == 'pull_request'
         run: |
@@ -115,7 +125,7 @@ jobs:
         if: always() && github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-pr-report
+          name: trivy-pr-report-${{ matrix.variant }}
           path: |
             trivy-report.txt
             pr-number.txt

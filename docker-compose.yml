@@ -1,6 +1,9 @@
 services:
   web:
-    image: ghcr.io/sneaks-community/sneaks-community-website:latest
+    # Default tags (latest / <version> / dev) are the root image (uid 0). This
+    # hardened runtime pins the non-root variant (uid 65532) via the "-nonroot"
+    # suffix; switch to :latest for the root build if you need uid 0.
+    image: ghcr.io/sneaks-community/sneaks-community-website:latest-nonroot
     container_name: sneaks_community_web
     ports:
       # Bind to loopback only; terminate HTTPS with a reverse proxy in front (set TRUST_PROXY).
@@ -23,7 +26,7 @@ services:
       # This overlay takes precedence over built-in public/ files
       - ./user-assets:/usr/src/app/user-assets:ro
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-verbose", "http://127.0.0.1:3000/health"]
+      test: ["CMD", "/nodejs/bin/node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
