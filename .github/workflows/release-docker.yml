@@ -47,6 +47,7 @@ jobs:
             type=raw,value=dev,enable=${{ github.event_name == 'push' }}
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v7.3.0
         with:
           context: .
@@ -59,3 +60,34 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: true
           sbom: true
+
+      # Scan the image we just pushed (by digest, so it's the exact build). Blocks
+      # the job on HIGH/CRITICAL. Runs on the dev push and on releases.
+      - name: Run Trivy vulnerability scanner
+        id: trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        timeout-minutes: 10
+        with:
+          scan-type: image
+          image-ref: ghcr.io/sneaks-community/sneaks-community-website@${{ steps.build.outputs.digest }}
+          scanners: vuln,secret
+          format: table
+          output: trivy-report.txt
+          exit-code: '1'
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          vuln-type: os,library
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      # Surface the report even when the scan fails (exit 1); the job still fails.
+      - name: Trivy report to job summary
+        if: always()
+        run: |
+          {
+            echo '### 🛡️ Trivy image scan'
+            echo '```'
+            cat trivy-report.txt 2>/dev/null || echo 'No report produced.'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -80,7 +80,7 @@ jobs:
         timeout-minutes: 10
         with:
           scan-type: image
-          image-ref: professional-portfolio:test
+          image-ref: sneaks-community-website:test
           scanners: vuln,secret
           format: table
           output: trivy-report.txt
