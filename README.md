@@ -8,7 +8,7 @@ A lightweight static landing page designed for [Sneak's Community](https://snksr
 - **Configurable External Links:** Manage social media, community platforms, and the Discord invite link through environment variables.
 - **Dark/Light Mode Theme:** Beautiful user interface featuring motion animations and a togglabe theme.
 - **Caching Mechanism:** Implements data caching to avoid spamming server queries.
-- **API First:** Exposes backend JSON endpoints for status queries or external configs.
+- **JSON Status Endpoint:** Exposes a `/api/status` JSON endpoint for live server status queries.
 
 ## Getting Started
 

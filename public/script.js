@@ -280,32 +280,6 @@ function initAnimations() {
     // performance and to respect prefers-reduced-motion without JS.
 }
 
-// Config Logic
-async function fetchConfig() {
-    try {
-        const res = await fetch('/api/config');
-        if (!res.ok) {throw new Error('Failed to fetch config');}
-        const config = await res.json();
-
-        const setLink = (id, url) => {
-            if (!url || url === '#') {return;}
-            const el = document.getElementById(id);
-            if (el) {el.href = url;}
-            if (el && url !== '#') {el.target = '_blank';}
-        };
-
-        setLink('link-steam-community', config.steamLink);
-        setLink('link-twitch-community', config.twitchLink);
-        setLink('link-github-community', config.githubLink);
-
-        setLink('link-steam-footer', config.steamLink);
-        setLink('link-twitch-footer', config.twitchLink);
-        setLink('link-github-footer', config.githubLink);
-    } catch (e) {
-        console.error('Error fetching config:', e);
-    }
-}
-
 // URL Hash Updates
 function initScrollSpy() {
     const sections = document.querySelectorAll('header[id], section[id]');
@@ -329,5 +303,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initAnimations();
     initScrollSpy();
     fetchServerStatus();
-    fetchConfig();
 });

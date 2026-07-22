@@ -67,8 +67,8 @@ const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
 // Set DISCORD_LINK to your server's invite (e.g. https://discord.gg/yourinvite).
 const discordLink = (process.env.DISCORD_LINK ?? '').trim() || "https://discord.gg/snksrv";
 
-// External social/community links. Shared by the server-rendered anchors (so no-JS visitors
-// get correct links) and the /api/config endpoint (which the client uses for the same links).
+// External social/community links, injected directly into the server-rendered anchors so
+// every visitor (including no-JS) gets correct links without any client-side API call.
 const steamLink = (process.env.STEAM_LINK ?? '').trim() || 'https://steamcommunity.com/groups/sneakscommunity';
 const twitchLink = (process.env.TWITCH_LINK ?? '').trim() || 'https://twitch.tv/snksrv';
 const githubLink = (process.env.GITHUB_LINK ?? '').trim() || 'https://github.com/Sneaks-Community';
@@ -347,17 +347,6 @@ const apiLimiter = rateLimit({
 
 // Apply global rate limiter to all /api/* routes
 app.use('/api', apiLimiter);
-
-// API Route for config
-app.get('/api/config', (req, res) => {
-    res.set('Cache-Control', 'public, max-age=300');
-    res.json({
-        steamLink,
-        twitchLink,
-        githubLink,
-        discordLink,
-    });
-});
 
 // API Route for server status
 app.get('/api/status', async (req, res) => {
