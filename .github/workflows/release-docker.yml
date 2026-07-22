@@ -46,23 +46,25 @@ jobs:
             type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
             type=raw,value=dev,enable=${{ github.event_name == 'push' }}
 
-      - name: Build and push Docker image
+      # Single build. Push by digest only — no consumable tag is created yet, so
+      # :dev / :latest never point at an unscanned image. The real tags are
+      # applied after Trivy passes, via a server-side manifest copy (no rebuild).
+      - name: Build and push image by digest
         id: build
         uses: docker/build-push-action@v7.3.0
         with:
           context: .
-          push: true
           target: production
           platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
+          outputs: type=image,name=ghcr.io/sneaks-community/sneaks-community-website,push-by-digest=true,name-canonical=true,push=true
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: true
           sbom: true
 
-      # Scan the image we just pushed (by digest, so it's the exact build). Blocks
-      # the job on HIGH/CRITICAL. Runs on the dev push and on releases.
+      # Blocks the job on HIGH/CRITICAL. If this fails, the tag step below never
+      # runs, so the vulnerable build stays an unreferenced (untagged) digest.
       - name: Run Trivy vulnerability scanner
         id: trivy
         uses: aquasecurity/trivy-action@v0.36.0
@@ -91,3 +93,11 @@ jobs:
             cat trivy-report.txt 2>/dev/null || echo 'No report produced.'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # Only reached if the scan passed. Applies the real tags to the scanned
+      # digest — a manifest copy in the registry, not another build.
+      - name: Apply tags to the scanned image
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            ghcr.io/sneaks-community/sneaks-community-website@${{ steps.build.outputs.digest }}
