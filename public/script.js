@@ -63,7 +63,8 @@ async function fetchServerStatus() {
                 const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
                 const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
-                card.className = "group block bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 p-4 rounded-2xl transition-all cursor-pointer server-card card-hover opacity-0 translate-y-4 shadow-sm dark:shadow-none";
+                const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
+                card.className = `group block surface-card card-hover p-4 rounded-2xl cursor-pointer server-card ${stateClass} opacity-0 translate-y-4`;
 
                 card.href = `steam://connect/${server.host}:${server.port}`;
                 card.setAttribute('aria-label', `Connect to ${server.name}`);
@@ -85,8 +86,8 @@ async function fetchServerStatus() {
                         </div>
                     </div>
                     <div class="flex items-center gap-3 mt-4">
-                        <div class="flex-1 h-1 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden relative">
-                            <div class="absolute top-0 left-0 h-full ${server.status === 'online' ? 'bg-gradient-to-r from-brand-500 to-brand-300' : 'bg-red-500/50'} transition-all duration-1000 server-bar" data-bar-width="${Math.ceil(playerPercentage / 10) * 10}"></div>
+                        <div class="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden relative">
+                            <div class="absolute top-0 left-0 h-full rounded-full ${server.status === 'online' ? 'bg-gradient-to-r from-brand-500 to-brand-300' : 'bg-red-500/50'} transition-all duration-1000 server-bar" data-bar-width="${Math.ceil(playerPercentage / 10) * 10}"></div>
                         </div>
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">${serverMap}</span>
                     </div>
@@ -127,7 +128,14 @@ async function fetchServerStatus() {
         }
     } catch (e) {
         console.error("Failed to fetch servers", e);
-        grid.innerHTML = '<div role="status" class="col-span-full text-center text-red-500 py-8">Failed to contact server API. Please try again later.</div>';
+        grid.innerHTML = `
+            <div role="status" class="col-span-full surface-card rounded-2xl p-8 flex flex-col items-center text-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6"><use href="#icon-flag"/></svg>
+                </div>
+                <p class="text-sm font-bold text-slate-900 dark:text-white">Server status unavailable</p>
+                <p class="text-xs text-slate-600 dark:text-slate-400">Failed to contact server API. Please try again later.</p>
+            </div>`;
     } finally {
         grid.setAttribute('aria-busy', 'false');
     }
@@ -281,6 +289,20 @@ function initAnimations() {
     // performance and to respect prefers-reduced-motion without JS.
 }
 
+// Keep the aurora sweep off the compositor while it is scrolled out of view.
+function initAurora() {
+    const aurora = document.querySelector('.aurora');
+    if (!aurora || prefersReducedMotion) { return; }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            aurora.classList.toggle('is-visible', entry.isIntersecting);
+        });
+    }, { rootMargin: '15% 0px' });
+
+    observer.observe(aurora);
+}
+
 // URL Hash Updates
 function initScrollSpy() {
     const sections = document.querySelectorAll('header[id], section[id]');
@@ -303,5 +325,6 @@ function initScrollSpy() {
 document.addEventListener("DOMContentLoaded", () => {
     initAnimations();
     initScrollSpy();
+    initAurora();
     fetchServerStatus();
 });

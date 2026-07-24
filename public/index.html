@@ -180,21 +180,21 @@
                     </p>
                 </div>
                 <div id="about-features" class="grid sm:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover opacity-0">
+                    <div class="surface-card card-hover p-6 rounded-2xl opacity-0">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-unlock"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Zero Friction</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">No applications or vetting processes. Jump directly into the action.</p>
                     </div>
-                    <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover opacity-0">
+                    <div class="surface-card card-hover p-6 rounded-2xl opacity-0">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-clock"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Longevity</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">Over 10 years of continuous operation, we are dedicated to gaming.</p>
                     </div>
-                    <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl backdrop-blur-sm shadow-sm sm:col-span-2 transition-all card-hover opacity-0">
+                    <div class="surface-card card-hover p-6 rounded-2xl sm:col-span-2 opacity-0">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-globe-2"/></svg>
                         </div>
@@ -226,44 +226,54 @@
             <!-- Server Grid -->
             <div id="server-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4" aria-busy="true">
                 <!-- Skeletons will be populated by JS -->
-                <div class="bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm animate-pulse flex flex-col sm:flex-row justify-between w-full h-[88px]"></div>
-                <div class="bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm animate-pulse flex flex-col sm:flex-row justify-between w-full h-[88px]"></div>
-                <div class="bg-slate-200/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm animate-pulse flex flex-col sm:flex-row justify-between w-full h-[88px]"></div>
+                <div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"></div>
+                <div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"></div>
+                <div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"></div>
             </div>
 
-            <div class="mt-16 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-sm transition-colors duration-300">
-                <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-8 text-center" id="modes-grid">
+            <div class="mt-16 surface-card rounded-2xl p-8">
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-8 text-center" id="modes-grid">
                     <div class="space-y-1">
-                        <div class="flex justify-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-waves"/></svg>
+                        <div class="flex justify-center mb-3">
+                            <div class="w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-waves"/></svg>
+                            </div>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">Surf</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Surf triangles on over 1000 maps. Tiers 1-6.</p>
                     </div>
                     <div class="space-y-1">
-                        <div class="flex justify-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="8.2 10.8 89 89" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-kz-climb"/></svg>
+                        <div class="flex justify-center mb-3">
+                            <div class="w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="8.2 10.8 89 89" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-kz-climb"/></svg>
+                            </div>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">KZ Climb</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Scale towering structures and master technical movement.</p>
                     </div>
                     <div class="space-y-1">
-                        <div class="flex justify-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-arrow-up"/></svg>
+                        <div class="flex justify-center mb-3">
+                            <div class="w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-arrow-up"/></svg>
+                            </div>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">Bhop</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Hop, skip and jump your way through maps.</p>
                     </div>
                     <div class="space-y-1">
-                        <div class="flex justify-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-crosshair"/></svg>
+                        <div class="flex justify-center mb-3">
+                            <div class="w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-crosshair"/></svg>
+                            </div>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">1v1 Arenas</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Face off in competitive 1v1 skill match-ups.</p>
                     </div>
                     <div class="space-y-1">
-                        <div class="flex justify-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 text-brand-600 dark:text-brand-400"><use href="#icon-crosshair"/></svg>
+                        <div class="flex justify-center mb-3">
+                            <div class="w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-crosshair"/></svg>
+                            </div>
                         </div>
                         <h4 class="font-bold text-slate-900 dark:text-white mb-2">Retakes</h4>
                         <p class="text-sm text-slate-600 dark:text-slate-400">Compete in a fast-paced 5v5 site retake scenario!</p>
@@ -286,7 +296,7 @@
 
             <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" id="resources-grid">
                 <!-- Stats Card -->
-                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-stats-card">
+                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl opacity-0" id="resource-stats-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-bar-chart-2"/></svg>
                     </div>
@@ -299,7 +309,7 @@
                 </a>
 
                 <!-- Bans Card -->
-                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 rounded-2xl backdrop-blur-sm shadow-sm transition-all card-hover hover:border-brand-500/50 opacity-0" id="resource-bans-card">
+                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl opacity-0" id="resource-bans-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-shield-alert"/></svg>
                     </div>
@@ -330,15 +340,15 @@
                         Our Discord is our primary hub. With hundreds of members online at any given time, it's the best place to find a squad, hang out, and be a part of the community.
                     </p>
                     <div class="grid grid-cols-2 gap-4 pt-4">
-                        <a id="link-steam-community" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-brand-500/50 transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-steam-community" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="surface-card card-hover group flex items-center space-x-3 p-4 rounded-xl">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"><title>Steam</title><use href="#icon-steam"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">Steam Group</span>
                         </a>
-                        <a id="link-twitch-community" href="{{twitchLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-[#9146FF] transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-twitch-community" href="{{twitchLink}}" target="_blank" rel="noopener noreferrer" class="surface-card card-hover group flex items-center space-x-3 p-4 rounded-xl">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 icon-twitch"><title>Twitch</title><use href="#icon-twitch"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">Twitch</span>
                         </a>
-                        <a id="link-github-community" href="{{githubLink}}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 p-4 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/5 hover:border-slate-800 dark:hover:border-white transition-all group shadow-sm dark:shadow-none">
+                        <a id="link-github-community" href="{{githubLink}}" target="_blank" rel="noopener noreferrer" class="surface-card card-hover group flex items-center space-x-3 p-4 rounded-xl">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"><title>GitHub</title><use href="#icon-github"/></svg>
                             <span class="font-bold text-slate-900 dark:text-white text-sm">GitHub</span>
                         </a>
@@ -346,7 +356,9 @@
                 </div>
                 
                 <div id="discord-widget" class="flex justify-center lg:justify-end opacity-0">
-                    <div class="w-full max-w-[350px] flex flex-col items-center text-center gap-6 p-10 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40">
+                  <div id="discord-card" class="relative isolate w-full max-w-[350px]">
+                    <div class="aurora"></div>
+                    <div class="surface-card flex flex-col items-center text-center gap-6 p-10 rounded-2xl">
                         <div class="w-16 h-16 rounded-2xl bg-brand-500/10 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400">
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 icon-discord"><title>Discord</title><use href="#icon-discord"/></svg>
                         </div>
@@ -358,6 +370,7 @@
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 icon-discord align-bottom"><title>Discord</title><use href="#icon-discord"/></svg> JOIN DISCORD
                         </a>
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
@@ -370,7 +383,8 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto mb-12">
-                <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">COMMUNITY RULES</h2>
+                <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">CONDUCT</h2>
+                <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">COMMUNITY RULES</h3>
                 <p class="text-base text-slate-600 dark:text-slate-400">
                     {{communityName}} is built on mutual respect. We strive to maintain a safe and enjoyable environment for everyone.
                 </p>
@@ -379,58 +393,58 @@
             <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
                 <!-- Community Rules -->
                 <div>
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-brand-600 dark:text-brand-400"><use href="#icon-shield"/></svg>
                         Community Rules
-                    </h3>
-                    <div class="grid grid-cols-2 gap-2 overflow-visible" id="community-rules-grid">
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                    </h4>
+                    <div class="rules-columns" id="community-rules-grid">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">1</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Respect</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Respect</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Be considerate. Friendly banter is normal, but abuse, attacking, or leaking personal information is not tolerated.</p>
                             </div>
                         </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
-                            <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">5</div>
-                            <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Staff</h4>
-                                <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Do not undermine administrative activities, impersonate admins, or waste their volunteered time.</p>
-                            </div>
-                        </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">2</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Spam</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Spam</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No voice/chat spam, including loud microphones, music, prank calls, or talking nonstop.</p>
                             </div>
                         </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
-                            <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">6</div>
-                            <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Advertising</h4>
-                                <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No unsolicited advertising; subtle self-promotion via in-game names is permitted.</p>
-                            </div>
-                        </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">3</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Cheating</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Cheating</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No cheating or hacking. We utilize a robust anti-cheat with administrative investigations for a clean gaming experience.</p>
                             </div>
                         </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
-                            <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">7</div>
-                            <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Discrimination</h4>
-                                <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Discrimination based on race, gender, or religion is not tolerated and is strictly enforced.</p>
-                            </div>
-                        </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">4</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Bugs</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Bugs</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Do not exploit major, disruptive bugs; their use in community spaces is prohibited.</p>
+                            </div>
+                        </div>
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                            <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">5</div>
+                            <div class="min-w-0 flex-1">
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Staff</h5>
+                                <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Do not undermine administrative activities, impersonate admins, or waste their volunteered time.</p>
+                            </div>
+                        </div>
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                            <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">6</div>
+                            <div class="min-w-0 flex-1">
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Advertising</h5>
+                                <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No unsolicited advertising; subtle self-promotion via in-game names is permitted.</p>
+                            </div>
+                        </div>
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                            <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">7</div>
+                            <div class="min-w-0 flex-1">
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Discrimination</h5>
+                                <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Discrimination based on race, gender, or religion is not tolerated and is strictly enforced.</p>
                             </div>
                         </div>
                     </div>
@@ -438,29 +452,29 @@
                 
                 <!-- Timer Rules -->
                 <div>
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-brand-700 dark:text-brand-300"><use href="#icon-timer"/></svg>
                         Timer Rules
-                    </h3>
-                    <div class="grid grid-cols-2 gap-2" id="timer-rules-grid">
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                    </h4>
+                    <div class="rules-columns" id="timer-rules-grid">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-[10px] mt-0.5">1</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Account Sharing</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Account Sharing</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No account sharing. Violations result in bans for all accounts and removal of shared times.</p>
                             </div>
                         </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-[10px] mt-0.5">2</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Alt Accounts</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Alt Accounts</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No alt accounts. Populating map/stage/bonus tops with more than one account is prohibited.</p>
                             </div>
                         </div>
-                        <div class="rule-card flex items-start gap-2 p-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-colors duration-300 opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-[10px] mt-0.5">3</div>
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Exploits</h4>
+                                <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Exploits</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No abusing timer/engine exploits (e.g., super/crouch boosting, trigger hopping, abusing props, looping, etc). Report accidental times to avoid enforcement actions.</p>
                             </div>
                         </div>
@@ -469,18 +483,20 @@
             </div>
             
             <div class="mt-10 text-center">
-                <div class="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 text-xs bg-white dark:bg-white/5 px-4 py-2 rounded-full border border-slate-200 dark:border-white/10">
+                <a href="{{discordLink}}" target="_blank" rel="noopener noreferrer" class="surface-card card-hover inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 text-xs px-4 py-2 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3.5 h-3.5"><use href="#icon-flag"/></svg>
                     <span>See something wrong? File a report on Discord.</span>
-                </div>
+                </a>
             </div>
         </div>
     </section>
     </main>
 
     <!-- Footer -->
-    <footer class="h-16 seam-top bg-surface-200 dark:bg-surface-950 flex items-center justify-between px-8 relative z-20 transition-colors duration-300">
-        <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8">
+    <footer class="h-16 seam-top bg-surface-200 dark:bg-surface-950 flex items-center justify-between px-8 ambient z-20 transition-colors duration-300">
+        <div class="glow glow--footer"></div>
+
+        <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8 relative z-10">
             <div class="flex gap-4 footer-icons-container">
                 <a id="link-steam-footer" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>Steam</title><use href="#icon-steam"/></svg>
@@ -492,7 +508,7 @@
                     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 relative z-10"><title>GitHub</title><use href="#icon-github"/></svg>
                 </a>
             </div>
-            <div class="hidden sm:block">© <span id="year"></span> {{communityName}}</div>
+            <div class="text-xs sm:text-base truncate pl-4">© <span id="year"></span> {{communityName}}</div>
         </div>
     </footer>
 

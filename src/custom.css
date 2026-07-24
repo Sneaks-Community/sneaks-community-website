@@ -189,6 +189,20 @@ a.bg-brand-500 .icon-discord {
     width: var(--bar-width, 0%);
 }
 
+.server-card--online .server-bar {
+    box-shadow: 0 0 8px color-mix(in oklab, var(--color-brand-400) 55%, transparent);
+}
+
+/* Offline servers recede so live ones draw the eye. */
+.server-card--offline {
+    opacity: 0.72;
+    filter: saturate(0.5);
+}
+
+.server-card--offline:hover {
+    opacity: 1;
+}
+
 /* Mobile menu overflow lock */
 .overflow-hidden {
     overflow: hidden;
@@ -248,7 +262,11 @@ a.bg-brand-500 .icon-discord {
 @media (prefers-reduced-motion: no-preference) {
     .rule-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 26px -12px var(--brand-shadow);
+        box-shadow: 0 10px 26px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .dark .rule-card:hover {
+        box-shadow: 0 10px 26px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 }
 
@@ -305,6 +323,7 @@ a.bg-brand-500 .icon-discord {
 .glow--resources { --glow-x: 6%; --glow-y: 0%; --glow-size: 48% 72%; }
 .glow--community { --glow-x: 96%; --glow-y: 8%; --glow-size: 48% 72%; --glow-color: var(--color-brand-700); }
 .glow--rules { --glow-x: 50%; --glow-y: 112%; --glow-size: 72% 46%; }
+.glow--footer { --glow-x: 50%; --glow-y: 130%; --glow-size: 55% 320%; }
 
 /* Faint structural grid. --grid-line / --grid-size let the hero keep its
    tighter, brighter lattice while sections get a wider, quieter one. */
@@ -382,6 +401,127 @@ a.bg-brand-500 .icon-discord {
     opacity: 0.05;
 }
 
+/* Scroll-linked lift on the servers glow. Opacity peaks mid-section, so the
+   panel appears to light up as it passes through the viewport. Off the main
+   thread where view() timelines are supported; a no-op elsewhere. */
+.glow--servers { --glow-peak: 0.16; }
+.dark .glow--servers { --glow-peak: 0.3; }
+
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .glow--servers {
+            animation: glow-rise linear both;
+            animation-timeline: view();
+            animation-range: entry 0% exit 100%;
+        }
+    }
+}
+
+@keyframes glow-rise {
+    from { opacity: calc(var(--glow-peak) * 0.3); transform: translateY(6%); }
+    50% { opacity: var(--glow-peak); transform: translateY(0); }
+    to { opacity: calc(var(--glow-peak) * 0.3); transform: translateY(-6%); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Card surface. Radius and padding stay as utilities in the markup;   */
+/* setting them here would beat those utilities and break the smaller  */
+/* rule cards.                                                        */
+/* ------------------------------------------------------------------ */
+.surface-card {
+    position: relative;
+    isolation: isolate;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background-color: var(--color-surface-50);
+    /* The inset highlight is what makes a flat panel read as lit. */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+}
+
+.dark .surface-card {
+    border-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--color-surface-800);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Hover glow. An element's own background paints before its negative
+   z-index children, so this lands above the fill and below the content. */
+.surface-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 0%,
+        color-mix(in oklab, var(--color-brand-400) 18%, transparent),
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.surface-card:hover::before {
+    opacity: 1;
+}
+
+/* Rule cards read as two columns but flow from natural 1-n document order,
+   so screen readers and any column count agree. */
+.rules-columns {
+    columns: 1;
+    column-gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .rules-columns {
+        columns: 2;
+    }
+}
+
+.rules-columns > .rule-card {
+    break-inside: avoid;
+    margin-bottom: 0.5rem;
+}
+
+/* Signature accent: a slow conic sweep haloing the Discord card. Softness
+   comes from wide transparent stops rather than filter: blur(), so the
+   animation stays a composited transform. */
+.aurora {
+    position: absolute;
+    /* Kept tight: the community section clips overflow, and at 1024-1280px the
+       card sits only ~32px from that edge. */
+    inset: -10%;
+    z-index: -1;
+    border-radius: 9999px;
+    pointer-events: none;
+    opacity: 0.4;
+    background: conic-gradient(from 0deg,
+        transparent 0deg,
+        color-mix(in oklab, var(--color-brand-400) 60%, transparent) 55deg,
+        transparent 125deg,
+        color-mix(in oklab, var(--color-brand-600) 50%, transparent) 215deg,
+        transparent 300deg,
+        transparent 360deg);
+}
+
+.dark .aurora {
+    opacity: 0.55;
+}
+
+/* Only spins while on screen; script.js toggles the class. will-change is
+   scoped to that state so the layer is not promoted for the whole page life. */
+@media (prefers-reduced-motion: no-preference) {
+    .aurora.is-visible {
+        animation: aurora-spin 22s linear infinite;
+        will-change: transform;
+    }
+}
+
+@keyframes aurora-spin {
+    to { transform: rotate(1turn); }
+}
+
 /* ------------------------------------------------------------------ */
 /* Shared card hover: gentle lift + brand glow (replaces JS scale)     */
 /* ------------------------------------------------------------------ */
@@ -393,14 +533,16 @@ a.bg-brand-500 .icon-discord {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+    /* The inset highlight is repeated here because box-shadow replaces rather
+       than adds to the .surface-card value. */
     .card-hover:hover {
         transform: translateY(-4px);
-        box-shadow: 0 14px 34px -12px var(--brand-shadow);
+        box-shadow: 0 14px 34px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
         border-color: var(--brand-border);
     }
 
     .dark .card-hover:hover {
-        box-shadow: 0 16px 40px -14px var(--brand-shadow-strong);
+        box-shadow: 0 16px 40px -14px var(--brand-shadow-strong), inset 0 1px 0 rgba(255, 255, 255, 0.06);
         border-color: var(--brand-border-dark);
     }
 }
