@@ -25,6 +25,12 @@
     --color-brand-900: #214254;
     --color-brand-950: #152b37;
 
+    /* "Live" green, shared by the online status dot and the player bar so a
+       populated server reads as active rather than as more brand chrome. */
+    --color-live-300: #86efac;
+    --color-live-400: #4ade80;
+    --color-live-500: #22c55e;
+
     /* Surface elevation scale. Sections alternate between the page surface and
        the raised one so the page reads as layered rather than one flat field. */
     --color-surface-50: #ffffff; /* light: card   */
