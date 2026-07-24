@@ -13,8 +13,9 @@
   },
   "scripts": {
     "dev": "tsx --env-file=.env src/index.ts",
-    "build": "npm run build:lib && npm run build:css && npm run build:js",
-    "build:lib": "mkdir -p public/lib public/fonts && cp node_modules/motion/dist/motion.js public/lib/motion.js && cp node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2 public/fonts/space-grotesk.woff2 && cp node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2 public/fonts/manrope.woff2",
+    "build": "npm run build:lib && npm run build:motion && npm run build:css && npm run build:js",
+    "build:lib": "mkdir -p public/lib public/fonts && cp node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2 public/fonts/space-grotesk.woff2 && cp node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2 public/fonts/manrope.woff2",
+    "build:motion": "esbuild src/motion-entry.js --bundle --format=iife --global-name=Motion --minify --outfile=public/lib/motion.js",
     "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
     "build:js": "esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --minify --outdir=dist",
     "start": "node --env-file=.env dist/index.js",
