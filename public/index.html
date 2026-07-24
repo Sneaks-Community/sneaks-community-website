@@ -167,7 +167,7 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid md:grid-cols-2 gap-16 items-center">
-                <div id="about-text" class="space-y-4 opacity-0">
+                <div id="about-text" class="space-y-4 reveal reveal--left">
                     <div>
                         <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">Our History</h2>
                         <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">OVER A DECADE OF GAMING.</h3>
@@ -179,22 +179,22 @@
                         {{aboutParagraph2}}
                     </p>
                 </div>
-                <div id="about-features" class="grid sm:grid-cols-2 gap-6">
-                    <div class="surface-card card-hover p-6 rounded-2xl opacity-0">
+                <div id="about-features" class="grid sm:grid-cols-2 gap-6 reveal-stagger">
+                    <div class="surface-card card-hover p-6 rounded-2xl">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-unlock"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Zero Friction</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">No applications or vetting processes. Jump directly into the action.</p>
                     </div>
-                    <div class="surface-card card-hover p-6 rounded-2xl opacity-0">
+                    <div class="surface-card card-hover p-6 rounded-2xl">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-clock"/></svg>
                         </div>
                         <h4 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Longevity</h4>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">Over 10 years of continuous operation, we are dedicated to gaming.</p>
                     </div>
-                    <div class="surface-card card-hover p-6 rounded-2xl sm:col-span-2 opacity-0">
+                    <div class="surface-card card-hover p-6 rounded-2xl sm:col-span-2">
                         <div class="w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="#icon-globe-2"/></svg>
                         </div>
@@ -213,7 +213,7 @@
         <div class="grain"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="flex justify-between items-end mb-16 opacity-0" id="servers-header">
+            <div class="flex justify-between items-end mb-16 reveal" id="servers-header">
                 <div>
                     <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">LIVE STATUS</h2>
                     <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">OUR SERVERS</h3>
@@ -289,14 +289,14 @@
         <div class="grain"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16 opacity-0" id="resources-header">
+            <div class="text-center mb-16 reveal" id="resources-header">
                 <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">TOOLS</h2>
                 <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">RESOURCES</h3>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" id="resources-grid">
+            <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto reveal-stagger" id="resources-grid">
                 <!-- Stats Card -->
-                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl opacity-0" id="resource-stats-card">
+                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl" id="resource-stats-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-bar-chart-2"/></svg>
                     </div>
@@ -309,7 +309,7 @@
                 </a>
 
                 <!-- Bans Card -->
-                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl opacity-0" id="resource-bans-card">
+                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl" id="resource-bans-card">
                     <div class="w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-shield-alert"/></svg>
                     </div>
@@ -331,7 +331,7 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
-                <div id="community-text" class="space-y-6 opacity-0">
+                <div id="community-text" class="space-y-6 reveal reveal--left">
                     <div>
                         <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">CONNECT</h2>
                         <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">THE HEART OF<br>THE COMMUNITY.</h3>
@@ -355,7 +355,7 @@
                     </div>
                 </div>
                 
-                <div id="discord-widget" class="flex justify-center lg:justify-end opacity-0">
+                <div id="discord-widget" class="flex justify-center lg:justify-end reveal reveal--scale">
                   <div id="discord-card" class="relative isolate w-full max-w-[350px]">
                     <div class="aurora"></div>
                     <div class="surface-card flex flex-col items-center text-center gap-6 p-10 rounded-2xl">
@@ -397,50 +397,50 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-brand-600 dark:text-brand-400"><use href="#icon-shield"/></svg>
                         Community Rules
                     </h4>
-                    <div class="rules-columns" id="community-rules-grid">
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                    <div class="rules-columns reveal-stagger" id="community-rules-grid">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">1</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Respect</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Be considerate. Friendly banter is normal, but abuse, attacking, or leaking personal information is not tolerated.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">2</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Spam</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No voice/chat spam, including loud microphones, music, prank calls, or talking nonstop.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">3</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Cheating</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No cheating or hacking. We utilize a robust anti-cheat with administrative investigations for a clean gaming experience.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">4</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Bugs</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Do not exploit major, disruptive bugs; their use in community spaces is prohibited.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">5</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Staff</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">Do not undermine administrative activities, impersonate admins, or waste their volunteered time.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">6</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Advertising</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No unsolicited advertising; subtle self-promotion via in-game names is permitted.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-[10px] mt-0.5">7</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Discrimination</h5>
@@ -456,22 +456,22 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-brand-700 dark:text-brand-300"><use href="#icon-timer"/></svg>
                         Timer Rules
                     </h4>
-                    <div class="rules-columns" id="timer-rules-grid">
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                    <div class="rules-columns reveal-stagger" id="timer-rules-grid">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-[10px] mt-0.5">1</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Account Sharing</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No account sharing. Violations result in bans for all accounts and removal of shared times.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-[10px] mt-0.5">2</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Alt Accounts</h5>
                                 <p class="text-slate-600 dark:text-slate-400 text-xs mt-0.5 leading-relaxed">No alt accounts. Populating map/stage/bonus tops with more than one account is prohibited.</p>
                             </div>
                         </div>
-                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg opacity-0">
+                        <div class="rule-card surface-card flex items-start gap-2 p-2.5 rounded-lg">
                             <div class="flex-shrink-0 w-5 h-5 rounded bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-[10px] mt-0.5">3</div>
                             <div class="min-w-0 flex-1">
                                 <h5 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Exploits</h5>

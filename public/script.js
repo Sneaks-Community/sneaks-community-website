@@ -13,7 +13,7 @@ function escapeHTML(str) {
 // window.Motion is undefined — so read it defensively. Destructuring it directly would
 // throw here at module scope and take down every feature on the page (theme, menu, etc.).
 const Motion = window.Motion ?? {};
-const { animate, stagger, inView, scroll } = Motion;
+const { animate, stagger } = Motion;
 const motionReady = typeof animate === 'function';
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Treat a missing animation library like reduced-motion: reveal content statically,
@@ -167,123 +167,6 @@ function initAnimations() {
     } else {
         heroWords.forEach(el => { el.style.transform = 'none'; });
     }
-
-    // Scroll-linked hero: gently drift + fade the glow and content as we leave
-    if (scroll && !prefersReducedMotion) {
-        const heroSection = document.getElementById('home');
-        const heroGlow = document.getElementById('hero-glow');
-        const heroContent = document.getElementById('hero-content');
-        const scrollOpts = { target: heroSection, offset: ['start start', 'end start'] };
-        if (heroGlow) {
-            scroll(animate(heroGlow, { y: [0, 140], opacity: [1, 0.25] }, { ease: 'linear' }), scrollOpts);
-        }
-        if (heroContent) {
-            scroll(animate(heroContent, { y: [0, 70], opacity: [1, 0] }, { ease: 'linear' }), scrollOpts);
-        }
-    }
-
-    // The scroll-triggered reveals below are a progressive enhancement. Without Motion,
-    // reveal these sections immediately so none stay stuck at opacity-0, then bail out
-    // before dereferencing the undefined inView.
-    if (!motionReady) {
-        [
-            '#about-text', '#about-features > div', '#servers-header',
-            '#community-text', '#discord-widget',
-            '#community-rules-grid .rule-card', '#timer-rules-grid .rule-card',
-            '#resources-header', '#resources-grid > a',
-        ].forEach(sel => document.querySelectorAll(sel).forEach(el => el.classList.remove('opacity-0')));
-        return;
-    }
-
-    // About Section
-    inView("#about-text", (info) => {
-        const el = info.target || info;
-        if(el && el.classList) {el.classList.remove('opacity-0');}
-        if (!prefersReducedMotion) {
-            animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
-        }
-    });
-
-    inView("#about-features", () => {
-        document.querySelectorAll("#about-features > div").forEach(el => el.classList.remove('opacity-0'));
-        if (!prefersReducedMotion) {
-            animate(
-                "#about-features > div",
-                { opacity: [0, 1], y: [20, 0] },
-                { duration: 0.5, delay: stagger(0.15) }
-            );
-        }
-    }, { amount: 0.2 });
-
-    // Server list header
-    inView("#servers-header", (info) => {
-        const el = info.target || info;
-        if(el && el.classList) {el.classList.remove('opacity-0');}
-        if (!prefersReducedMotion) {
-            animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
-        }
-    });
-
-    // Community section
-    inView("#community-text", (info) => {
-        const el = info.target || info;
-        if(el && el.classList) {el.classList.remove('opacity-0');}
-        if (!prefersReducedMotion) {
-            animate(el, { opacity: [0, 1], x: [-30, 0] }, { duration: 0.6 });
-        }
-    });
-
-    inView("#discord-widget", (info) => {
-        const el = info.target || info;
-        if(el && el.classList) {el.classList.remove('opacity-0');}
-        if (!prefersReducedMotion) {
-            animate(el, { opacity: [0, 1], scale: [0.95, 1] }, { duration: 0.6 });
-        }
-    });
-
-    // Community Rules
-    inView("#community-rules-grid", () => {
-        document.querySelectorAll("#community-rules-grid .rule-card").forEach(el => el.classList.remove('opacity-0'));
-        if (!prefersReducedMotion) {
-            animate(
-                "#community-rules-grid .rule-card",
-                { opacity: [0, 1], y: [20, 0] },
-                { duration: 0.4, delay: stagger(0.08) }
-            );
-        }
-    }, { amount: 0.1 });
-
-    // Timer Rules
-    inView("#timer-rules-grid", () => {
-        document.querySelectorAll("#timer-rules-grid .rule-card").forEach(el => el.classList.remove('opacity-0'));
-        if (!prefersReducedMotion) {
-            animate(
-                "#timer-rules-grid .rule-card",
-                { opacity: [0, 1], y: [20, 0] },
-                { duration: 0.4, delay: stagger(0.08) }
-            );
-        }
-    }, { amount: 0.1 });
-
-    // Resources section
-    inView("#resources-header", (info) => {
-        const el = info.target || info;
-        if(el && el.classList) {el.classList.remove('opacity-0');}
-        if (!prefersReducedMotion) {
-            animate(el, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5 });
-        }
-    });
-
-    inView("#resources-grid", () => {
-        document.querySelectorAll("#resources-grid > a").forEach(el => el.classList.remove('opacity-0'));
-        if (!prefersReducedMotion) {
-            animate(
-                "#resources-grid > a",
-                { opacity: [0, 1], y: [20, 0] },
-                { duration: 0.5, delay: stagger(0.15) }
-            );
-        }
-    }, { amount: 0.2 });
 
     // Rule-card hover lift/glow is handled in CSS (.rule-card:hover) for
     // performance and to respect prefers-reduced-motion without JS.
