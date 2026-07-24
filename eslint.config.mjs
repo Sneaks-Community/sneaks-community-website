@@ -93,8 +93,6 @@ export default tseslint.config(
         ...globals.browser,
         ...globals.es2023,
         Motion: "readonly",
-        // Shared helpers defined in common.js and consumed by the page scripts.
-        prefersReducedMotion: "readonly",
       },
     },
     rules: {

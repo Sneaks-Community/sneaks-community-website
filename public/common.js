@@ -1,8 +1,6 @@
 // Shared logic used by every page (homepage + 404): theme, mobile menu, custom logo,
 // icons. Loaded before each page's own script. Page-specific behaviour (server grid,
-// scroll animations, config link sets) lives in script.js / 404.js.
-
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// scroll animations, config link sets) lives in script.js.
 
 // Theme Initialization and Logic
 function initTheme() {
@@ -40,10 +38,14 @@ function initTheme() {
         window.safeStorage.set('theme', newTheme);
         applyTheme(newTheme);
 
-        // Button animation
-        if (window.Motion && window.Motion.animate && !prefersReducedMotion) {
-            window.Motion.animate(themeToggleBtn, { rotate: [0, 180] }, { duration: 0.3 });
-        }
+        // Restart the CSS spin by clearing the class before re-adding it.
+        themeToggleBtn.classList.remove('is-spinning');
+        void themeToggleBtn.offsetWidth;
+        themeToggleBtn.classList.add('is-spinning');
+    });
+
+    themeToggleBtn.addEventListener('animationend', () => {
+        themeToggleBtn.classList.remove('is-spinning');
     });
 }
 
@@ -63,18 +65,11 @@ function initMobileMenu() {
 
         if (isMenuOpen) {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+            mobileMenu.classList.add('is-open'); // Drives the CSS link stagger
             document.body.classList.add('overflow-hidden'); // Prevent scrolling
             mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-x"/></svg>';
-
-            // Animate links in
-            if (window.Motion && window.Motion.animate && window.Motion.stagger && !prefersReducedMotion) {
-                window.Motion.animate(
-                    mobileLinks,
-                    { opacity: [0, 1], y: [20, 0] },
-                    { duration: 0.4, delay: window.Motion.stagger(0.1) }
-                );
-            }
         } else {
+            mobileMenu.classList.remove('is-open');
             mobileMenu.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden'); // Restore scrolling
             mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-menu"/></svg>';

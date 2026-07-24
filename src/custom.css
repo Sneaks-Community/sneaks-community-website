@@ -173,6 +173,37 @@ a.bg-brand-500 .icon-discord {
     overflow: hidden;
 }
 
+/* Mobile menu links rise in when the menu opens. Scoped to no-preference so
+   reduced-motion users get them plainly visible rather than at opacity 0. */
+@media (prefers-reduced-motion: no-preference) {
+    #mobileMenu .mobile-link {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    #mobileMenu.is-open .mobile-link {
+        opacity: 1;
+        transform: none;
+    }
+
+    #mobileMenu.is-open .mobile-link:nth-child(2) { transition-delay: 0.1s; }
+    #mobileMenu.is-open .mobile-link:nth-child(3) { transition-delay: 0.2s; }
+    #mobileMenu.is-open .mobile-link:nth-child(4) { transition-delay: 0.3s; }
+    #mobileMenu.is-open .mobile-link:nth-child(5) { transition-delay: 0.4s; }
+    #mobileMenu.is-open .mobile-link:nth-child(6) { transition-delay: 0.5s; }
+    #mobileMenu.is-open .mobile-link:nth-child(7) { transition-delay: 0.6s; }
+
+    #themeToggle.is-spinning {
+        animation: toggle-spin 0.3s ease;
+    }
+}
+
+@keyframes toggle-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(180deg); }
+}
+
 /* Rule card hover animation */
 .rule-card {
     transform-origin: center center;

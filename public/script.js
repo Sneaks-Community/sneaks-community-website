@@ -15,8 +15,9 @@ function escapeHTML(str) {
 const Motion = window.Motion ?? {};
 const { animate, stagger, inView, scroll } = Motion;
 const motionReady = typeof animate === 'function';
-// prefersReducedMotion is declared in common.js (loaded first). Treat a missing animation
-// library like reduced-motion: reveal content statically, skip animation.
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Treat a missing animation library like reduced-motion: reveal content statically,
+// skip animation.
 const animationsOff = prefersReducedMotion || !motionReady;
 
 // Animate a number from 0 up to its target (easeOutCubic) via rAF.
