@@ -19,6 +19,14 @@
     src: url("/fonts/space-grotesk.woff2") format("woff2");
 }
 
+/* Brand-derived accents, so recolouring --color-brand-500 recolours the site. */
+:root {
+    --brand-border: color-mix(in oklab, var(--color-brand-500) 50%, transparent);
+    --brand-border-dark: color-mix(in oklab, var(--color-brand-400) 45%, transparent);
+    --brand-shadow: color-mix(in oklab, var(--color-brand-500) 40%, transparent);
+    --brand-shadow-strong: color-mix(in oklab, var(--color-brand-500) 55%, transparent);
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -26,6 +34,19 @@ html {
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+    text-wrap: balance;
+}
+
+p {
+    text-wrap: pretty;
+}
+
+/* Stops card widths jittering while the player count animates upward. */
+.player-count {
+    font-variant-numeric: tabular-nums;
 }
 
 /* Logo container default size (CSP-compliant alternative to inline styles) */
@@ -42,12 +63,12 @@ body {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #357192; /* brand-600 */
+    background: var(--color-brand-600);
     border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #2a5d79; /* brand-700 */
+    background: var(--color-brand-700);
 }
 
 @keyframes ping-green {
@@ -217,17 +238,17 @@ a.bg-brand-500 .icon-discord {
 }
 
 .rule-card:hover {
-    border-color: rgba(65, 137, 175, 0.5);
+    border-color: var(--brand-border);
 }
 
 .dark .rule-card:hover {
-    border-color: rgba(99, 162, 196, 0.45);
+    border-color: var(--brand-border-dark);
 }
 
 @media (prefers-reduced-motion: no-preference) {
     .rule-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 26px -12px rgba(65, 137, 175, 0.40);
+        box-shadow: 0 10px 26px -12px var(--brand-shadow);
     }
 }
 
@@ -239,23 +260,23 @@ a.bg-brand-500 .icon-discord {
    richer against the near-black dark surface. */
 .brand-glow {
     background:
-        radial-gradient(55% 50% at 18% 0%, rgba(65, 137, 175, 0.10), transparent 70%),
-        radial-gradient(45% 45% at 85% 15%, rgba(99, 162, 196, 0.08), transparent 70%),
-        radial-gradient(40% 45% at 60% 95%, rgba(42, 93, 121, 0.08), transparent 70%);
+        radial-gradient(55% 50% at 18% 0%, color-mix(in oklab, var(--color-brand-500) 10%, transparent), transparent 70%),
+        radial-gradient(45% 45% at 85% 15%, color-mix(in oklab, var(--color-brand-400) 8%, transparent), transparent 70%),
+        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 8%, transparent), transparent 70%);
 }
 
 .dark .brand-glow {
     background:
-        radial-gradient(55% 50% at 18% 0%, rgba(65, 137, 175, 0.22), transparent 70%),
-        radial-gradient(45% 45% at 85% 15%, rgba(99, 162, 196, 0.14), transparent 70%),
-        radial-gradient(40% 45% at 60% 95%, rgba(42, 93, 121, 0.20), transparent 70%);
+        radial-gradient(55% 50% at 18% 0%, color-mix(in oklab, var(--color-brand-500) 22%, transparent), transparent 70%),
+        radial-gradient(45% 45% at 85% 15%, color-mix(in oklab, var(--color-brand-400) 14%, transparent), transparent 70%),
+        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 20%, transparent), transparent 70%);
 }
 
 /* Faint structural grid, masked to fade out toward the edges. */
 .bg-grid {
     background-image:
-        linear-gradient(to right, rgba(65, 137, 175, 0.07) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(65, 137, 175, 0.07) 1px, transparent 1px);
+        linear-gradient(to right, color-mix(in oklab, var(--color-brand-500) 7%, transparent) 1px, transparent 1px),
+        linear-gradient(to bottom, color-mix(in oklab, var(--color-brand-500) 7%, transparent) 1px, transparent 1px);
     background-size: 56px 56px;
     -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
     mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
@@ -308,13 +329,13 @@ a.bg-brand-500 .icon-discord {
 @media (prefers-reduced-motion: no-preference) {
     .card-hover:hover {
         transform: translateY(-4px);
-        box-shadow: 0 14px 34px -12px rgba(65, 137, 175, 0.40);
-        border-color: rgba(65, 137, 175, 0.5);
+        box-shadow: 0 14px 34px -12px var(--brand-shadow);
+        border-color: var(--brand-border);
     }
 
     .dark .card-hover:hover {
-        box-shadow: 0 16px 40px -14px rgba(65, 137, 175, 0.55);
-        border-color: rgba(99, 162, 196, 0.45);
+        box-shadow: 0 16px 40px -14px var(--brand-shadow-strong);
+        border-color: var(--brand-border-dark);
     }
 }
 
@@ -325,17 +346,17 @@ nav.nav-scrolled {
 }
 
 .dark nav.nav-scrolled {
-    background-color: rgba(8, 9, 11, 0.75);
+    background-color: color-mix(in oklab, var(--color-surface-950) 75%, transparent);
     border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Primary CTA brand glow */
 .btn-glow {
-    box-shadow: 0 8px 24px -8px rgba(65, 137, 175, 0.55);
+    box-shadow: 0 8px 24px -8px var(--brand-shadow-strong);
 }
 
 .btn-glow:hover {
-    box-shadow: 0 10px 30px -8px rgba(65, 137, 175, 0.75);
+    box-shadow: 0 10px 30px -8px color-mix(in oklab, var(--color-brand-500) 75%, transparent);
 }
 
 /* Hero headline word reveal: each word sits in an overflow-clipped

@@ -25,7 +25,18 @@
     --color-brand-900: #214254;
     --color-brand-950: #152b37;
 
-    /* Self-hosted (see @font-face in public/style.css) — no external requests. */
+    /* Surface elevation scale. Sections alternate between the page surface and
+       the raised one so the page reads as layered rather than one flat field. */
+    --color-surface-50: #ffffff; /* light: card   */
+    --color-surface-100: #f8fafc; /* light: page   */
+    --color-surface-200: #eef2f7; /* light: raised */
+    --color-surface-800: #12151c; /* dark:  card   */
+    --color-surface-900: #0c0e13; /* dark:  raised */
+    --color-surface-950: #08090b; /* dark:  page   */
+
+    --color-ink: #e2e8f0; /* dark-mode body text */
+
+    /* Self-hosted (see @font-face in src/custom.css) — no external requests. */
     --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-display: "Space Grotesk", "Manrope", ui-sans-serif, system-ui, sans-serif;
 }

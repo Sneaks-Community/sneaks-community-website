@@ -41,7 +41,7 @@
     <!-- Motion.dev (self-hosted) -->
     <script src="/lib/motion.js" defer></script>
 </head>
-<body class="bg-slate-50 dark:bg-[#08090b] text-slate-800 dark:text-[#e2e8f0] font-sans antialiased transition-colors duration-300">
+<body class="bg-surface-100 dark:bg-surface-950 text-slate-800 dark:text-ink font-sans antialiased transition-colors duration-300">
 
     <!-- Brand icon sprite: each brand SVG path is defined once here and referenced via <use> below -->
     <svg xmlns="http://www.w3.org/2000/svg" class="hidden" aria-hidden="true">
@@ -115,7 +115,7 @@
     </nav>
 
     <!-- Mobile Menu Overlay -->
-    <div id="mobileMenu" class="fixed inset-0 z-40 bg-slate-50/95 dark:bg-[#08090b]/95 backdrop-blur-xl flex flex-col justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="mobileMenu" class="fixed inset-0 z-40 bg-surface-100/95 dark:bg-surface-950/95 backdrop-blur-xl flex flex-col justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="flex flex-col items-center gap-8 text-xl font-bold tracking-tight font-display">
             <a href="#home" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">Home</a>
             <a href="#about" class="mobile-link text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-white transition-colors">About</a>
@@ -160,7 +160,7 @@
     </header>
 
     <!-- About Section -->
-    <section id="about" class="py-24 border-y border-black/5 dark:border-white/5 bg-slate-100 dark:bg-[#08090b] relative transition-colors duration-300">
+    <section id="about" class="py-24 border-y border-black/5 dark:border-white/5 bg-surface-200 dark:bg-surface-900 relative transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid md:grid-cols-2 gap-16 items-center">
                 <div id="about-text" class="space-y-4 opacity-0">
@@ -266,7 +266,7 @@
     </section>
 
     <!-- Resources Section -->
-    <section id="resources" class="py-24 border-y border-black/5 dark:border-white/5 bg-white dark:bg-[#08090b] relative overflow-hidden transition-colors duration-300">
+    <section id="resources" class="py-24 border-y border-black/5 dark:border-white/5 bg-surface-50 dark:bg-surface-900 relative overflow-hidden transition-colors duration-300">
         <!-- Background accents -->
         <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
             <div class="absolute left-0 top-0 w-1/2 h-full bg-gradient-to-r from-brand-500/20 to-transparent"></div>
@@ -309,7 +309,7 @@
     </section>
 
     <!-- Community Section -->
-    <section id="community" class="py-24 bg-slate-100 dark:bg-[#08090b] relative overflow-hidden border-t border-black/5 dark:border-white/5 transition-colors duration-300">
+    <section id="community" class="py-24 bg-surface-200 dark:bg-surface-950 relative overflow-hidden border-t border-black/5 dark:border-white/5 transition-colors duration-300">
         <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
             <div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-brand-700/20 to-transparent"></div>
         </div>
@@ -359,7 +359,7 @@
     </section>
 
     <!-- Rules Section -->
-    <section id="rules" class="py-20 border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-[#08090b] transition-colors duration-300">
+    <section id="rules" class="py-20 border-t border-black/5 dark:border-white/5 bg-surface-100 dark:bg-surface-900 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-12">
                 <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">COMMUNITY RULES</h2>
@@ -471,7 +471,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="h-16 border-t border-black/5 dark:border-white/5 bg-slate-100 dark:bg-black/40 flex items-center justify-between px-8 z-20 transition-colors duration-300">
+    <footer class="h-16 border-t border-black/5 dark:border-white/5 bg-surface-200 dark:bg-surface-950 flex items-center justify-between px-8 z-20 transition-colors duration-300">
         <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8">
             <div class="flex gap-4 footer-icons-container">
                 <a id="link-steam-footer" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
