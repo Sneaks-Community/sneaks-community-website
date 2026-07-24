@@ -85,7 +85,9 @@ export default tseslint.config(
   },
 
   {
-    files: ["public/**/*.js"],
+    // Browser-targeted scripts: everything served from public/, plus the bundle
+    // entry that esbuild compiles into public/lib/.
+    files: ["public/**/*.js", "src/motion-entry.js"],
     languageOptions: {
       globals: {
         ...globals.browser,
