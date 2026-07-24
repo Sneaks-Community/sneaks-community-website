@@ -272,48 +272,114 @@ a.bg-brand-500 .icon-discord {
         radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 20%, transparent), transparent 70%);
 }
 
-/* Faint structural grid, masked to fade out toward the edges. */
-.bg-grid {
+/* Host for the decorative layers below. isolation confines the grain's blend
+   mode to this section instead of letting it composite against the whole page. */
+.ambient {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+/* Single-radial section accent. Position, size and tint come from custom
+   properties so each section gets one class instead of its own wrapper divs
+   (inline styles are not an option under the CSP). Strength is applied as
+   layer opacity rather than colour alpha, which keeps it compositable. */
+.glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--glow-opacity, 0.12);
+    background: radial-gradient(
+        var(--glow-size, 60% 55%) at var(--glow-x, 50%) var(--glow-y, 0%),
+        var(--glow-color, var(--color-brand-500)),
+        transparent 72%);
+}
+
+.dark .glow {
+    opacity: var(--glow-opacity, 0.22);
+}
+
+.glow--about { --glow-x: 3%; --glow-y: 40%; --glow-size: 40% 62%; }
+.glow--servers { --glow-x: 50%; --glow-y: -6%; --glow-size: 78% 58%; }
+.glow--resources { --glow-x: 6%; --glow-y: 0%; --glow-size: 48% 72%; }
+.glow--community { --glow-x: 96%; --glow-y: 8%; --glow-size: 48% 72%; --glow-color: var(--color-brand-700); }
+.glow--rules { --glow-x: 50%; --glow-y: 112%; --glow-size: 72% 46%; }
+
+/* Faint structural grid. --grid-line / --grid-size let the hero keep its
+   tighter, brighter lattice while sections get a wider, quieter one. */
+.bg-grid,
+.bg-grid-soft {
     background-image:
-        linear-gradient(to right, color-mix(in oklab, var(--color-brand-500) 7%, transparent) 1px, transparent 1px),
-        linear-gradient(to bottom, color-mix(in oklab, var(--color-brand-500) 7%, transparent) 1px, transparent 1px);
-    background-size: 56px 56px;
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+}
+
+.bg-grid {
+    --grid-line: color-mix(in oklab, var(--color-brand-500) 7%, transparent);
+    --grid-size: 56px;
     -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
     mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
 }
 
 .dark .bg-grid {
-    background-image:
-        linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    --grid-line: rgba(255, 255, 255, 0.045);
 }
 
-/* Fine film grain to keep gradients from looking sterile/digital. */
-.bg-grain {
+.bg-grid-soft {
+    --grid-line: color-mix(in oklab, var(--color-brand-500) 5%, transparent);
+    --grid-size: 96px;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, #000 15%, transparent 80%);
+    mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, #000 15%, transparent 80%);
+}
+
+.dark .bg-grid-soft {
+    --grid-line: rgba(255, 255, 255, 0.03);
+}
+
+/* Brand hairline that fades out at both ends, replacing flat 1px borders
+   at section boundaries. */
+.seam-top::before,
+.seam-bottom::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to right,
+        transparent,
+        color-mix(in oklab, var(--color-brand-500) 28%, transparent) 22%,
+        color-mix(in oklab, var(--color-brand-400) 45%, transparent) 50%,
+        color-mix(in oklab, var(--color-brand-500) 28%, transparent) 78%,
+        transparent);
+}
+
+.seam-top::before { top: 0; }
+.seam-bottom::after { bottom: 0; }
+
+/* Fine film grain to keep gradients from looking sterile/digital. Static: it
+   previously animated background-position forever, repainting a full-viewport
+   layer every ~1.3s on every page. */
+.grain {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
     background-image: url("/grain.svg");
     background-repeat: repeat;
     opacity: 0.03;
     mix-blend-mode: overlay;
 }
 
-.dark .bg-grain {
+.dark .grain {
     opacity: 0.05;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .bg-grain {
-        animation: grain-shift 8s steps(6) infinite;
-    }
-}
-
-/* Tiny positional jitter makes the grain read as film, not a static tile.
-   Animating background-position (not transform) keeps full edge coverage. */
-@keyframes grain-shift {
-    0%, 100% { background-position: 0 0; }
-    20% { background-position: -12px 8px; }
-    40% { background-position: 8px -12px; }
-    60% { background-position: -8px -8px; }
-    80% { background-position: 12px 8px; }
 }
 
 /* ------------------------------------------------------------------ */

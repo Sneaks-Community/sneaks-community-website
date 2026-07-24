@@ -136,7 +136,7 @@
         <div id="hero-bg" class="absolute inset-0 z-0 select-none pointer-events-none">
             <div class="absolute inset-0 bg-grid"></div>
             <div id="hero-glow" class="absolute inset-0 brand-glow"></div>
-            <div class="absolute inset-0 bg-grain"></div>
+            <div class="grain"></div>
         </div>
 
         <div id="hero-content" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
@@ -160,7 +160,11 @@
     </header>
 
     <!-- About Section -->
-    <section id="about" class="py-24 border-y border-black/5 dark:border-white/5 bg-surface-200 dark:bg-surface-900 relative transition-colors duration-300">
+    <section id="about" class="py-24 seam-top seam-bottom bg-surface-200 dark:bg-surface-900 ambient transition-colors duration-300">
+        <div class="bg-grid-soft"></div>
+        <div class="glow glow--about"></div>
+        <div class="grain"></div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid md:grid-cols-2 gap-16 items-center">
                 <div id="about-text" class="space-y-4 opacity-0">
@@ -203,7 +207,11 @@
     </section>
 
     <!-- Servers Section -->
-    <section id="servers" class="py-24 relative transition-colors duration-300">
+    <section id="servers" class="py-24 ambient transition-colors duration-300">
+        <div class="bg-grid-soft"></div>
+        <div class="glow glow--servers"></div>
+        <div class="grain"></div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="flex justify-between items-end mb-16 opacity-0" id="servers-header">
                 <div>
@@ -266,11 +274,9 @@
     </section>
 
     <!-- Resources Section -->
-    <section id="resources" class="py-24 border-y border-black/5 dark:border-white/5 bg-surface-50 dark:bg-surface-900 relative overflow-hidden transition-colors duration-300">
-        <!-- Background accents -->
-        <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
-            <div class="absolute left-0 top-0 w-1/2 h-full bg-gradient-to-r from-brand-500/20 to-transparent"></div>
-        </div>
+    <section id="resources" class="py-24 seam-top seam-bottom bg-surface-50 dark:bg-surface-900 ambient transition-colors duration-300">
+        <div class="glow glow--resources"></div>
+        <div class="grain"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16 opacity-0" id="resources-header">
@@ -309,11 +315,10 @@
     </section>
 
     <!-- Community Section -->
-    <section id="community" class="py-24 bg-surface-200 dark:bg-surface-950 relative overflow-hidden border-t border-black/5 dark:border-white/5 transition-colors duration-300">
-        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
-            <div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-brand-700/20 to-transparent"></div>
-        </div>
-        
+    <section id="community" class="py-24 bg-surface-200 dark:bg-surface-950 ambient transition-colors duration-300">
+        <div class="glow glow--community"></div>
+        <div class="grain"></div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <div id="community-text" class="space-y-6 opacity-0">
@@ -359,8 +364,11 @@
     </section>
 
     <!-- Rules Section -->
-    <section id="rules" class="py-20 border-t border-black/5 dark:border-white/5 bg-surface-100 dark:bg-surface-900 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="rules" class="py-20 seam-top bg-surface-100 dark:bg-surface-900 ambient transition-colors duration-300">
+        <div class="glow glow--rules"></div>
+        <div class="grain"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto mb-12">
                 <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">COMMUNITY RULES</h2>
                 <p class="text-base text-slate-600 dark:text-slate-400">
@@ -471,7 +479,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="h-16 border-t border-black/5 dark:border-white/5 bg-surface-200 dark:bg-surface-950 flex items-center justify-between px-8 z-20 transition-colors duration-300">
+    <footer class="h-16 seam-top bg-surface-200 dark:bg-surface-950 flex items-center justify-between px-8 relative z-20 transition-colors duration-300">
         <div class="flex gap-4 max-w-7xl mx-auto w-full justify-between items-center sm:px-6 lg:px-8">
             <div class="flex gap-4 footer-icons-container">
                 <a id="link-steam-footer" href="{{steamLink}}" target="_blank" rel="noopener noreferrer" class="footer-icon relative flex items-center justify-center w-8 h-8 rounded-full" data-brand="steam">
