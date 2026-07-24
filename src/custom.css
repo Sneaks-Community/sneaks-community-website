@@ -297,7 +297,17 @@ a.bg-brand-500 .icon-discord {
 .ambient {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
+    /* clip, not hidden: `overflow: hidden` makes this a scroll container, and a
+       view() timeline measures against its nearest ancestor scroll container.
+       That pinned every reveal inside these sections to a constant progress.
+       `clip` gives the same visual clipping without becoming a scroller. */
+    overflow: clip;
+}
+
+@supports not (overflow: clip) {
+    .ambient {
+        overflow: hidden;
+    }
 }
 
 /* Single-radial section accent. Position, size and tint come from custom
@@ -414,7 +424,9 @@ a.bg-brand-500 .icon-discord {
         .glow--servers {
             animation: glow-rise linear both;
             animation-timeline: view();
-            animation-range: entry 0% exit 100%;
+            /* `cover` spans entry 0% to exit 100%. Written this way because the
+               minifier mangles `entry 0% exit 100%` into `entry exit 0%`. */
+            animation-range: cover;
         }
     }
 }
@@ -582,24 +594,50 @@ nav.nav-scrolled {
 /* ------------------------------------------------------------------ */
 @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-        .reveal,
-        .reveal-stagger > * {
+        /* Ranges end within the `entry` phase, i.e. by the time the subject is
+           fully in view. Fixed pixel distances are not usable here: the last
+           section sits just above a 64px footer, so elements near the document
+           end run out of scroll and freeze at partial opacity. */
+        .reveal {
             animation: reveal-up 0.7s ease-out both;
             animation-timeline: view();
-            animation-range: entry 0% entry 55%;
+            animation-range: entry 0% entry 100%;
         }
 
         .reveal--left { animation-name: reveal-left; }
         .reveal--scale { animation-name: reveal-scale; }
 
-        /* animation-delay is ignored on a scroll timeline, so stagger by
-           shifting each child's range rather than delaying it. */
-        .reveal-stagger > *:nth-child(2) { animation-range: entry 7% entry 62%; }
-        .reveal-stagger > *:nth-child(3) { animation-range: entry 14% entry 69%; }
-        .reveal-stagger > *:nth-child(4) { animation-range: entry 21% entry 76%; }
-        .reveal-stagger > *:nth-child(5) { animation-range: entry 28% entry 83%; }
-        .reveal-stagger > *:nth-child(6) { animation-range: entry 35% entry 90%; }
-        .reveal-stagger > *:nth-child(7) { animation-range: entry 42% entry 97%; }
+        /* Each child on its own timeline by default: always reachable. */
+        .reveal-stagger > * {
+            animation: reveal-up 0.7s ease-out both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 100%;
+        }
+
+        /* From sm up the cards sit side by side, so bind them to the container's
+           timeline instead: it is far taller than one card, so the cascade plays
+           out over a visible distance rather than a card's ~120px height. Only
+           above sm, because these grids collapse to one tall column on mobile
+           and a container taller than the viewport never reaches entry 100%. */
+        @media (min-width: 640px) {
+            .reveal-stagger {
+                view-timeline-name: --reveal-group;
+            }
+
+            .reveal-stagger > * {
+                animation-timeline: --reveal-group;
+                animation-range: entry 0% entry 55%;
+            }
+
+            /* animation-delay is ignored on a scroll timeline, so stagger by
+               offsetting each child's range rather than delaying it. */
+            .reveal-stagger > *:nth-child(2) { animation-range: entry 5% entry 60%; }
+            .reveal-stagger > *:nth-child(3) { animation-range: entry 10% entry 65%; }
+            .reveal-stagger > *:nth-child(4) { animation-range: entry 15% entry 70%; }
+            .reveal-stagger > *:nth-child(5) { animation-range: entry 20% entry 75%; }
+            .reveal-stagger > *:nth-child(6) { animation-range: entry 25% entry 80%; }
+            .reveal-stagger > *:nth-child(7) { animation-range: entry 30% entry 85%; }
+        }
 
         /* Hero parallax. Both layers read the hero's own geometry, matching
            the section-targeted range the JS version used. */
@@ -623,11 +661,11 @@ nav.nav-scrolled {
 }
 
 @keyframes reveal-up {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(28px); }
 }
 
 @keyframes reveal-left {
-    from { opacity: 0; transform: translateX(-30px); }
+    from { opacity: 0; transform: translateX(-36px); }
 }
 
 @keyframes reveal-scale {
