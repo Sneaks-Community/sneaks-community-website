@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Unlayered, so these rules win over Tailwind's utilities. */
+@import "./custom.css";
 
 @source '../public';
 
