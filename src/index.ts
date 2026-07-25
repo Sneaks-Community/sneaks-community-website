@@ -96,6 +96,59 @@ function resolveSiteUrl(raw: string | undefined): string {
 }
 const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 
+// Optional web analytics, proxied same-origin under /stats (see the ANALYTICS_PROXY_PATH mount
+// below) so the browser never contacts the analytics host and the CSP needs no third-party
+// origins. Enabled only when the provider is supported and both the host and website id are
+// valid; anything missing or malformed disables analytics entirely (no script, /stats 404s).
+const SUPPORTED_ANALYTICS_PROVIDERS = new Set(['umami', 'plausible']);
+// Covers Umami UUIDs and Plausible domains; also keeps the value safe to interpolate.
+const ANALYTICS_WEBSITE_ID_RE = /^[\w.-]{1,128}$/;
+
+interface AnalyticsConfig {
+    provider: string;
+    host: string;
+    websiteId: string;
+}
+
+// Like resolveSiteUrl, but there is no sane default backend, so invalid input means unset.
+function resolveAnalyticsHost(raw: string | undefined): string | null {
+    const value = (raw ?? '').trim();
+    if (value === '') return null;
+    try {
+        const url = new URL(value);
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('protocol must be http(s)');
+        if (url.search || url.hash || (url.pathname !== '/' && url.pathname !== '')) throw new Error('must be a bare origin');
+        return url.origin;
+    } catch (error) {
+        logger.warn({ err: error, analyticsHost: value }, 'Invalid ANALYTICS_HOST, analytics disabled');
+        return null;
+    }
+}
+
+function resolveAnalytics(): AnalyticsConfig | null {
+    const provider = (process.env.ANALYTICS_PROVIDER ?? '').trim().toLowerCase();
+    if (provider === '') return null;
+    if (!SUPPORTED_ANALYTICS_PROVIDERS.has(provider)) {
+        logger.warn({ provider }, 'Unsupported ANALYTICS_PROVIDER, analytics disabled');
+        return null;
+    }
+
+    const host = resolveAnalyticsHost(process.env.ANALYTICS_HOST);
+    const websiteId = (process.env.ANALYTICS_WEBSITE_ID ?? '').trim();
+    if (websiteId !== '' && !ANALYTICS_WEBSITE_ID_RE.test(websiteId)) {
+        logger.warn('Invalid ANALYTICS_WEBSITE_ID, analytics disabled');
+        return null;
+    }
+    if (!host || websiteId === '') {
+        logger.warn({ provider }, 'ANALYTICS_PROVIDER set without ANALYTICS_HOST and ANALYTICS_WEBSITE_ID, analytics disabled');
+        return null;
+    }
+
+    return { provider, host, websiteId };
+}
+const analytics = resolveAnalytics();
+if (analytics) logger.info({ provider: analytics.provider, host: analytics.host }, 'Analytics enabled');
+
 // SEO metadata and a few identity-specific prose fields.
 const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
     || "Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.";
@@ -312,6 +365,74 @@ app.get('/sitemap.xml', (req, res) => {
     res.set('Cache-Control', 'public, max-age=86400');
     res.type('application/xml').send(renderedSitemapXml);
 });
+// Same-origin analytics proxy. Mounted before the public static mount (so no file can shadow
+// it) and before the 404 handler. Forwards /stats/<path> to the analytics backend 1:1, which
+// keeps every analytics request on this origin: CSP stays 'self', and ad-blockers have no
+// third-party hostname to match. Outbound fetch only, so read_only containers are unaffected.
+// Note: the rate limiter is mounted on /api only, so /stats is not throttled.
+const ANALYTICS_PROXY_PATH = '/stats';
+const ANALYTICS_TIMEOUT_MS = 5000;
+const ANALYTICS_MAX_BODY_BYTES = 64 * 1024;
+
+// Buffer the (tiny) event beacon body: no body parser runs before /stats, so req is still a raw
+// stream, and buffering avoids fetch's duplex: 'half' streaming requirement.
+const readRequestBody = async (req: express.Request): Promise<Uint8Array<ArrayBuffer>> => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    for await (const chunk of req) {
+        const buffer = chunk as Buffer;
+        size += buffer.length;
+        if (size > ANALYTICS_MAX_BODY_BYTES) throw new Error('body too large');
+        chunks.push(buffer);
+    }
+    return new Uint8Array(Buffer.concat(chunks));
+};
+
+app.use(ANALYTICS_PROXY_PATH, async (req, res) => {
+    if (!analytics) return res.sendStatus(404);
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'POST') {
+        return res.set('Allow', 'GET, HEAD, POST').sendStatus(405);
+    }
+
+    let body: Uint8Array<ArrayBuffer> | undefined;
+    if (req.method === 'POST') {
+        try {
+            body = await readRequestBody(req);
+        } catch (error) {
+            logger.warn({ err: error }, 'Analytics request body rejected');
+            return res.sendStatus(413);
+        }
+    }
+
+    const headers: Record<string, string> = { 'x-forwarded-for': req.ip ?? '' };
+    if (req.headers['content-type']) headers['content-type'] = req.headers['content-type'];
+    if (req.headers['user-agent']) headers['user-agent'] = req.headers['user-agent'];
+
+    try {
+        const upstream = await fetch(`${analytics.host}${req.url}`, {
+            method: req.method,
+            headers,
+            body,
+            signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
+        });
+
+        // Relay content-type/cache-control only. content-encoding and content-length must not be
+        // copied: fetch already decoded the body and compression() re-encodes the response.
+        const contentType = upstream.headers.get('content-type');
+        const cacheControl = upstream.headers.get('cache-control');
+        if (contentType) res.set('Content-Type', contentType);
+        if (cacheControl) res.set('Cache-Control', cacheControl);
+
+        res.status(upstream.status);
+        const payload = Buffer.from(await upstream.arrayBuffer());
+        return res.send(payload);
+    } catch (error) {
+        // Never let a flaky analytics backend break a page load.
+        logger.warn({ err: error, path: req.url }, 'Analytics proxy request failed');
+        return res.sendStatus(502);
+    }
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
 
 // Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
