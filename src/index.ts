@@ -405,6 +405,18 @@ const readRequestBody = async (req: express.Request): Promise<Uint8Array<ArrayBu
     return new Uint8Array(Buffer.concat(chunks));
 };
 
+// Dedicated limiter: the /api limiter does not cover /stats. Sized well above real usage (one
+// cached tracker fetch plus an event per page view) and only mounted when analytics is enabled.
+if (analytics) {
+    app.use(ANALYTICS_PROXY_PATH, rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 900,
+        message: { success: false, message: 'Too many requests, please try again later' },
+        standardHeaders: true,
+        legacyHeaders: false,
+    }));
+}
+
 app.use(ANALYTICS_PROXY_PATH, async (req, res) => {
     if (!analytics) return res.sendStatus(404);
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'POST') {

@@ -59,6 +59,8 @@ The server reverse-proxies analytics traffic under `/stats`, so:
 - **No Content-Security-Policy change is needed.** The hardened `script-src 'self'` / `connect-src 'self'` policy already permits same-origin requests, and no third-party analytics hostname is ever exposed to the client.
 - The client IP is forwarded as `X-Forwarded-For` so backend geolocation works. Set `TRUST_PROXY` correctly if you run behind a reverse proxy.
 - If the analytics host is unreachable, the proxy returns a `502` and logs a warning; page loads are unaffected.
+- `/stats` has its own rate limit (900 requests per 15 minutes per IP), well above what a real visitor generates.
+- Page views are tracked on both the site and the 404 page, so hits on missing URLs appear in your dashboard.
 
 The reference provider is [Umami](https://umami.is) (cookieless, no consent banner needed); [Plausible](https://plausible.io) is also supported. Like every other variable, these are read at container start, so a change plus `docker compose up -d` is enough.
 
