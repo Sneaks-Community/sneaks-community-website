@@ -44,7 +44,23 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `STATS_LINK` | "Player Statistics" resource card destination |
 | `BANS_LINK` | "Ban List" resource card destination |
 | `ALLOWED_ORIGINS` | Comma-separated CORS allow-list |
+| `ANALYTICS_PROVIDER` | Analytics tracker to embed: `umami` or `plausible`. Unset (default) disables analytics entirely |
+| `ANALYTICS_HOST` | Origin of your existing analytics instance (no trailing slash), self-hosted on any domain or a hosted service such as `https://cloud.umami.is` |
+| `ANALYTICS_WEBSITE_ID` | Site identifier from the analytics dashboard (a UUID for Umami, the configured domain for Plausible) |
 | `TRUST_PROXY` | Trust `X-Forwarded-For` for the client IP. **Only enable behind a trusted reverse proxy** — otherwise clients can spoof their IP to evade the rate limiter and the `/health` guard. `false` (default), `true`, a hop count (e.g. `1`), or a comma-separated IP/CIDR list |
+
+### Analytics
+
+Analytics is **disabled by default** and only activates when `ANALYTICS_PROVIDER`, `ANALYTICS_HOST` and `ANALYTICS_WEBSITE_ID` are all set to valid values; anything missing or malformed logs a warning at startup and leaves the site untouched. Standing up the analytics backend is out of scope: point `ANALYTICS_HOST` at an instance you already run (on any domain) or at a hosted service.
+
+The server reverse-proxies analytics traffic under `/stats`, so:
+
+- The browser only ever talks to this site's own origin. The tracker loads from `/stats/script.js` and events post to `/stats/*`, which the server forwards to `ANALYTICS_HOST`.
+- **No Content-Security-Policy change is needed.** The hardened `script-src 'self'` / `connect-src 'self'` policy already permits same-origin requests, and no third-party analytics hostname is ever exposed to the client.
+- The client IP is forwarded as `X-Forwarded-For` so backend geolocation works. Set `TRUST_PROXY` correctly if you run behind a reverse proxy.
+- If the analytics host is unreachable, the proxy returns a `502` and logs a warning; page loads are unaffected.
+
+The reference provider is [Umami](https://umami.is) (cookieless, no consent banner needed); [Plausible](https://plausible.io) is also supported. Like every other variable, these are read at container start, so a change plus `docker compose up -d` is enough.
 
 ### Server Configuration
 
