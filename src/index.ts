@@ -100,6 +100,7 @@ const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 // below) so the browser never contacts the analytics host and the CSP needs no third-party
 // origins. Enabled only when the provider is supported and both the host and website id are
 // valid; anything missing or malformed disables analytics entirely (no script, /stats 404s).
+const ANALYTICS_PROXY_PATH = '/stats';
 const SUPPORTED_ANALYTICS_PROVIDERS = new Set(['umami', 'plausible']);
 // Covers Umami UUIDs and Plausible domains; also keeps the value safe to interpolate.
 const ANALYTICS_WEBSITE_ID_RE = /^[\w.-]{1,128}$/;
@@ -226,6 +227,21 @@ const detectLogoPath = (): string | null => {
 const logoPath = detectLogoPath();
 if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
 
+// Tracker tag, pointed at the same-origin proxy instead of the analytics host. Empty string
+// when analytics is disabled, so the rendered HTML is unchanged.
+const buildAnalyticsScript = (): string => {
+    if (!analytics) return '';
+    const websiteId = escapeHtml(analytics.websiteId);
+    switch (analytics.provider) {
+        case 'umami':
+            return `<script defer src="${ANALYTICS_PROXY_PATH}/script.js" data-website-id="${websiteId}" data-host-url="${ANALYTICS_PROXY_PATH}"></script>`;
+        case 'plausible':
+            return `<script defer src="${ANALYTICS_PROXY_PATH}/script.js" data-domain="${websiteId}" data-api="${ANALYTICS_PROXY_PATH}/api/event"></script>`;
+        default:
+            return '';
+    }
+};
+
 // Token values, already fully escaped (or JSON-safe for structuredData). Substituted via a
 // single function-replacer pass so replaceAll's '$' patterns ($$, $&, ...) in values can't
 // mangle the output or re-inject the matched token.
@@ -251,6 +267,8 @@ const brandingTokens = new Map<string, string>([
     ['logoContainerInner', logoPath
         ? `<img src="${logoPath}" alt="Logo">`
         : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-crosshair"/></svg>'],
+    // Also trusted markup: only the escaped, charset-constrained website id is interpolated.
+    ['analyticsScript', buildAnalyticsScript()],
 ]);
 
 const renderBranding = (html: string): string =>
@@ -370,7 +388,6 @@ app.get('/sitemap.xml', (req, res) => {
 // keeps every analytics request on this origin: CSP stays 'self', and ad-blockers have no
 // third-party hostname to match. Outbound fetch only, so read_only containers are unaffected.
 // Note: the rate limiter is mounted on /api only, so /stats is not throttled.
-const ANALYTICS_PROXY_PATH = '/stats';
 const ANALYTICS_TIMEOUT_MS = 5000;
 const ANALYTICS_MAX_BODY_BYTES = 64 * 1024;
 
