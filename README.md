@@ -25,29 +25,46 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 > precompiled Docker image you only need to change the env and restart (`docker compose up -d`),
 > **no rebuild required**. Every variable falls back to a sensible default when unset.
 
-| Variable | Purpose |
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `NODE_ENV` | Node environment (`production` / `development`) | *unset* (anything but `development` behaves as production) |
+| `PORT` | Port to listen on | `3000` |
+| `LOG_LEVEL` | Pino log level | `info` (`debug` when `NODE_ENV=development`) |
+| `COMMUNITY_NAME` | Community name used in the title, headings and footer | `Sneak's Community` |
+| `COMMUNITY_ESTABLISHED` | Founding year shown in the title/OG tags | `2015` |
+| `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` |
+| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Sneak's Community description |
+| `META_KEYWORDS` | SEO meta keywords | Sneak's Community keyword list |
+| `HERO_TAGLINE` | Hero subtitle line | `An open and fun gaming community for all. No application. No membership. Just fun and friends.` |
+| `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | Sneak's Community history copy |
+| `STEAM_LINK` | Steam group/community link | `https://steamcommunity.com/groups/sneakscommunity` |
+| `TWITCH_LINK` | Twitch channel link | `https://twitch.tv/snksrv` |
+| `GITHUB_LINK` | GitHub organization/repo link | `https://github.com/Sneaks-Community` |
+| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs | `https://discord.gg/snksrv` |
+| `STATS_LINK` | "Player Statistics" resource card destination | `https://stats.snksrv.com` |
+| `BANS_LINK` | "Ban List" resource card destination | `https://bans.snksrv.com` |
+| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list | `http://localhost:3000` |
+| `ANALYTICS_PROVIDER` | Analytics tracker to embed: `umami` or `plausible` | *unset* (analytics disabled) |
+| `ANALYTICS_HOST` | Origin of your existing analytics instance (no trailing slash), self-hosted on any domain or a hosted service such as `https://cloud.umami.is` | *unset* (analytics disabled) |
+| `ANALYTICS_WEBSITE_ID` | Site identifier from the analytics dashboard (a UUID for Umami, the configured domain for Plausible) | *unset* (analytics disabled) |
+| `CLIENT_IP_HEADER` | Name of the header your proxy puts the real client IP in; see [Client IP resolution](#client-ip-resolution) | *unset* (TCP peer address) |
+
+### Client IP resolution
+
+`CLIENT_IP_HEADER` names the header the rate limiters and the analytics proxy read the visitor's
+address from:
+
+| Value | Use it when |
 | --- | --- |
-| `NODE_ENV` | Node environment (`production` / `development`) |
-| `PORT` | Port to listen on (default `3000`) |
-| `LOG_LEVEL` | Pino log level |
-| `COMMUNITY_NAME` | Community name used in the title, headings and footer |
-| `COMMUNITY_ESTABLISHED` | Founding year shown in the title/OG tags |
-| `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` |
-| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) |
-| `META_KEYWORDS` | SEO meta keywords |
-| `HERO_TAGLINE` | Hero subtitle line |
-| `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs |
-| `STEAM_LINK` | Steam group/community link |
-| `TWITCH_LINK` | Twitch channel link |
-| `GITHUB_LINK` | GitHub organization/repo link |
-| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs |
-| `STATS_LINK` | "Player Statistics" resource card destination |
-| `BANS_LINK` | "Ban List" resource card destination |
-| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list |
-| `ANALYTICS_PROVIDER` | Analytics tracker to embed: `umami` or `plausible`. Unset (default) disables analytics entirely |
-| `ANALYTICS_HOST` | Origin of your existing analytics instance (no trailing slash), self-hosted on any domain or a hosted service such as `https://cloud.umami.is` |
-| `ANALYTICS_WEBSITE_ID` | Site identifier from the analytics dashboard (a UUID for Umami, the configured domain for Plausible) |
-| `TRUST_PROXY` | Trust `X-Forwarded-For` for the client IP. **Only enable behind a trusted reverse proxy** — otherwise clients can spoof their IP to evade the rate limiter and the `/health` guard. `false` (default), `true`, a hop count (e.g. `1`), or a comma-separated IP/CIDR list |
+| *unset* (default) | Nothing fronts the app, so the TCP peer address is used and no header is consulted. |
+| `X-Forwarded-For` | A reverse proxy (nginx, Caddy, Traefik, HAProxy) appends to this chain, which is read from the right. |
+| `X-Real-IP` | Your proxy publishes a single-IP header, which is unambiguous and preferable where available. |
+| `CF-Connecting-IP` | Cloudflare fronts the app and overwrites this header at its edge. |
+
+> [!WARNING]
+> Whichever header you name, the app must be reachable only through the upstream that sets it, or a
+> visitor can send it themselves. Values that are not a single IP address are ignored and the peer
+> address is used instead.
 
 ### Analytics
 
@@ -57,7 +74,7 @@ The server reverse-proxies analytics traffic under `/stats`, so:
 
 - The browser only ever talks to this site's own origin. The tracker loads from `/stats/script.js` and events post to `/stats/*`, which the server forwards to `ANALYTICS_HOST`.
 - **No Content-Security-Policy change is needed.** The hardened `script-src 'self'` / `connect-src 'self'` policy already permits same-origin requests, and no third-party analytics hostname is ever exposed to the client.
-- The client IP is forwarded as `X-Forwarded-For` so backend geolocation works. Set `TRUST_PROXY` correctly if you run behind a reverse proxy.
+- The resolved client IP is forwarded as a single-entry `X-Forwarded-For` so backend geolocation works. Configure [client IP resolution](#client-ip-resolution) first, or every hit will be attributed to your reverse proxy. If your *analytics host* is itself behind Cloudflare, set `CLIENT_IP_HEADER=x-forwarded-for` in **Umami's** own environment (it uses a variable of the same name), since it otherwise prefers the `CF-Connecting-IP` that Cloudflare rewrites to this server's address.
 - If the analytics host is unreachable, the proxy returns a `502` and logs a warning; page loads are unaffected.
 - `/stats` has its own rate limit (900 requests per 15 minutes per IP), well above what a real visitor generates.
 - Page views are tracked on both the site and the 404 page, so hits on missing URLs appear in your dashboard.
