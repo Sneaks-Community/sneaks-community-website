@@ -102,14 +102,29 @@ const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 // origins. Enabled only when the provider is supported and both the host and website id are
 // valid; anything missing or malformed disables analytics entirely (no script, /stats 404s).
 const ANALYTICS_PROXY_PATH = '/stats';
-const SUPPORTED_ANALYTICS_PROVIDERS = new Set(['umami', 'plausible']);
 // Covers Umami UUIDs and Plausible domains; also keeps the value safe to interpolate.
 const ANALYTICS_WEBSITE_ID_RE = /^[\w.-]{1,128}$/;
+
+// The only upstream paths a tracker needs: the script itself and the event ingest API. Everything
+// else the backend serves (dashboard, login, admin API) is deliberately absent, so the proxy being
+// publicly reachable does not make a private analytics instance publicly reachable.
+interface AnalyticsEndpoints {
+    scriptPath: string;
+    eventPaths: string[];
+}
+const ANALYTICS_ENDPOINTS = new Map<string, AnalyticsEndpoints>([
+    // /api/collect is Umami v1's ingest path, kept alongside v2's /api/send so either works.
+    ['umami', { scriptPath: '/script.js', eventPaths: ['/api/send', '/api/collect'] }],
+    ['plausible', { scriptPath: '/js/script.js', eventPaths: ['/api/event'] }],
+]);
 
 interface AnalyticsConfig {
     provider: string;
     host: string;
     websiteId: string;
+    scriptPath: string;
+    // Upstream path -> methods the proxy forwards for it. Anything absent is a 404.
+    allowedPaths: Map<string, Set<string>>;
 }
 
 // Like resolveSiteUrl, but there is no sane default backend, so invalid input means unset.
@@ -127,10 +142,30 @@ function resolveAnalyticsHost(raw: string | undefined): string | null {
     }
 }
 
+// Optional override for backends serving the tracker under a non-default name (Umami's own
+// TRACKER_SCRIPT_NAME, Plausible's script variants). Constrained to a single rooted .js path so it
+// can only ever widen the allowlist to another script, never to a data or admin endpoint.
+const ANALYTICS_SCRIPT_PATH_CHARSET_RE = /^[\w./-]+$/;
+function resolveAnalyticsScriptPath(raw: string | undefined, fallback: string): string {
+    const value = (raw ?? '').trim();
+    if (value === '') return fallback;
+    const valid = value.startsWith('/')
+        && value.endsWith('.js')
+        && value.length <= 128
+        && !value.includes('..')
+        && ANALYTICS_SCRIPT_PATH_CHARSET_RE.test(value);
+    if (!valid) {
+        logger.warn({ scriptPath: value }, `Invalid ANALYTICS_SCRIPT_PATH, falling back to ${fallback}`);
+        return fallback;
+    }
+    return value;
+}
+
 function resolveAnalytics(): AnalyticsConfig | null {
     const provider = (process.env.ANALYTICS_PROVIDER ?? '').trim().toLowerCase();
     if (provider === '') return null;
-    if (!SUPPORTED_ANALYTICS_PROVIDERS.has(provider)) {
+    const endpoints = ANALYTICS_ENDPOINTS.get(provider);
+    if (!endpoints) {
         logger.warn({ provider }, 'Unsupported ANALYTICS_PROVIDER, analytics disabled');
         return null;
     }
@@ -146,10 +181,19 @@ function resolveAnalytics(): AnalyticsConfig | null {
         return null;
     }
 
-    return { provider, host, websiteId };
+    const scriptPath = resolveAnalyticsScriptPath(process.env.ANALYTICS_SCRIPT_PATH, endpoints.scriptPath);
+    const allowedPaths = new Map<string, Set<string>>([[scriptPath, new Set(['GET', 'HEAD'])]]);
+    for (const eventPath of endpoints.eventPaths) allowedPaths.set(eventPath, new Set(['POST']));
+
+    return { provider, host, websiteId, scriptPath, allowedPaths };
 }
 const analytics = resolveAnalytics();
-if (analytics) logger.info({ provider: analytics.provider, host: analytics.host }, 'Analytics enabled');
+if (analytics) {
+    logger.info(
+        { provider: analytics.provider, host: analytics.host, proxiedPaths: [...analytics.allowedPaths.keys()] },
+        'Analytics enabled'
+    );
+}
 
 // SEO metadata and a few identity-specific prose fields.
 const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
@@ -229,15 +273,19 @@ const logoPath = detectLogoPath();
 if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
 
 // Tracker tag, pointed at the same-origin proxy instead of the analytics host. Empty string
-// when analytics is disabled, so the rendered HTML is unchanged.
+// when analytics is disabled, so the rendered HTML is unchanged. The src mirrors the upstream
+// script path (the proxy forwards 1:1), and the ingest attribute keeps events on the proxy too:
+// Umami appends its event path to data-host-url, Plausible posts to data-api verbatim.
 const buildAnalyticsScript = (): string => {
     if (!analytics) return '';
     const websiteId = escapeHtml(analytics.websiteId);
+    // Charset-constrained by resolveAnalyticsScriptPath, so there is nothing to escape.
+    const scriptSource = `${ANALYTICS_PROXY_PATH}${analytics.scriptPath}`;
     switch (analytics.provider) {
         case 'umami':
-            return `<script defer src="${ANALYTICS_PROXY_PATH}/script.js" data-website-id="${websiteId}" data-host-url="${ANALYTICS_PROXY_PATH}"></script>`;
+            return `<script defer src="${scriptSource}" data-website-id="${websiteId}" data-host-url="${ANALYTICS_PROXY_PATH}"></script>`;
         case 'plausible':
-            return `<script defer src="${ANALYTICS_PROXY_PATH}/script.js" data-domain="${websiteId}" data-api="${ANALYTICS_PROXY_PATH}/api/event"></script>`;
+            return `<script defer src="${scriptSource}" data-domain="${websiteId}" data-api="${ANALYTICS_PROXY_PATH}/api/event"></script>`;
         default:
             return '';
     }
@@ -403,7 +451,9 @@ app.get('/sitemap.xml', (req, res) => {
 // it) and before the 404 handler. Forwards /stats/<path> to the analytics backend 1:1, which
 // keeps every analytics request on this origin: CSP stays 'self', and ad-blockers have no
 // third-party hostname to match. Outbound fetch only, so read_only containers are unaffected.
-// Note: the rate limiter is mounted on /api only, so /stats is not throttled.
+// Only the tracker script and event endpoint are forwarded (see analytics.allowedPaths), so the
+// backend can stay on a private network or an unpublished port and remain unreachable from here.
+// Note: the rate limiter is mounted on /api only, so /stats gets its own below.
 const ANALYTICS_TIMEOUT_MS = 5000;
 const ANALYTICS_MAX_BODY_BYTES = 64 * 1024;
 
@@ -436,8 +486,19 @@ if (analytics) {
 
 app.use(ANALYTICS_PROXY_PATH, async (req, res) => {
     if (!analytics) return res.sendStatus(404);
-    if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'POST') {
-        return res.set('Allow', 'GET, HEAD, POST').sendStatus(405);
+
+    // Exact-match allowlist on the path, which also settles traversal: a request for
+    // /stats/api/send/../../login never equals an allowed key, so it is never forwarded. Split on
+    // '?' only, so a '#' stays in the compared path and fails the match rather than hiding it.
+    const queryIndex = req.url.indexOf('?');
+    const requestPath = queryIndex === -1 ? req.url : req.url.slice(0, queryIndex);
+    const allowedMethods = analytics.allowedPaths.get(requestPath);
+    if (!allowedMethods) {
+        logger.debug({ path: requestPath }, 'Analytics request rejected: path not proxied');
+        return res.sendStatus(404);
+    }
+    if (!allowedMethods.has(req.method)) {
+        return res.set('Allow', [...allowedMethods].join(', ')).sendStatus(405);
     }
 
     let body: Uint8Array<ArrayBuffer> | undefined;

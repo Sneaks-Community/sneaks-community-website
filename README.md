@@ -45,8 +45,9 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `BANS_LINK` | "Ban List" resource card destination | `https://bans.snksrv.com` |
 | `ALLOWED_ORIGINS` | Comma-separated CORS allow-list | `http://localhost:3000` |
 | `ANALYTICS_PROVIDER` | Analytics tracker to embed: `umami` or `plausible` | *unset* (analytics disabled) |
-| `ANALYTICS_HOST` | Origin of your existing analytics instance (no trailing slash), self-hosted on any domain or a hosted service such as `https://cloud.umami.is` | *unset* (analytics disabled) |
+| `ANALYTICS_HOST` | Origin of your existing analytics instance (no trailing slash), reachable privately (e.g. `http://umami:3000`), self-hosted on any domain, or a hosted service such as `https://cloud.umami.is` | *unset* (analytics disabled) |
 | `ANALYTICS_WEBSITE_ID` | Site identifier from the analytics dashboard (a UUID for Umami, the configured domain for Plausible) | *unset* (analytics disabled) |
+| `ANALYTICS_SCRIPT_PATH` | Upstream path of the tracker script, for backends that rename it (Umami's `TRACKER_SCRIPT_NAME`, Plausible script variants). Must be a rooted `.js` path | `/script.js` (umami), `/js/script.js` (plausible) |
 | `CLIENT_IP_HEADER` | Name of the header your proxy puts the real client IP in; see [Client IP resolution](#client-ip-resolution) | *unset* (TCP peer address) |
 
 ### Client IP resolution
@@ -72,14 +73,29 @@ Analytics is **disabled by default** and only activates when `ANALYTICS_PROVIDER
 
 The server reverse-proxies analytics traffic under `/stats`, so:
 
-- The browser only ever talks to this site's own origin. The tracker loads from `/stats/script.js` and events post to `/stats/*`, which the server forwards to `ANALYTICS_HOST`.
+- The browser only ever talks to this site's own origin. The tracker loads from `/stats/<script path>` and events post to `/stats/<event path>`, which the server forwards to `ANALYTICS_HOST`.
 - **No Content-Security-Policy change is needed.** The hardened `script-src 'self'` / `connect-src 'self'` policy already permits same-origin requests, and no third-party analytics hostname is ever exposed to the client.
+- **Only the two paths the tracker needs are proxied**, matched exactly and per method; everything else under `/stats` returns `404` without contacting the backend. See [What the proxy exposes](#what-the-proxy-exposes).
 - The resolved client IP is forwarded as a single-entry `X-Forwarded-For` so backend geolocation works. Configure [client IP resolution](#client-ip-resolution) first, or every hit will be attributed to your reverse proxy. If your *analytics host* is itself behind Cloudflare, set `CLIENT_IP_HEADER=x-forwarded-for` in **Umami's** own environment (it uses a variable of the same name), since it otherwise prefers the `CF-Connecting-IP` that Cloudflare rewrites to this server's address.
 - If the analytics host is unreachable, the proxy returns a `502` and logs a warning; page loads are unaffected.
 - `/stats` has its own rate limit (900 requests per 15 minutes per IP), well above what a real visitor generates.
 - Page views are tracked on both the site and the 404 page, so hits on missing URLs appear in your dashboard.
 
 The reference provider is [Umami](https://umami.is) (cookieless, no consent banner needed); [Plausible](https://plausible.io) is also supported. Like every other variable, these are read at container start, so a change plus `docker compose up -d` is enough.
+
+#### What the proxy exposes
+
+The proxy is not a general pass-through. It forwards exactly two upstream paths per provider, and only the method each one actually uses:
+
+| Provider | `GET`/`HEAD` | `POST` |
+| --- | --- | --- |
+| `umami` | `/script.js` | `/api/send` (and `/api/collect` for v1) |
+| `plausible` | `/js/script.js` | `/api/event` |
+
+Anything else, including `/login`, the dashboard and the admin API, is answered with a `404` by this server and never forwarded. The wrong method on a proxied path returns `405`. Matching is exact, so path traversal (`/stats/api/send/../../login`) fails to match and is rejected as well. Override the script path with `ANALYTICS_SCRIPT_PATH` if your backend renames it; the value must be a rooted `.js` path, so it cannot be pointed at a data endpoint.
+
+> [!TIP]
+> Because only ingest is reachable, **your analytics backend never needs to be exposed to the internet.** Put it on the same Docker network and set `ANALYTICS_HOST=http://umami:3000`: no public hostname, no DNS record, no certificate, and no internet-reachable login form. Reach the dashboard over your LAN, a VPN or an SSH tunnel. A public or hosted instance works exactly the same way.
 
 ### Server Configuration
 
