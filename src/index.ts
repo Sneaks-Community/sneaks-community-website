@@ -1,11 +1,12 @@
 import fs from 'node:fs';
+import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { GameDig } from 'gamedig';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
@@ -228,17 +229,32 @@ try {
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// trust proxy config: only enable behind a trusted reverse proxy, or clients can spoof
-// X-Forwarded-For to bypass the /health IP guard and the rate limiter. Default off.
-// Accepts: false (default), true, a hop count (e.g. "1"), or a comma-separated IP/CIDR list.
-function parseTrustProxy(raw: string | undefined): boolean | number | string {
-    const value = (raw ?? '').trim();
-    if (value === '' || value.toLowerCase() === 'false') return false;
-    if (value.toLowerCase() === 'true') return true;
-    if (/^\d+$/.test(value)) return Number(value);
-    return value;
+// Header naming where the real client IP arrives: CF-Connecting-IP behind Cloudflare, X-Real-IP or
+// X-Forwarded-For behind a reverse proxy. Trusting it rests on the upstream that sets it being the
+// only route to this app, which is the operator's call. Unset means the socket peer is used and no
+// header can override it.
+function resolveClientIpHeader(raw: string | undefined): string | null {
+    const name = (raw ?? '').trim().toLowerCase();
+    if (name === '') return null;
+    if (!/^[\d!#$%&'*+.^_`|~a-z-]+$/.test(name)) {
+        logger.warn({ header: name }, 'CLIENT_IP_HEADER is not a valid header name, ignoring it');
+        return null;
+    }
+    return name;
 }
-const TRUST_PROXY = parseTrustProxy(process.env.TRUST_PROXY);
+const CLIENT_IP_HEADER = resolveClientIpHeader(process.env.CLIENT_IP_HEADER);
+if (CLIENT_IP_HEADER) logger.info({ header: CLIENT_IP_HEADER }, 'Trusting client IP header');
+
+// Single source of truth for the client IP used by the rate limiters and the analytics proxy. A
+// forwarding chain is only trustworthy from the right: whatever precedes the last entry was supplied
+// by the client, so read the last one and ignore the rest. Single-value headers are unaffected.
+function getClientIp(req: express.Request): string | undefined {
+    if (!CLIENT_IP_HEADER) return req.socket.remoteAddress;
+    // eslint-disable-next-line security/detect-object-injection -- charset-validated header name
+    const forwarded = (req.headers[CLIENT_IP_HEADER] ?? '').toString();
+    const nearest = forwarded.slice(forwarded.lastIndexOf(',') + 1).trim();
+    return net.isIP(nearest) ? nearest : req.socket.remoteAddress;
+}
 
 app.use(helmet({
     contentSecurityPolicy: {
@@ -312,10 +328,8 @@ app.get('/sitemap.xml', (req, res) => {
     res.set('Cache-Control', 'public, max-age=86400');
     res.type('application/xml').send(renderedSitemapXml);
 });
-app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
 
-// Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
-app.set('trust proxy', TRUST_PROXY);
+app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
 
 // In-memory cache for server queries (60 seconds TTL)
 const CACHE_TTL_MS = 60_000;
@@ -343,6 +357,7 @@ const apiLimiter = rateLimit({
     message: { success: false, message: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => ipKeyGenerator(getClientIp(req) ?? 'unknown'),
 });
 
 // Apply global rate limiter to all /api/* routes
@@ -424,8 +439,9 @@ app.get('/api/status', async (req, res) => {
 
 // Health check endpoint — restricted to localhost only
 app.get('/health', (req, res) => {
-    const ip = req.ip;
-    if (ip !== '::1' && ip !== '127.0.0.1') {
+    // The raw socket peer, never req.ip or a forwarded header: no proxy setting can open this up.
+    const peer = req.socket.remoteAddress;
+    if (peer !== '127.0.0.1' && peer !== '::1' && peer !== '::ffff:127.0.0.1') {
         return res.status(403).json({ success: false, message: 'Forbidden' });
     }
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
