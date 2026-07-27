@@ -1,11 +1,12 @@
 import fs from 'node:fs';
+import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { GameDig } from 'gamedig';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
@@ -96,6 +97,104 @@ function resolveSiteUrl(raw: string | undefined): string {
 }
 const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 
+// Optional web analytics, proxied same-origin under /stats (see the ANALYTICS_PROXY_PATH mount
+// below) so the browser never contacts the analytics host and the CSP needs no third-party
+// origins. Enabled only when the provider is supported and both the host and website id are
+// valid; anything missing or malformed disables analytics entirely (no script, /stats 404s).
+const ANALYTICS_PROXY_PATH = '/stats';
+// Covers Umami UUIDs and Plausible domains; also keeps the value safe to interpolate.
+const ANALYTICS_WEBSITE_ID_RE = /^[\w.-]{1,128}$/;
+
+// The only upstream paths a tracker needs: the script itself and the event ingest API. Everything
+// else the backend serves (dashboard, login, admin API) is deliberately absent, so the proxy being
+// publicly reachable does not make a private analytics instance publicly reachable.
+interface AnalyticsEndpoints {
+    scriptPath: string;
+    eventPaths: string[];
+}
+const ANALYTICS_ENDPOINTS = new Map<string, AnalyticsEndpoints>([
+    // /api/collect is Umami v1's ingest path, kept alongside v2's /api/send so either works.
+    ['umami', { scriptPath: '/script.js', eventPaths: ['/api/send', '/api/collect'] }],
+    ['plausible', { scriptPath: '/js/script.js', eventPaths: ['/api/event'] }],
+]);
+
+interface AnalyticsConfig {
+    provider: string;
+    host: string;
+    websiteId: string;
+    scriptPath: string;
+    // Upstream path -> methods the proxy forwards for it. Anything absent is a 404.
+    allowedPaths: Map<string, Set<string>>;
+}
+
+// Like resolveSiteUrl, but there is no sane default backend, so invalid input means unset.
+function resolveAnalyticsHost(raw: string | undefined): string | null {
+    const value = (raw ?? '').trim();
+    if (value === '') return null;
+    try {
+        const url = new URL(value);
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('protocol must be http(s)');
+        if (url.search || url.hash || (url.pathname !== '/' && url.pathname !== '')) throw new Error('must be a bare origin');
+        return url.origin;
+    } catch (error) {
+        logger.warn({ err: error, analyticsHost: value }, 'Invalid ANALYTICS_HOST, analytics disabled');
+        return null;
+    }
+}
+
+// Optional override for backends serving the tracker under a non-default name (Umami's own
+// TRACKER_SCRIPT_NAME, Plausible's script variants). Constrained to a single rooted .js path so it
+// can only ever widen the allowlist to another script, never to a data or admin endpoint.
+const ANALYTICS_SCRIPT_PATH_CHARSET_RE = /^[\w./-]+$/;
+function resolveAnalyticsScriptPath(raw: string | undefined, fallback: string): string {
+    const value = (raw ?? '').trim();
+    if (value === '') return fallback;
+    const valid = value.startsWith('/')
+        && value.endsWith('.js')
+        && value.length <= 128
+        && !value.includes('..')
+        && ANALYTICS_SCRIPT_PATH_CHARSET_RE.test(value);
+    if (!valid) {
+        logger.warn({ scriptPath: value }, `Invalid ANALYTICS_SCRIPT_PATH, falling back to ${fallback}`);
+        return fallback;
+    }
+    return value;
+}
+
+function resolveAnalytics(): AnalyticsConfig | null {
+    const provider = (process.env.ANALYTICS_PROVIDER ?? '').trim().toLowerCase();
+    if (provider === '') return null;
+    const endpoints = ANALYTICS_ENDPOINTS.get(provider);
+    if (!endpoints) {
+        logger.warn({ provider }, 'Unsupported ANALYTICS_PROVIDER, analytics disabled');
+        return null;
+    }
+
+    const host = resolveAnalyticsHost(process.env.ANALYTICS_HOST);
+    const websiteId = (process.env.ANALYTICS_WEBSITE_ID ?? '').trim();
+    if (websiteId !== '' && !ANALYTICS_WEBSITE_ID_RE.test(websiteId)) {
+        logger.warn('Invalid ANALYTICS_WEBSITE_ID, analytics disabled');
+        return null;
+    }
+    if (!host || websiteId === '') {
+        logger.warn({ provider }, 'ANALYTICS_PROVIDER set without ANALYTICS_HOST and ANALYTICS_WEBSITE_ID, analytics disabled');
+        return null;
+    }
+
+    const scriptPath = resolveAnalyticsScriptPath(process.env.ANALYTICS_SCRIPT_PATH, endpoints.scriptPath);
+    const allowedPaths = new Map<string, Set<string>>([[scriptPath, new Set(['GET', 'HEAD'])]]);
+    for (const eventPath of endpoints.eventPaths) allowedPaths.set(eventPath, new Set(['POST']));
+
+    return { provider, host, websiteId, scriptPath, allowedPaths };
+}
+const analytics = resolveAnalytics();
+if (analytics) {
+    logger.info(
+        { provider: analytics.provider, host: analytics.host, proxiedPaths: [...analytics.allowedPaths.keys()] },
+        'Analytics enabled'
+    );
+}
+
 // SEO metadata and a few identity-specific prose fields.
 const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
     || "Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.";
@@ -173,6 +272,25 @@ const detectLogoPath = (): string | null => {
 const logoPath = detectLogoPath();
 if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
 
+// Tracker tag, pointed at the same-origin proxy instead of the analytics host. Empty string
+// when analytics is disabled, so the rendered HTML is unchanged. The src mirrors the upstream
+// script path (the proxy forwards 1:1), and the ingest attribute keeps events on the proxy too:
+// Umami appends its event path to data-host-url, Plausible posts to data-api verbatim.
+const buildAnalyticsScript = (): string => {
+    if (!analytics) return '';
+    const websiteId = escapeHtml(analytics.websiteId);
+    // Charset-constrained by resolveAnalyticsScriptPath, so there is nothing to escape.
+    const scriptSource = `${ANALYTICS_PROXY_PATH}${analytics.scriptPath}`;
+    switch (analytics.provider) {
+        case 'umami':
+            return `<script defer src="${scriptSource}" data-website-id="${websiteId}" data-host-url="${ANALYTICS_PROXY_PATH}"></script>`;
+        case 'plausible':
+            return `<script defer src="${scriptSource}" data-domain="${websiteId}" data-api="${ANALYTICS_PROXY_PATH}/api/event"></script>`;
+        default:
+            return '';
+    }
+};
+
 // Token values, already fully escaped (or JSON-safe for structuredData). Substituted via a
 // single function-replacer pass so replaceAll's '$' patterns ($$, $&, ...) in values can't
 // mangle the output or re-inject the matched token.
@@ -198,6 +316,8 @@ const brandingTokens = new Map<string, string>([
     ['logoContainerInner', logoPath
         ? `<img src="${logoPath}" alt="Logo">`
         : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-crosshair"/></svg>'],
+    // Also trusted markup: only the escaped, charset-constrained website id is interpolated.
+    ['analyticsScript', buildAnalyticsScript()],
 ]);
 
 const renderBranding = (html: string): string =>
@@ -228,17 +348,32 @@ try {
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// trust proxy config: only enable behind a trusted reverse proxy, or clients can spoof
-// X-Forwarded-For to bypass the /health IP guard and the rate limiter. Default off.
-// Accepts: false (default), true, a hop count (e.g. "1"), or a comma-separated IP/CIDR list.
-function parseTrustProxy(raw: string | undefined): boolean | number | string {
-    const value = (raw ?? '').trim();
-    if (value === '' || value.toLowerCase() === 'false') return false;
-    if (value.toLowerCase() === 'true') return true;
-    if (/^\d+$/.test(value)) return Number(value);
-    return value;
+// Header naming where the real client IP arrives: CF-Connecting-IP behind Cloudflare, X-Real-IP or
+// X-Forwarded-For behind a reverse proxy. Trusting it rests on the upstream that sets it being the
+// only route to this app, which is the operator's call. Unset means the socket peer is used and no
+// header can override it.
+function resolveClientIpHeader(raw: string | undefined): string | null {
+    const name = (raw ?? '').trim().toLowerCase();
+    if (name === '') return null;
+    if (!/^[\d!#$%&'*+.^_`|~a-z-]+$/.test(name)) {
+        logger.warn({ header: name }, 'CLIENT_IP_HEADER is not a valid header name, ignoring it');
+        return null;
+    }
+    return name;
 }
-const TRUST_PROXY = parseTrustProxy(process.env.TRUST_PROXY);
+const CLIENT_IP_HEADER = resolveClientIpHeader(process.env.CLIENT_IP_HEADER);
+if (CLIENT_IP_HEADER) logger.info({ header: CLIENT_IP_HEADER }, 'Trusting client IP header');
+
+// Single source of truth for the client IP used by the rate limiters and the analytics proxy. A
+// forwarding chain is only trustworthy from the right: whatever precedes the last entry was supplied
+// by the client, so read the last one and ignore the rest. Single-value headers are unaffected.
+function getClientIp(req: express.Request): string | undefined {
+    if (!CLIENT_IP_HEADER) return req.socket.remoteAddress;
+    // eslint-disable-next-line security/detect-object-injection -- charset-validated header name
+    const forwarded = (req.headers[CLIENT_IP_HEADER] ?? '').toString();
+    const nearest = forwarded.slice(forwarded.lastIndexOf(',') + 1).trim();
+    return net.isIP(nearest) ? nearest : req.socket.remoteAddress;
+}
 
 app.use(helmet({
     contentSecurityPolicy: {
@@ -312,10 +447,100 @@ app.get('/sitemap.xml', (req, res) => {
     res.set('Cache-Control', 'public, max-age=86400');
     res.type('application/xml').send(renderedSitemapXml);
 });
-app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
+// Same-origin analytics proxy. Mounted before the public static mount (so no file can shadow
+// it) and before the 404 handler. Forwards /stats/<path> to the analytics backend 1:1, which
+// keeps every analytics request on this origin: CSP stays 'self', and ad-blockers have no
+// third-party hostname to match. Outbound fetch only, so read_only containers are unaffected.
+// Only the tracker script and event endpoint are forwarded (see analytics.allowedPaths), so the
+// backend can stay on a private network or an unpublished port and remain unreachable from here.
+// Note: the rate limiter is mounted on /api only, so /stats gets its own below.
+const ANALYTICS_TIMEOUT_MS = 5000;
+const ANALYTICS_MAX_BODY_BYTES = 64 * 1024;
 
-// Trust proxy for proper IP detection behind reverse proxies (required for express-rate-limit)
-app.set('trust proxy', TRUST_PROXY);
+// Buffer the (tiny) event beacon body: no body parser runs before /stats, so req is still a raw
+// stream, and buffering avoids fetch's duplex: 'half' streaming requirement.
+const readRequestBody = async (req: express.Request): Promise<Uint8Array<ArrayBuffer>> => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    for await (const chunk of req) {
+        const buffer = chunk as Buffer;
+        size += buffer.length;
+        if (size > ANALYTICS_MAX_BODY_BYTES) throw new Error('body too large');
+        chunks.push(buffer);
+    }
+    return new Uint8Array(Buffer.concat(chunks));
+};
+
+// Dedicated limiter: the /api limiter does not cover /stats. Sized well above real usage (one
+// cached tracker fetch plus an event per page view) and only mounted when analytics is enabled.
+if (analytics) {
+    app.use(ANALYTICS_PROXY_PATH, rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 900,
+        message: { success: false, message: 'Too many requests, please try again later' },
+        standardHeaders: true,
+        legacyHeaders: false,
+        keyGenerator: (req) => ipKeyGenerator(getClientIp(req) ?? 'unknown'),
+    }));
+}
+
+app.use(ANALYTICS_PROXY_PATH, async (req, res) => {
+    if (!analytics) return res.sendStatus(404);
+
+    // Exact-match allowlist on the path, which also settles traversal: a request for
+    // /stats/api/send/../../login never equals an allowed key, so it is never forwarded. Split on
+    // '?' only, so a '#' stays in the compared path and fails the match rather than hiding it.
+    const queryIndex = req.url.indexOf('?');
+    const requestPath = queryIndex === -1 ? req.url : req.url.slice(0, queryIndex);
+    const allowedMethods = analytics.allowedPaths.get(requestPath);
+    if (!allowedMethods) {
+        logger.debug({ path: requestPath }, 'Analytics request rejected: path not proxied');
+        return res.sendStatus(404);
+    }
+    if (!allowedMethods.has(req.method)) {
+        return res.set('Allow', [...allowedMethods].join(', ')).sendStatus(405);
+    }
+
+    let body: Uint8Array<ArrayBuffer> | undefined;
+    if (req.method === 'POST') {
+        try {
+            body = await readRequestBody(req);
+        } catch (error) {
+            logger.warn({ err: error }, 'Analytics request body rejected');
+            return res.sendStatus(413);
+        }
+    }
+
+    const headers: Record<string, string> = { 'x-forwarded-for': getClientIp(req) ?? '' };
+    if (req.headers['content-type']) headers['content-type'] = req.headers['content-type'];
+    if (req.headers['user-agent']) headers['user-agent'] = req.headers['user-agent'];
+
+    try {
+        const upstream = await fetch(`${analytics.host}${req.url}`, {
+            method: req.method,
+            headers,
+            body,
+            signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
+        });
+
+        // Relay content-type/cache-control only. content-encoding and content-length must not be
+        // copied: fetch already decoded the body and compression() re-encodes the response.
+        const contentType = upstream.headers.get('content-type');
+        const cacheControl = upstream.headers.get('cache-control');
+        if (contentType) res.set('Content-Type', contentType);
+        if (cacheControl) res.set('Cache-Control', cacheControl);
+
+        res.status(upstream.status);
+        const payload = Buffer.from(await upstream.arrayBuffer());
+        return res.send(payload);
+    } catch (error) {
+        // Never let a flaky analytics backend break a page load.
+        logger.warn({ err: error, path: req.url }, 'Analytics proxy request failed');
+        return res.sendStatus(502);
+    }
+});
+
+app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
 
 // In-memory cache for server queries (60 seconds TTL)
 const CACHE_TTL_MS = 60_000;
@@ -343,6 +568,7 @@ const apiLimiter = rateLimit({
     message: { success: false, message: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => ipKeyGenerator(getClientIp(req) ?? 'unknown'),
 });
 
 // Apply global rate limiter to all /api/* routes
@@ -424,8 +650,9 @@ app.get('/api/status', async (req, res) => {
 
 // Health check endpoint — restricted to localhost only
 app.get('/health', (req, res) => {
-    const ip = req.ip;
-    if (ip !== '::1' && ip !== '127.0.0.1') {
+    // The raw socket peer, never req.ip or a forwarded header: no proxy setting can open this up.
+    const peer = req.socket.remoteAddress;
+    if (peer !== '127.0.0.1' && peer !== '::1' && peer !== '::ffff:127.0.0.1') {
         return res.status(403).json({ success: false, message: 'Forbidden' });
     }
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
