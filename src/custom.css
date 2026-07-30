@@ -607,20 +607,32 @@ nav.nav-scrolled {
         .reveal-stagger > * {
             animation: reveal-up 0.7s ease-out both;
             animation-timeline: view();
-            animation-range-start: cover 0%;
-            animation-range-end: cover 30%;
+            animation-range-start: cover 5%;
+            animation-range-end: cover 45%;
         }
 
         .reveal--left { animation-name: reveal-left; }
         .reveal--scale { animation-name: reveal-scale; }
+
+        /* The last section sits ~220px above the footer, too little scroll left
+           to finish the range above, so its grids reveal over a shorter one. */
+        #rules .reveal-stagger > * {
+            animation-range-start: cover 0%;
+            animation-range-end: cover 28%;
+        }
 
         /* From sm up these grids are two columns, whose cards would otherwise
            reveal in lockstep. animation-delay is ignored on a scroll timeline,
            so stagger the second column by offsetting its range. */
         @media (min-width: 640px) {
             .reveal-stagger > *:nth-child(even) {
-                animation-range-start: cover 6%;
-                animation-range-end: cover 36%;
+                animation-range-start: cover 16%;
+                animation-range-end: cover 54%;
+            }
+
+            #rules .reveal-stagger > *:nth-child(even) {
+                animation-range-start: cover 4%;
+                animation-range-end: cover 32%;
             }
         }
 
