@@ -594,49 +594,29 @@ nav.nav-scrolled {
 /* ------------------------------------------------------------------ */
 @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-        /* Ranges end within the `entry` phase, i.e. by the time the subject is
-           fully in view. Fixed pixel distances are not usable here: the last
-           section sits just above a 64px footer, so elements near the document
-           end run out of scroll and freeze at partial opacity. */
-        .reveal {
+        /* `cover` fractions, not the `entry` phase: `entry` ends as soon as the
+           subject is fully on screen, so a short card finished revealing while
+           still in the bottom sliver. A cover fraction keeps going past that,
+           settling once the card is a third of the way up the viewport. */
+        .reveal,
+        .reveal-stagger > * {
             animation: reveal-up 0.7s ease-out both;
             animation-timeline: view();
-            animation-range: entry 0% entry 100%;
+            animation-range-start: cover 0%;
+            animation-range-end: cover 30%;
         }
 
         .reveal--left { animation-name: reveal-left; }
         .reveal--scale { animation-name: reveal-scale; }
 
-        /* Each child on its own timeline by default: always reachable. */
-        .reveal-stagger > * {
-            animation: reveal-up 0.7s ease-out both;
-            animation-timeline: view();
-            animation-range: entry 0% entry 100%;
-        }
-
-        /* From sm up the cards sit side by side, so bind them to the container's
-           timeline instead: it is far taller than one card, so the cascade plays
-           out over a visible distance rather than a card's ~120px height. Only
-           above sm, because these grids collapse to one tall column on mobile
-           and a container taller than the viewport never reaches entry 100%. */
+        /* From sm up these grids are two columns, whose cards would otherwise
+           reveal in lockstep. animation-delay is ignored on a scroll timeline,
+           so stagger the second column by offsetting its range. */
         @media (min-width: 640px) {
-            .reveal-stagger {
-                view-timeline-name: --reveal-group;
+            .reveal-stagger > *:nth-child(even) {
+                animation-range-start: cover 6%;
+                animation-range-end: cover 36%;
             }
-
-            .reveal-stagger > * {
-                animation-timeline: --reveal-group;
-                animation-range: entry 0% entry 55%;
-            }
-
-            /* animation-delay is ignored on a scroll timeline, so stagger by
-               offsetting each child's range rather than delaying it. */
-            .reveal-stagger > *:nth-child(2) { animation-range: entry 5% entry 60%; }
-            .reveal-stagger > *:nth-child(3) { animation-range: entry 10% entry 65%; }
-            .reveal-stagger > *:nth-child(4) { animation-range: entry 15% entry 70%; }
-            .reveal-stagger > *:nth-child(5) { animation-range: entry 20% entry 75%; }
-            .reveal-stagger > *:nth-child(6) { animation-range: entry 25% entry 80%; }
-            .reveal-stagger > *:nth-child(7) { animation-range: entry 30% entry 85%; }
         }
 
         /* Hero parallax. Both layers read the hero's own geometry, matching
@@ -660,16 +640,21 @@ nav.nav-scrolled {
     }
 }
 
+/* Motion is done by 65% and holds after: reveals near the footer run out of
+   scroll, and this leaves them finished rather than at partial opacity. */
 @keyframes reveal-up {
     from { opacity: 0; transform: translateY(28px); }
+    65% { opacity: 1; transform: none; }
 }
 
 @keyframes reveal-left {
     from { opacity: 0; transform: translateX(-36px); }
+    65% { opacity: 1; transform: none; }
 }
 
 @keyframes reveal-scale {
     from { opacity: 0; transform: scale(0.95); }
+    65% { opacity: 1; transform: none; }
 }
 
 @keyframes hero-glow-exit {
