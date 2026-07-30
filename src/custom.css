@@ -331,7 +331,11 @@ a.bg-brand-500 .icon-discord {
 }
 
 .glow--about { --glow-x: 3%; --glow-y: 40%; --glow-size: 40% 62%; }
-.glow--servers { --glow-x: 50%; --glow-y: -6%; --glow-size: 78% 58%; }
+/* This one is the only glow that moves (see glow-rise), so it bleeds past the
+   section it clips to: at inset 0 the lift dragged its top edge into view and
+   left an unlit band across the section top. Position and vertical radius are
+   percentages of the taller box, chosen to land the same as inset 0 would. */
+.glow--servers { --glow-x: 50%; --glow-y: 2%; --glow-size: 78% 50%; inset: -8% 0; }
 .glow--resources { --glow-x: 6%; --glow-y: 0%; --glow-size: 48% 72%; }
 .glow--community { --glow-x: 96%; --glow-y: 8%; --glow-size: 48% 72%; --glow-color: var(--color-brand-700); }
 .glow--rules { --glow-x: 50%; --glow-y: 112%; --glow-size: 72% 46%; }
@@ -431,10 +435,11 @@ a.bg-brand-500 .icon-discord {
     }
 }
 
+/* Lift stays inside the layer's 8% bleed so no edge ever enters the section. */
 @keyframes glow-rise {
-    from { opacity: calc(var(--glow-peak) * 0.3); transform: translateY(6%); }
+    from { opacity: calc(var(--glow-peak) * 0.3); transform: translateY(4%); }
     50% { opacity: var(--glow-peak); transform: translateY(0); }
-    to { opacity: calc(var(--glow-peak) * 0.3); transform: translateY(-6%); }
+    to { opacity: calc(var(--glow-peak) * 0.3); transform: translateY(-4%); }
 }
 
 /* ------------------------------------------------------------------ */
