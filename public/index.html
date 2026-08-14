@@ -288,49 +288,8 @@
         </div>
     </section>
 
-    <!-- Resources Section -->
-    <section id="resources" class="py-24 seam-top seam-bottom bg-surface-50 dark:bg-surface-900 ambient transition-colors duration-300">
-        <div class="glow glow--resources"></div>
-        <div class="grain"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16 reveal" id="resources-header">
-                <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">TOOLS</h2>
-                <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">RESOURCES</h3>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto reveal-stagger" id="resources-grid">
-                <!-- Stats Card -->
-                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl" id="resource-stats-card">
-                    <div class="icon-chip w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-bar-chart-2"/></svg>
-                    </div>
-                    <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Player Statistics</h4>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View detailed player statistics across all servers. Track your performance, compare with others, and see your progress over time.</p>
-                    <div class="mt-6 flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold text-sm group-hover:gap-3 transition-all">
-                        View Stats
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4"><use href="#icon-arrow-right"/></svg>
-                    </div>
-                </a>
-
-                <!-- Bans Card -->
-                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl" id="resource-bans-card">
-                    <div class="icon-chip w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-shield-alert"/></svg>
-                    </div>
-                    <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Ban List</h4>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View the comprehensive ban list. Administrators can also manage bans and enforcement actions from this dashboard.</p>
-                    <div class="mt-6 flex items-center gap-2 text-brand-700 dark:text-brand-300 font-bold text-sm group-hover:gap-3 transition-all">
-                        View Bans
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4"><use href="#icon-arrow-right"/></svg>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
     <!-- Community Section -->
-    <section id="community" class="py-24 bg-surface-200 dark:bg-surface-950 ambient transition-colors duration-300">
+    <section id="community" class="py-24 seam-top seam-bottom bg-surface-50 dark:bg-surface-900 ambient transition-colors duration-300">
         <div class="glow glow--community"></div>
         <div class="grain"></div>
 
@@ -377,6 +336,47 @@
                     </div>
                   </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-24 bg-surface-200 dark:bg-surface-950 ambient transition-colors duration-300">
+        <div class="glow glow--resources"></div>
+        <div class="grain"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal" id="resources-header">
+                <h2 class="text-brand-600 dark:text-brand-400 font-semibold tracking-widest uppercase text-xs mb-2">TOOLS</h2>
+                <h3 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">RESOURCES</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto reveal-stagger" id="resources-grid">
+                <!-- Stats Card -->
+                <a href="{{statsLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl" id="resource-stats-card">
+                    <div class="icon-chip w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-600 dark:text-brand-400 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-bar-chart-2"/></svg>
+                    </div>
+                    <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Player Statistics</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View detailed player statistics across all servers. Track your performance, compare with others, and see your progress over time.</p>
+                    <div class="mt-6 flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold text-sm group-hover:gap-3 transition-all">
+                        View Stats
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4"><use href="#icon-arrow-right"/></svg>
+                    </div>
+                </a>
+
+                <!-- Bans Card -->
+                <a href="{{bansLink}}" target="_blank" rel="noopener noreferrer" class="group surface-card card-hover p-8 rounded-2xl" id="resource-bans-card">
+                    <div class="icon-chip w-14 h-14 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-600 dark:group-hover:bg-brand-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="text-brand-700 dark:text-brand-300 group-hover:text-white dark:group-hover:text-white w-7 h-7"><use href="#icon-shield-alert"/></svg>
+                    </div>
+                    <h4 class="font-display text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Ban List</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">View the comprehensive ban list. Administrators can also manage bans and enforcement actions from this dashboard.</p>
+                    <div class="mt-6 flex items-center gap-2 text-brand-700 dark:text-brand-300 font-bold text-sm group-hover:gap-3 transition-all">
+                        View Bans
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4"><use href="#icon-arrow-right"/></svg>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
