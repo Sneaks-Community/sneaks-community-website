@@ -50,7 +50,7 @@ async function fetchServerStatus() {
                 const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
                 const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
-                card.className = `group block surface-card card-hover p-4 rounded-2xl cursor-pointer server-card ${stateClass} opacity-0 translate-y-4`;
+                card.className = `group block surface-card card-hover p-4 rounded-2xl cursor-pointer server-card ${stateClass} opacity-0 translate-y-2`;
 
                 card.href = `steam://connect/${server.host}:${server.port}`;
                 card.setAttribute('aria-label', `Connect to ${server.name}`);
@@ -94,7 +94,7 @@ async function fetchServerStatus() {
             if (!animationsOff) {
                 animate(
                     ".server-card",
-                    { opacity: [0, 1], y: [20, 0] },
+                    { opacity: [0, 1], y: [10, 0] },
                     { duration: 0.5, delay: stagger(0.1) }
                 );
                 // Count player numbers up from zero for a premium feel
