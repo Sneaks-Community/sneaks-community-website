@@ -73,25 +73,12 @@ p {
 }
 
 @keyframes ping-green {
-    0% {
-        box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-live-500) 70%, transparent);
-    }
-    70% {
-        box-shadow: 0 0 0 6px transparent;
-    }
-    100% {
-        box-shadow: 0 0 0 0 transparent;
-    }
-}
-
-/* Status dot animation - only apply when user prefers motion */
-@media (prefers-reduced-motion: no-preference) {
-    .status-dot {
-        animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
+    from { transform: scale(1); opacity: 0.7; }
+    to { transform: scale(2.5); opacity: 0; }
 }
 
 .status-dot {
+    position: relative;
     display: inline-block;
     width: 8px;
     height: 8px;
@@ -102,10 +89,19 @@ p {
     margin-right: 6px;
 }
 
-/* Explicitly disable animation for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-    .status-dot {
-        animation: none;
+.status-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-color: var(--color-live-500);
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .status-dot::after {
+        animation: ping-green 1s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
 }
 
@@ -323,9 +319,7 @@ a.bg-brand-500 .icon-discord {
     }
 }
 
-/* ------------------------------------------------------------------ */
-/* Layered hero / section backgrounds (CSP-safe: all same-origin)      */
-/* ------------------------------------------------------------------ */
+/* Layered hero / section backgrounds */
 
 /* Soft mesh-gradient glow. Subtle in light mode, richer against the near-black
    dark surface. The lower source is the accent, so the mesh shifts hue across
@@ -598,13 +592,28 @@ a.bg-brand-500 .icon-discord {
     to { transform: rotate(1turn); }
 }
 
-/* ------------------------------------------------------------------ */
-/* Shared card hover: gentle lift + brand glow (replaces JS scale)     */
-/* ------------------------------------------------------------------ */
-/* Hover uses the independent translate/scale properties rather than transform.
-   The reveal animations own transform, and because their keyframes have no
-   explicit `to`, the implicit one resolves against the hover value and applies
-   it instantly as a held keyframe. Separate properties transition normally. */
+/* Hero mesh fades up to full brightness on arrival, then holds */
+.glow-intro {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* `both`: backwards so it starts dark rather than flashing at full brightness
+   before the first frame, forwards so it holds lit once done. */
+@media (prefers-reduced-motion: no-preference) {
+    .glow-intro {
+        animation: glow-in 1.2s ease-out both;
+    }
+}
+
+@keyframes glow-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Shared card hover: gentle lift + brand glow */
+
 .card-hover {
     transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 scale 0.3s cubic-bezier(0.22, 1, 0.36, 1),
@@ -683,11 +692,7 @@ nav.nav-scrolled {
     box-shadow: 0 10px 30px -8px color-mix(in oklab, var(--color-brand-500) 75%, transparent);
 }
 
-/* ------------------------------------------------------------------ */
-/* Scroll reveals, native. The hidden state lives only inside the      */
-/* @supports block, so browsers without view() timelines (and anyone   */
-/* with JS disabled) simply get the content, never a stuck opacity: 0. */
-/* ------------------------------------------------------------------ */
+/* Scroll reveals */
 @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
         /* `cover` fractions, not the `entry` phase: `entry` ends as soon as the
