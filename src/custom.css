@@ -45,6 +45,17 @@ p {
     text-wrap: pretty;
 }
 
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+}
+
+.dark a:focus-visible,
+.dark button:focus-visible {
+    outline-color: var(--color-accent-400);
+}
+
 /* Stops card widths jittering while the player count animates upward. */
 .player-count {
     font-variant-numeric: tabular-nums;
