@@ -25,6 +25,16 @@
     --color-brand-900: #214254;
     --color-brand-950: #152b37;
 
+    /* Secondary accent. Analogous to the brand blue, used sparingly (hero type,
+       one side of each glow, the aurora, the nav progress, the seam centre) so
+       the page gains chromatic depth without a second competing brand colour. */
+    --color-accent-200: #ded7ff;
+    --color-accent-300: #c3b5ff;
+    --color-accent-400: #a08cff;
+    --color-accent-500: #7c5cff;
+    --color-accent-600: #6544e0;
+    --color-accent-700: #5133b8;
+
     /* "Live" green, shared by the online status dot and the player bar so a
        populated server reads as active rather than as more brand chrome. */
     --color-live-300: #86efac;
@@ -34,8 +44,8 @@
     /* Surface elevation scale. Sections alternate between the page surface and
        the raised one so the page reads as layered rather than one flat field. */
     --color-surface-50: #ffffff; /* light: card   */
-    --color-surface-100: #f8fafc; /* light: page   */
-    --color-surface-200: #eef2f7; /* light: raised */
+    --color-surface-100: #f2f6fa; /* light: page   */
+    --color-surface-200: #e6edf5; /* light: raised */
     --color-surface-800: #12151c; /* dark:  card   */
     --color-surface-900: #0c0e13; /* dark:  raised */
     --color-surface-950: #08090b; /* dark:  page   */

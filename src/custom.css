@@ -25,6 +25,7 @@
     --brand-border-dark: color-mix(in oklab, var(--color-brand-400) 45%, transparent);
     --brand-shadow: color-mix(in oklab, var(--color-brand-500) 40%, transparent);
     --brand-shadow-strong: color-mix(in oklab, var(--color-brand-500) 55%, transparent);
+    --accent-shadow: color-mix(in oklab, var(--color-accent-500) 35%, transparent);
 }
 
 html {
@@ -110,7 +111,7 @@ p {
 
 /* Footer icon container background */
 .footer-icons-container {
-    background-color: rgba(15, 23, 42, 0.06);
+    background-color: color-mix(in oklab, var(--color-brand-700) 7%, transparent);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 9999px;
     padding: 0.25rem 0.75rem;
@@ -314,7 +315,7 @@ a.bg-brand-500 .icon-discord {
     .rule-card:hover {
         translate: 0 -3px;
         scale: 1.025;
-        box-shadow: 0 10px 26px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+        box-shadow: 0 10px 26px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.85);
     }
 
     .dark .rule-card:hover {
@@ -330,9 +331,9 @@ a.bg-brand-500 .icon-discord {
    richer against the near-black dark surface. */
 .brand-glow {
     background:
-        radial-gradient(55% 50% at 18% 0%, color-mix(in oklab, var(--color-brand-500) 10%, transparent), transparent 70%),
-        radial-gradient(45% 45% at 85% 15%, color-mix(in oklab, var(--color-brand-400) 8%, transparent), transparent 70%),
-        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 8%, transparent), transparent 70%);
+        radial-gradient(55% 50% at 18% 0%, color-mix(in oklab, var(--color-brand-500) 15%, transparent), transparent 70%),
+        radial-gradient(45% 45% at 85% 15%, color-mix(in oklab, var(--color-brand-400) 11%, transparent), transparent 70%),
+        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 12%, transparent), transparent 70%);
 }
 
 .dark .brand-glow {
@@ -369,7 +370,7 @@ a.bg-brand-500 .icon-discord {
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: var(--glow-opacity, 0.12);
+    opacity: var(--glow-opacity, 0.18);
     background: radial-gradient(
         var(--glow-size, 60% 55%) at var(--glow-x, 50%) var(--glow-y, 0%),
         var(--glow-color, var(--color-brand-500)),
@@ -402,7 +403,7 @@ a.bg-brand-500 .icon-discord {
 }
 
 .bg-grid {
-    --grid-line: color-mix(in oklab, var(--color-brand-500) 7%, transparent);
+    --grid-line: color-mix(in oklab, var(--color-brand-500) 10%, transparent);
     --grid-size: 56px;
     -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
     mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 10%, transparent 75%);
@@ -413,7 +414,7 @@ a.bg-brand-500 .icon-discord {
 }
 
 .bg-grid-soft {
-    --grid-line: color-mix(in oklab, var(--color-brand-500) 5%, transparent);
+    --grid-line: color-mix(in oklab, var(--color-brand-500) 7%, transparent);
     --grid-size: 96px;
     position: absolute;
     inset: 0;
@@ -459,7 +460,7 @@ a.bg-brand-500 .icon-discord {
     pointer-events: none;
     background-image: url("/grain.svg");
     background-repeat: repeat;
-    opacity: 0.03;
+    opacity: 0.04;
     mix-blend-mode: overlay;
 }
 
@@ -470,7 +471,7 @@ a.bg-brand-500 .icon-discord {
 /* Scroll-linked lift on the servers glow. Opacity peaks mid-section, so the
    panel appears to light up as it passes through the viewport. Off the main
    thread where view() timelines are supported; a no-op elsewhere. */
-.glow--servers { --glow-peak: 0.16; }
+.glow--servers { --glow-peak: 0.22; }
 .dark .glow--servers { --glow-peak: 0.3; }
 
 @supports (animation-timeline: view()) {
@@ -500,10 +501,14 @@ a.bg-brand-500 .icon-discord {
 .surface-card {
     position: relative;
     isolation: isolate;
-    border: 1px solid rgba(0, 0, 0, 0.07);
+    border: 1px solid color-mix(in oklab, var(--color-brand-500) 14%, transparent);
     background-color: var(--color-surface-50);
-    /* The inset highlight is what makes a flat panel read as lit. */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    /* Brand-tinted rather than neutral black: against a cool light page a grey
+       shadow reads as photocopied. The inset highlight is what makes a flat
+       panel read as lit. */
+    box-shadow: 0 1px 2px color-mix(in oklab, var(--color-brand-900) 8%, transparent),
+                0 10px 24px -18px color-mix(in oklab, var(--color-brand-700) 30%, transparent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.85);
     transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 scale 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.3s ease,
@@ -612,7 +617,7 @@ a.bg-brand-500 .icon-discord {
     .card-hover:hover {
         translate: 0 -4px;
         scale: 1.02;
-        box-shadow: 0 14px 34px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+        box-shadow: 0 14px 34px -12px var(--brand-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.85);
         border-color: var(--brand-border);
     }
 
