@@ -671,6 +671,34 @@ nav.nav-scrolled {
             }
         }
 
+        /* Seams draw themselves out from the centre as their section arrives.
+           One name on .ambient resolves per-section: a pseudo-element's
+           timeline lookup walks up to its own section, not a shared one. */
+        .ambient {
+            view-timeline-name: --section;
+        }
+
+        /* Sections only. The footer carries a seam too, but it sits at the page
+           bottom and never travels more than its own height past cover 0%
+           (~6% of its cover range on a tall viewport), so any usable range
+           would leave it permanently part-drawn. It stays static. */
+        section.seam-top::before,
+        section.seam-bottom::after {
+            animation-name: seam-draw;
+            animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+            animation-fill-mode: both;
+            animation-timeline: --section;
+            animation-range-start: cover 0%;
+            animation-range-end: cover 32%;
+        }
+
+        /* The bottom seam is still below the fold during the range above, so
+           it needs a later one or it is already drawn by the time it arrives. */
+        section.seam-bottom::after {
+            animation-range-start: cover 45%;
+            animation-range-end: cover 75%;
+        }
+
         /* Hero parallax. Both layers read the hero's own geometry, matching
            the section-targeted range the JS version used. */
         #home {
@@ -707,6 +735,14 @@ nav.nav-scrolled {
 @keyframes reveal-scale {
     from { opacity: 0; transform: scale(0.95); }
     65% { opacity: 1; transform: none; }
+}
+
+/* Centre-out, and done by 80% so a section that runs out of scroll leaves its
+   seam fully drawn rather than clipped short. `scale`, not `transform`: the
+   seam is a pseudo-element of a section that may own transform elsewhere. */
+@keyframes seam-draw {
+    from { scale: 0 1; }
+    80% { scale: 1 1; }
 }
 
 @keyframes hero-glow-exit {
