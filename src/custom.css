@@ -327,20 +327,21 @@ a.bg-brand-500 .icon-discord {
 /* Layered hero / section backgrounds (CSP-safe: all same-origin)      */
 /* ------------------------------------------------------------------ */
 
-/* Soft mesh-gradient glow in brand tones. Subtle in light mode,
-   richer against the near-black dark surface. */
+/* Soft mesh-gradient glow. Subtle in light mode, richer against the near-black
+   dark surface. The lower source is the accent, so the mesh shifts hue across
+   the hero rather than being one blue at three strengths. */
 .brand-glow {
     background:
         radial-gradient(55% 50% at 18% 0%, color-mix(in oklab, var(--color-brand-500) 15%, transparent), transparent 70%),
         radial-gradient(45% 45% at 85% 15%, color-mix(in oklab, var(--color-brand-400) 11%, transparent), transparent 70%),
-        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 12%, transparent), transparent 70%);
+        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-accent-600) 12%, transparent), transparent 70%);
 }
 
 .dark .brand-glow {
     background:
         radial-gradient(55% 50% at 18% 0%, color-mix(in oklab, var(--color-brand-500) 22%, transparent), transparent 70%),
         radial-gradient(45% 45% at 85% 15%, color-mix(in oklab, var(--color-brand-400) 14%, transparent), transparent 70%),
-        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-brand-700) 20%, transparent), transparent 70%);
+        radial-gradient(40% 45% at 60% 95%, color-mix(in oklab, var(--color-accent-600) 20%, transparent), transparent 70%);
 }
 
 /* Host for the decorative layers below. isolation confines the grain's blend
@@ -387,8 +388,8 @@ a.bg-brand-500 .icon-discord {
    left an unlit band across the section top. Position and vertical radius are
    percentages of the taller box, chosen to land the same as inset 0 would. */
 .glow--servers { --glow-x: 50%; --glow-y: 2%; --glow-size: 78% 50%; inset: -8% 0; }
-.glow--resources { --glow-x: 6%; --glow-y: 0%; --glow-size: 48% 72%; }
-.glow--community { --glow-x: 96%; --glow-y: 8%; --glow-size: 48% 72%; --glow-color: var(--color-brand-700); }
+.glow--resources { --glow-x: 6%; --glow-y: 0%; --glow-size: 48% 72%; --glow-color: var(--color-accent-500); }
+.glow--community { --glow-x: 96%; --glow-y: 8%; --glow-size: 48% 72%; --glow-color: var(--color-accent-600); }
 .glow--rules { --glow-x: 50%; --glow-y: 112%; --glow-size: 72% 46%; }
 .glow--footer { --glow-x: 50%; --glow-y: 130%; --glow-size: 55% 320%; }
 
@@ -429,7 +430,7 @@ a.bg-brand-500 .icon-discord {
 }
 
 /* Brand hairline that fades out at both ends, replacing flat 1px borders
-   at section boundaries. */
+   at section boundaries. Reads blue -> violet -> blue across its width. */
 .seam-top::before,
 .seam-bottom::after {
     content: '';
@@ -442,7 +443,7 @@ a.bg-brand-500 .icon-discord {
     background: linear-gradient(to right,
         transparent,
         color-mix(in oklab, var(--color-brand-500) 28%, transparent) 22%,
-        color-mix(in oklab, var(--color-brand-400) 45%, transparent) 50%,
+        color-mix(in oklab, var(--color-accent-400) 45%, transparent) 50%,
         color-mix(in oklab, var(--color-brand-500) 28%, transparent) 78%,
         transparent);
 }
@@ -575,7 +576,7 @@ a.bg-brand-500 .icon-discord {
         transparent 0deg,
         color-mix(in oklab, var(--color-brand-400) 60%, transparent) 55deg,
         transparent 125deg,
-        color-mix(in oklab, var(--color-brand-600) 50%, transparent) 215deg,
+        color-mix(in oklab, var(--color-accent-500) 50%, transparent) 215deg,
         transparent 300deg,
         transparent 360deg);
 }
@@ -648,14 +649,14 @@ nav.nav-scrolled {
     scale: 0 1;
     background: linear-gradient(to right,
         var(--color-brand-600),
-        var(--color-brand-400));
+        var(--color-accent-400));
     box-shadow: 0 0 8px var(--brand-shadow);
 }
 
 .dark .nav-progress {
     background: linear-gradient(to right,
         var(--color-brand-500),
-        var(--color-brand-300));
+        var(--color-accent-300));
 }
 
 @supports (animation-timeline: scroll()) {
