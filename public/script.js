@@ -20,20 +20,6 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // skip animation.
 const animationsOff = prefersReducedMotion || !motionReady;
 
-// Animate a number from 0 up to its target (easeOutCubic) via rAF.
-function countUp(el, target, duration = 900) {
-    if (!el) { return; }
-    if (target <= 0) { el.textContent = '0'; return; }
-    const start = performance.now();
-    const step = (now) => {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(eased * target);
-        if (progress < 1) { requestAnimationFrame(step); }
-    };
-    requestAnimationFrame(step);
-}
-
 async function fetchServerStatus() {
     const grid = document.getElementById('server-grid');
     grid.setAttribute('aria-busy', 'true');
@@ -113,7 +99,13 @@ async function fetchServerStatus() {
                 );
                 // Count player numbers up from zero for a premium feel
                 document.querySelectorAll('.player-count').forEach(el => {
-                    countUp(el, Number(el.getAttribute('data-target')) || 0);
+                    const target = Number(el.getAttribute('data-target')) || 0;
+                    if (target <= 0) { el.textContent = '0'; return; }
+                    animate(0, target, {
+                        duration: 0.9,
+                        ease: [0.33, 1, 0.68, 1],
+                        onUpdate: (v) => { el.textContent = Math.round(v); },
+                    });
                 });
             } else {
                 // When reduced motion is preferred, make cards visible immediately
