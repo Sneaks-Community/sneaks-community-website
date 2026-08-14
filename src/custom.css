@@ -193,6 +193,32 @@ a.bg-brand-500 .icon-discord {
     box-shadow: 0 0 8px color-mix(in oklab, var(--color-live-400) 60%, transparent);
 }
 
+// Animate filled server player bar
+
+@media (prefers-reduced-motion: no-preference) {
+    .server-card--online .server-bar {
+        overflow: hidden;
+    }
+
+    .server-card--online .server-bar::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        width: 70%;
+        pointer-events: none;
+        background: linear-gradient(to right,
+            transparent,
+            rgba(255, 255, 255, 0.75),
+            transparent);
+        animation: bar-sheen 2.4s ease-in-out infinite;
+    }
+}
+
+@keyframes bar-sheen {
+    from { translate: -110%; }
+    to { translate: 210%; }
+}
+
 /* Offline servers recede so live ones draw the eye. */
 .server-card--offline {
     opacity: 0.72;
@@ -234,8 +260,8 @@ a.bg-brand-500 .icon-discord {
     }
 }
 
-// Animate (spin) theme toggle
-
+/* Animate (spin) theme toggle. Note: `//` is not a CSS comment — using one
+   here makes the compiler drop this whole @keyframes block silently. */
 @keyframes toggle-spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
