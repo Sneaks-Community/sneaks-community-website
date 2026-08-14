@@ -65,7 +65,7 @@ export default tseslint.config(
 
       "unicorn/prefer-node-protocol": "error",
       "unicorn/no-await-expression-member": "warn",
-      "unicorn/prevent-abbreviations": [
+      "unicorn/name-replacements": [
         "error",
         { "allowList": { "req": true, "res": true, "next": true, "LogFnFields": true } }
       ],
