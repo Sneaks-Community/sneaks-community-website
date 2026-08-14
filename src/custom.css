@@ -583,6 +583,41 @@ nav.nav-scrolled {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
+.nav-progress {
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 2px;
+    z-index: 1;
+    pointer-events: none;
+    transform-origin: 0 50%;
+    scale: 0 1;
+    background: linear-gradient(to right,
+        var(--color-brand-600),
+        var(--color-brand-400));
+    box-shadow: 0 0 8px var(--brand-shadow);
+}
+
+.dark .nav-progress {
+    background: linear-gradient(to right,
+        var(--color-brand-500),
+        var(--color-brand-300));
+}
+
+@supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .nav-progress {
+            animation-name: nav-progress;
+            animation-timing-function: linear;
+            animation-fill-mode: both;
+            animation-timeline: scroll(root block);
+        }
+    }
+}
+
+@keyframes nav-progress {
+    to { scale: 1 1; }
+}
+
 /* Primary CTA brand glow */
 .btn-glow {
     box-shadow: 0 8px 24px -8px var(--brand-shadow-strong);
