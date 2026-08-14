@@ -36,8 +36,10 @@ async function fetchServerStatus() {
             grid.innerHTML = ''; // Specific clear removing skeletons
 
             data.data.forEach((server) => {
-                // Anchor (not div) so cards are keyboard-focusable and announce their destination.
-                const card = document.createElement('a');
+                // The card holds two controls (connect, copy address), so the steam:// link is a
+                // stretched overlay anchor rather than the card element itself: a <button> nested
+                // inside an <a> is invalid and announces badly.
+                const card = document.createElement('div');
                 const maxPlayers = Number(server.maxplayers) || 0;
                 const currentPlayers = Number(server.players) || 0;
                 let playerPercentage = 0;
@@ -50,20 +52,23 @@ async function fetchServerStatus() {
                 const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
                 const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
-                card.className = `group block surface-card card-hover p-4 rounded-2xl cursor-pointer server-card ${stateClass} opacity-0 translate-y-2`;
-
-                card.href = `steam://connect/${server.host}:${server.port}`;
-                card.setAttribute('aria-label', `Connect to ${server.name}`);
+                card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${stateClass} opacity-0 translate-y-2`;
 
                 const onlineCount = server.status === 'online'
                     ? `<span class="player-count" data-target="${currentPlayers}">0</span>/${escapeHTML(server.maxplayers || '?')}`
                     : 'OFFLINE';
 
                 card.innerHTML = `
+                    <a class="connect-link absolute inset-0 z-0 rounded-2xl cursor-pointer"></a>
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">${serverName}</h4>
-                            <p class="text-[10px] font-mono text-slate-500 mt-0.5">${serverIp}</p>
+                            <p class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mt-0.5">
+                                ${serverIp}
+                                <button type="button" class="copy-ip relative z-10 p-1 -m-1 rounded text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors" aria-label="Copy server address">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3 h-3"><use href="#icon-copy"/></svg>
+                                </button>
+                            </p>
                         </div>
                         <div class="text-right">
                             <span class="text-sm font-bold ${server.status === 'online' ? 'text-brand-600 dark:text-brand-400' : 'text-red-500 dark:text-red-400'}">
@@ -78,6 +83,13 @@ async function fetchServerStatus() {
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">${serverMap}</span>
                     </div>
                 `;
+
+                // Set from the raw values so a quote in a host or name can't break out of the
+                // attribute (escapeHTML leaves quotes alone).
+                const link = card.querySelector('.connect-link');
+                link.href = `steam://connect/${server.host}:${server.port}`;
+                link.setAttribute('aria-label', `Connect to ${server.name}`);
+                card.querySelector('.copy-ip').dataset.ip = `${server.host}:${server.port || 27015}`;
 
                 grid.appendChild(card);
             });
@@ -110,7 +122,7 @@ async function fetchServerStatus() {
             } else {
                 // When reduced motion is preferred, make cards visible immediately
                 document.querySelectorAll(".server-card").forEach(el => {
-                    el.classList.remove('opacity-0', 'translate-y-4');
+                    el.classList.remove('opacity-0', 'translate-y-2');
                 });
                 document.querySelectorAll('.player-count').forEach(el => {
                     el.textContent = el.getAttribute('data-target') || '0';
@@ -131,6 +143,61 @@ async function fetchServerStatus() {
     } finally {
         grid.setAttribute('aria-busy', 'false');
     }
+}
+
+// navigator.clipboard is only available in a secure context, and self-hosted
+// instances commonly run over plain http, so keep the legacy fallback.
+async function copyText(text) {
+    if (navigator.clipboard) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch { /* fall through to execCommand */ }
+    }
+
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.readOnly = true;
+    field.className = 'sr-only';
+    document.body.appendChild(field);
+    field.select();
+    let copied;
+    try {
+        copied = document.execCommand('copy');
+    } catch {
+        copied = false;
+    }
+    field.remove();
+    return copied;
+}
+
+// Copy button on each server card. Delegated from the grid because the cards are
+// rendered after this runs. The clipboard gets the bare host:port, not the
+// steam:// URL the card links to.
+function initCopyIp() {
+    const grid = document.getElementById('server-grid');
+    const status = document.getElementById('copy-status');
+    let resetTimer;
+
+    grid.addEventListener('click', async (event) => {
+        const button = event.target.closest('.copy-ip');
+        if (!button) { return; }
+
+        const ip = button.dataset.ip;
+        const copied = await copyText(ip);
+        const icon = button.querySelector('use');
+
+        icon.setAttribute('href', copied ? '#icon-check' : '#icon-copy');
+        button.classList.toggle('text-live-500', copied);
+        status.textContent = copied ? `Copied ${ip}` : 'Copy failed';
+
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+            icon.setAttribute('href', '#icon-copy');
+            button.classList.remove('text-live-500');
+            status.textContent = '';
+        }, 1500);
+    });
 }
 
 // Animations specific logic
@@ -211,5 +278,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initAnimations();
     initScrollSpy();
     initAurora();
+    initCopyIp();
     fetchServerStatus();
 });
