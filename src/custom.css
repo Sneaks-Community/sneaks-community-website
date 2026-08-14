@@ -193,7 +193,7 @@ a.bg-brand-500 .icon-discord {
     box-shadow: 0 0 8px color-mix(in oklab, var(--color-live-400) 60%, transparent);
 }
 
-// Animate filled server player bar
+/* Animate filled server player bar */
 
 @media (prefers-reduced-motion: no-preference) {
     .server-card--online .server-bar {
@@ -260,8 +260,8 @@ a.bg-brand-500 .icon-discord {
     }
 }
 
-/* Animate (spin) theme toggle. Note: `//` is not a CSS comment — using one
-   here makes the compiler drop this whole @keyframes block silently. */
+/* Animate (spin) theme toggle  */
+
 @keyframes toggle-spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
