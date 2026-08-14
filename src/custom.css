@@ -234,9 +234,33 @@ a.bg-brand-500 .icon-discord {
     }
 }
 
+// Animate (spin) theme toggle
+
 @keyframes toggle-spin {
     from { transform: rotate(0deg); }
-    to { transform: rotate(180deg); }
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        mix-blend-mode: normal;
+    }
+
+    ::view-transition-old(root) {
+        animation: none;
+    }
+
+    ::view-transition-new(root) {
+        animation-name: theme-reveal;
+        animation-duration: 0.45s;
+        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+}
+
+@keyframes theme-reveal {
+    from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
+    to { clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
 }
 
 /* Rule card hover animation */

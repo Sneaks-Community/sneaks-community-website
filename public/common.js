@@ -35,8 +35,22 @@ function initTheme() {
         const isDark = htmlClassList.contains('dark');
         const newTheme = isDark ? 'light' : 'dark';
 
-        window.safeStorage.set('theme', newTheme);
-        applyTheme(newTheme);
+        const commit = () => {
+            window.safeStorage.set('theme', newTheme);
+            applyTheme(newTheme);
+        };
+
+        // Animate (rotate) theme toggle
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion || !document.startViewTransition) {
+            commit();
+        } else {
+            const rect = themeToggleBtn.getBoundingClientRect();
+            const root = document.documentElement;
+            root.style.setProperty('--vt-x', `${rect.left + rect.width / 2}px`);
+            root.style.setProperty('--vt-y', `${rect.top + rect.height / 2}px`);
+            document.startViewTransition(commit);
+        }
 
         // Restart the CSS spin by clearing the class before re-adding it.
         themeToggleBtn.classList.remove('is-spinning');
