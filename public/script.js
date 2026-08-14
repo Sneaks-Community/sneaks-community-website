@@ -178,15 +178,25 @@ function initAurora() {
     observer.observe(aurora);
 }
 
-// URL Hash Updates
+// URL hash updates + the matching nav link's underline. aria-current doubles as
+// the style hook, so screen readers announce the current section for free.
 function initScrollSpy() {
     const sections = document.querySelectorAll('header[id], section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 const id = entry.target.getAttribute('id');
                 const hash = id === 'home' ? window.location.pathname + window.location.search : `#${id}`;
                 window.history.replaceState(null, null, hash);
+
+                navLinks.forEach((link) => {
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.setAttribute('aria-current', 'location');
+                    } else {
+                        link.removeAttribute('aria-current');
+                    }
+                });
             }
         });
     }, {
