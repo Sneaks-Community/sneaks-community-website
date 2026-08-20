@@ -245,7 +245,7 @@ function resolveClientIpHeader(raw: string | undefined): string | null {
 const CLIENT_IP_HEADER = resolveClientIpHeader(process.env.CLIENT_IP_HEADER);
 if (CLIENT_IP_HEADER) logger.info({ header: CLIENT_IP_HEADER }, 'Trusting client IP header');
 
-// Single source of truth for the client IP used by the rate limiters and the analytics proxy. A
+// Single source of truth for the client IP used by the rate limiter. A
 // forwarding chain is only trustworthy from the right: whatever precedes the last entry was supplied
 // by the client, so read the last one and ignore the rest. Single-value headers are unaffected.
 function getClientIp(req: express.Request): string | undefined {

@@ -48,7 +48,7 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 
 ### Client IP resolution
 
-`CLIENT_IP_HEADER` names the header the rate limiters and the analytics proxy read the visitor's
+`CLIENT_IP_HEADER` names the header the rate limiter reads the visitor's
 address from:
 
 | Value | Use it when |
