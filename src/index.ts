@@ -260,13 +260,13 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", 'https://static.cloudflareinsights.com'],
+            scriptSrc: ["'self'"],
             styleSrc: ["'self'"],
             fontSrc: ["'self'"],
             imgSrc: ["'self'"],
             frameSrc: ["'none'"],
             frameAncestors: ["'none'"],
-            connectSrc: ["'self'", 'https://cloudflareinsights.com'],
+            connectSrc: ["'self'"],
             baseUri: ["'self'"],
             formAction: ["'self'"],
             objectSrc: ["'none'"],
