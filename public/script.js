@@ -60,8 +60,8 @@ async function fetchServerStatus() {
 
                 card.innerHTML = `
                     <a class="connect-link absolute inset-0 z-0 rounded-2xl cursor-pointer"></a>
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
+                    <div class="flex justify-between items-start gap-2 mb-2">
+                        <div class="min-w-0 break-words">
                             <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">${serverName}</h4>
                             <p class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mt-0.5">
                                 ${serverIp}
@@ -70,7 +70,7 @@ async function fetchServerStatus() {
                                 </button>
                             </p>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right shrink-0">
                             <span class="text-sm font-bold ${server.status === 'online' ? 'text-brand-600 dark:text-brand-400' : 'text-red-500 dark:text-red-400'}">
                                 ${onlineCount}
                             </span>
