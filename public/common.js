@@ -81,12 +81,12 @@ function initMobileMenu() {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
             mobileMenu.classList.add('is-open'); // Drives the CSS link stagger
             document.body.classList.add('overflow-hidden'); // Prevent scrolling
-            mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-x"/></svg>';
+            mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="/icons.svg#icon-x"/></svg>';
         } else {
             mobileMenu.classList.remove('is-open');
             mobileMenu.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden'); // Restore scrolling
-            mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-menu"/></svg>';
+            mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="/icons.svg#icon-menu"/></svg>';
         }
     };
 

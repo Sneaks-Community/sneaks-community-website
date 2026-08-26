@@ -21,6 +21,7 @@
     "start": "node --env-file=.env dist/index.js",
     "clean": "rm -rf dist && rm -f public/tailwind.css && rm -f public/lib/*.js",
     "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

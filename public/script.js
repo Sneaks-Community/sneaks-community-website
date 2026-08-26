@@ -65,7 +65,7 @@ async function fetchServerStatus() {
                         <p class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mt-0.5">
                             ${serverIp}
                             <button type="button" class="copy-ip relative z-10 p-1 -m-1 rounded text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors" aria-label="Copy server address">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3 h-3"><use href="#icon-copy"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3 h-3"><use href="/icons.svg#icon-copy"/></svg>
                             </button>
                         </p>
                     </div>
@@ -132,7 +132,7 @@ async function fetchServerStatus() {
         grid.innerHTML = `
             <div role="status" class="col-span-full surface-card rounded-2xl p-8 flex flex-col items-center text-center gap-3">
                 <div class="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6"><use href="#icon-flag"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6"><use href="/icons.svg#icon-flag"/></svg>
                 </div>
                 <p class="text-sm font-bold text-slate-900 dark:text-white">Server status unavailable</p>
                 <p class="text-xs text-slate-600 dark:text-slate-400">Failed to contact server API. Please try again later.</p>
@@ -184,13 +184,13 @@ function initCopyIp() {
         const copied = await copyText(ip);
         const icon = button.querySelector('use');
 
-        icon.setAttribute('href', copied ? '#icon-check' : '#icon-copy');
+        icon.setAttribute('href', copied ? '/icons.svg#icon-check' : '/icons.svg#icon-copy');
         button.classList.toggle('text-live-500', copied);
         status.textContent = copied ? `Copied ${ip}` : 'Copy failed';
 
         clearTimeout(resetTimer);
         resetTimer = setTimeout(() => {
-            icon.setAttribute('href', '#icon-copy');
+            icon.setAttribute('href', '/icons.svg#icon-copy');
             button.classList.remove('text-live-500');
             status.textContent = '';
         }, 1500);

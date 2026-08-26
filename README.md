@@ -137,6 +137,14 @@ Recommended size: 64x64 pixels or larger. Transparent backgrounds work best.
 
 To comply with Open Graph Protocol standards, and to have a nice looking embed, including your desired logo in `user-assets/` folder as `/og-image.png` at 1200x630 px is also recommended.
 
+#### Icons
+
+Icons live one per file in `public/icons/` as plain, renderable SVGs. At startup they are
+concatenated into a single sprite served at `/icons.svg` (cached for a day) and referenced from the
+markup as `<use href="/icons.svg#icon-<filename>"/>`. To add an icon, drop `name.svg` into
+`public/icons/` and reference `#icon-name`; no build step is involved. `npm test` checks that every
+reference resolves to a file.
+
 ### Build & Run
 
 1. Build the backend using esbuild.

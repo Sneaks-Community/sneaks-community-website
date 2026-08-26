@@ -198,7 +198,7 @@ const brandingTokens = new Map<string, string>([
     ['logoContainerClass', logoPath ? 'has-logo' : 'bg-brand-500 font-black'],
     ['logoContainerInner', logoPath
         ? `<img src="${logoPath}" alt="Logo">`
-        : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="#icon-crosshair"/></svg>'],
+        : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="/icons.svg#icon-crosshair"/></svg>'],
 ]);
 
 const renderBranding = (html: string): string =>
@@ -212,17 +212,47 @@ const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');
 // raw (a bare origin has no HTML-special chars, and HTML-escaping '&' would corrupt them).
 const robotsTxtPath = path.join(__dirname, '..', 'public', 'robots.txt');
 const sitemapXmlPath = path.join(__dirname, '..', 'public', 'sitemap.xml');
+// Icons are authored one per file in public/icons/ and concatenated into a single sprite at
+// startup: one cacheable request for every page instead of an inline copy per page. Each file is a
+// standalone renderable SVG, so its root <svg> becomes the <symbol> and the id comes from the
+// filename (public/icons/sun.svg -> #icon-sun).
+const iconsDirectory = path.join(__dirname, '..', 'public', 'icons');
+const buildIconSprite = (): string => {
+    const symbols = fs.readdirSync(iconsDirectory)
+        .filter((file) => file.endsWith('.svg'))
+        .sort()
+        .map((file) => {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- name comes from readdirSync over a fixed directory
+            const svg = fs.readFileSync(path.join(iconsDirectory, file), 'utf-8');
+            const root = /<svg\b([^>]*)>/.exec(svg);
+            if (!root) {
+                throw new Error(`icons/${file}: no <svg> root element`);
+            }
+            // Keep presentation attributes (viewBox, fill, stroke...); drop the ones a <symbol>
+            // must not carry over from the standalone document.
+            const attributes = root[1].replace(/\s(?:xmlns|id|class|width|height)="[^"]*"/g, '');
+            const body = svg.slice(root.index + root[0].length, svg.lastIndexOf('</svg>'));
+            return `<symbol id="icon-${path.basename(file, '.svg')}"${attributes}>${body}</symbol>`;
+        });
+    if (symbols.length === 0) {
+        throw new Error('icons/: no .svg files found');
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg">${symbols.join('')}</svg>`;
+};
+
+let iconSprite: string;
 let renderedIndexHtml: string;
 let rendered404Html: string;
 let renderedRobotsTxt: string;
 let renderedSitemapXml: string;
 try {
+    iconSprite = buildIconSprite();
     renderedIndexHtml = renderBranding(fs.readFileSync(indexHtmlPath, 'utf-8'));
     rendered404Html = renderBranding(fs.readFileSync(notFoundHtmlPath, 'utf-8'));
     renderedRobotsTxt = fs.readFileSync(robotsTxtPath, 'utf-8').replaceAll('{{siteUrl}}', () => siteUrl);
     renderedSitemapXml = fs.readFileSync(sitemapXmlPath, 'utf-8').replaceAll('{{siteUrl}}', () => siteUrl);
 } catch (error) {
-    logger.fatal({ err: error }, 'Failed to read HTML template');
+    logger.fatal({ err: error }, 'Failed to read HTML template or icon sprite');
     process.exit(1);
 }
 
@@ -318,6 +348,11 @@ if (fs.existsSync(userAssetsPath)) {
 app.get(['/', '/index.html'], (req, res) => {
     res.set('Cache-Control', 'public, max-age=300');
     res.type('html').send(renderedIndexHtml);
+});
+// Shared icon sprite, referenced as /icons.svg#icon-<name> from both pages and the scripts.
+app.get('/icons.svg', (req, res) => {
+    res.set('Cache-Control', `public, max-age=${String(STATIC_LONG_MAX_AGE)}`);
+    res.type('image/svg+xml').send(iconSprite);
 });
 // Serve the site-URL-branded robots.txt / sitemap.xml before the static mount so they win.
 app.get('/robots.txt', (req, res) => {
