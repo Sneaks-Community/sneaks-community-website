@@ -35,8 +35,23 @@ jobs:
             target: production
             suffix: "-nonroot"
     steps:
+      # Weekly rebuild targets the last release, not main HEAD — :latest must
+      # stay released code, just with patched base packages.
+      - name: Resolve release ref
+        id: ref
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag=$(gh release view -R ${{ github.repository }} --json tagName -q .tagName)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          # empty on non-schedule runs = default checkout
+          ref: ${{ steps.ref.outputs.tag }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4.2.0
@@ -63,6 +78,8 @@ jobs:
             type=raw,value=latest,enable=${{ github.event_name == 'release' }}
             type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
             type=raw,value=dev,enable=${{ github.event_name == 'push' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'schedule' }}
+            type=raw,value=${{ steps.ref.outputs.version }},enable=${{ github.event_name == 'schedule' }}
 
       # Single build per variant. Push by digest only — no consumable tag is
       # created yet, so :dev / :latest never point at an unscanned image. The
