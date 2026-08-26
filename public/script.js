@@ -32,103 +32,100 @@ async function fetchServerStatus() {
             throw new Error(`API responded ${res.status}`);
         }
 
-        {
-            grid.innerHTML = ''; // Specific clear removing skeletons
+        grid.innerHTML = ''; // Specific clear removing skeletons
 
-            data.data.forEach((server) => {
-                // The card holds two controls (connect, copy address), so the steam:// link is a
-                // stretched overlay anchor rather than the card element itself: a <button> nested
-                // inside an <a> is invalid and announces badly.
-                const card = document.createElement('div');
-                const maxPlayers = Number(server.maxplayers) || 0;
-                const currentPlayers = Number(server.players) || 0;
-                let playerPercentage = 0;
-                if (maxPlayers > 0) {
-                    playerPercentage = (currentPlayers / maxPlayers) * 100;
-                }
-
-                const serverName = escapeHTML(`${server.name}`);
-                const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
-                const serverMap = escapeHTML(`${server.map || 'N/A'}`);
-
-                const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
-                card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${stateClass} opacity-0 translate-y-2`;
-
-                const onlineCount = server.status === 'online'
-                    ? `<span class="player-count" data-target="${currentPlayers}">0</span>/${escapeHTML(server.maxplayers || '?')}`
-                    : 'OFFLINE';
-
-                card.innerHTML = `
-                    <a class="connect-link absolute inset-0 z-0 rounded-2xl cursor-pointer"></a>
-                    <div class="flex justify-between items-start gap-2 mb-2">
-                        <div class="min-w-0 break-words">
-                            <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">${serverName}</h4>
-                            <p class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mt-0.5">
-                                ${serverIp}
-                                <button type="button" class="copy-ip relative z-10 p-1 -m-1 rounded text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors" aria-label="Copy server address">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3 h-3"><use href="#icon-copy"/></svg>
-                                </button>
-                            </p>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <span class="text-sm font-bold ${server.status === 'online' ? 'text-brand-600 dark:text-brand-400' : 'text-red-500 dark:text-red-400'}">
-                                ${onlineCount}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 mt-4">
-                        <div class="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden relative">
-                            <div class="absolute top-0 left-0 h-full rounded-full ${server.status === 'online' ? 'bg-gradient-to-r from-live-500 to-live-300' : 'bg-red-500/50'} transition-all duration-1000 server-bar" data-bar-width="${Math.ceil(playerPercentage / 10) * 10}"></div>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">${serverMap}</span>
-                    </div>
-                `;
-
-                // Set from the raw values so a quote in a host or name can't break out of the
-                // attribute (escapeHTML leaves quotes alone).
-                const link = card.querySelector('.connect-link');
-                link.href = `steam://connect/${server.host}:${server.port}`;
-                link.setAttribute('aria-label', `Connect to ${server.name}`);
-                card.querySelector('.copy-ip').dataset.ip = `${server.host}:${server.port || 27015}`;
-
-                grid.appendChild(card);
-            });
-
-            // Apply CSS custom property for player bar widths (CSP-compliant)
-            document.querySelectorAll('.server-bar').forEach(bar => {
-                const width = bar.getAttribute('data-bar-width');
-                if (width) {
-                    bar.style.setProperty('--bar-width', width + '%');
-                }
-            });
-
-            // Animate Server Cards in with stagger
-            if (!animationsOff) {
-                animate(
-                    ".server-card",
-                    { opacity: [0, 1], y: [10, 0] },
-                    { duration: 0.5, delay: stagger(0.1) }
-                );
-                // Count player numbers up from zero for a premium feel
-                document.querySelectorAll('.player-count').forEach(el => {
-                    const target = Number(el.getAttribute('data-target')) || 0;
-                    if (target <= 0) { el.textContent = '0'; return; }
-                    animate(0, target, {
-                        duration: 0.9,
-                        ease: [0.33, 1, 0.68, 1],
-                        onUpdate: (v) => { el.textContent = Math.round(v); },
-                    });
-                });
-            } else {
-                // When reduced motion is preferred, make cards visible immediately
-                document.querySelectorAll(".server-card").forEach(el => {
-                    el.classList.remove('opacity-0', 'translate-y-2');
-                });
-                document.querySelectorAll('.player-count').forEach(el => {
-                    el.textContent = el.getAttribute('data-target') || '0';
-                });
+        data.data.forEach((server) => {
+            // The card holds two controls (connect, copy address), so the steam:// link is a
+            // stretched overlay anchor rather than the card element itself: a <button> nested
+            // inside an <a> is invalid and announces badly.
+            const card = document.createElement('div');
+            const maxPlayers = Number(server.maxplayers) || 0;
+            const currentPlayers = Number(server.players) || 0;
+            let playerPercentage = 0;
+            if (maxPlayers > 0) {
+                playerPercentage = (currentPlayers / maxPlayers) * 100;
             }
 
+            const serverName = escapeHTML(`${server.name}`);
+            const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
+            const serverMap = escapeHTML(`${server.map || 'N/A'}`);
+
+            const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
+            card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${stateClass} opacity-0 translate-y-2`;
+
+            const onlineCount = server.status === 'online'
+                ? `<span class="player-count" data-target="${currentPlayers}">0</span>/${escapeHTML(server.maxplayers || '?')}`
+                : 'OFFLINE';
+
+            card.innerHTML = `
+                <a class="connect-link absolute inset-0 z-0 rounded-2xl cursor-pointer"></a>
+                <div class="flex justify-between items-start gap-2 mb-2">
+                    <div class="min-w-0 break-words">
+                        <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">${serverName}</h4>
+                        <p class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mt-0.5">
+                            ${serverIp}
+                            <button type="button" class="copy-ip relative z-10 p-1 -m-1 rounded text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors" aria-label="Copy server address">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-3 h-3"><use href="#icon-copy"/></svg>
+                            </button>
+                        </p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-sm font-bold ${server.status === 'online' ? 'text-brand-600 dark:text-brand-400' : 'text-red-500 dark:text-red-400'}">
+                            ${onlineCount}
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 mt-4">
+                    <div class="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden relative">
+                        <div class="absolute top-0 left-0 h-full rounded-full ${server.status === 'online' ? 'bg-gradient-to-r from-live-500 to-live-300' : 'bg-red-500/50'} transition-all duration-1000 server-bar" data-bar-width="${Math.ceil(playerPercentage / 10) * 10}"></div>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">${serverMap}</span>
+                </div>
+            `;
+
+            // Set from the raw values so a quote in a host or name can't break out of the
+            // attribute (escapeHTML leaves quotes alone).
+            const link = card.querySelector('.connect-link');
+            link.href = `steam://connect/${server.host}:${server.port}`;
+            link.setAttribute('aria-label', `Connect to ${server.name}`);
+            card.querySelector('.copy-ip').dataset.ip = `${server.host}:${server.port || 27015}`;
+
+            grid.appendChild(card);
+        });
+
+        // Apply CSS custom property for player bar widths (CSP-compliant)
+        document.querySelectorAll('.server-bar').forEach(bar => {
+            const width = bar.getAttribute('data-bar-width');
+            if (width) {
+                bar.style.setProperty('--bar-width', width + '%');
+            }
+        });
+
+        // Animate Server Cards in with stagger
+        if (!animationsOff) {
+            animate(
+                ".server-card",
+                { opacity: [0, 1], y: [10, 0] },
+                { duration: 0.5, delay: stagger(0.1) }
+            );
+            // Count player numbers up from zero for a premium feel
+            document.querySelectorAll('.player-count').forEach(el => {
+                const target = Number(el.getAttribute('data-target')) || 0;
+                if (target <= 0) { el.textContent = '0'; return; }
+                animate(0, target, {
+                    duration: 0.9,
+                    ease: [0.33, 1, 0.68, 1],
+                    onUpdate: (v) => { el.textContent = Math.round(v); },
+                });
+            });
+        } else {
+            // When reduced motion is preferred, make cards visible immediately
+            document.querySelectorAll(".server-card").forEach(el => {
+                el.classList.remove('opacity-0', 'translate-y-2');
+            });
+            document.querySelectorAll('.player-count').forEach(el => {
+                el.textContent = el.getAttribute('data-target') || '0';
+            });
         }
     } catch (e) {
         console.error("Failed to fetch servers", e);
