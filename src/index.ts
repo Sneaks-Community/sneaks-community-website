@@ -309,6 +309,11 @@ app.use(helmet({
     },
 }));
 
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    next();
+});
+
 // Restrict CORS to allowed origins instead of allowing all. /api only; a global mount would put
 // `Vary: Origin` on every asset.
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) ?? ['http://localhost:3000'];
