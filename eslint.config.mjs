@@ -103,4 +103,15 @@ export default tseslint.config(
       "no-undef": "error",
     },
   },
+
+  {
+    // Node test runner files.
+    files: ["test/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.es2024,
+      },
+    },
+  },
 );

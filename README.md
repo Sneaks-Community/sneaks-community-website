@@ -29,6 +29,7 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | --- | --- | --- |
 | `NODE_ENV` | Node environment (`production` / `development`) | *unset* (anything but `development` behaves as production) |
 | `PORT` | Port to listen on | `3000` |
+| `CONFIG_PATH` | Path to the server list JSON | `config/config.json` |
 | `LOG_LEVEL` | Pino log level | `info` (`debug` when `NODE_ENV=development`) |
 | `COMMUNITY_NAME` | Community name used in the title, headings and footer | `Sneak's Community` |
 | `COMMUNITY_ESTABLISHED` | Founding year shown in the title/OG tags | `2015` |
@@ -144,6 +145,15 @@ concatenated into a single sprite served at `/icons.svg` (cached for a day) and 
 markup as `<use href="/icons.svg#icon-<filename>"/>`. To add an icon, drop `name.svg` into
 `public/icons/` and reference `#icon-name`; no build step is involved. `npm test` checks that every
 reference resolves to a file.
+
+### Tests
+
+`npm test` runs the Node built-in test runner: a smoke test that boots the built server on a free
+port against a throwaway config (via `CONFIG_PATH`, so your own `config/config.json` is untouched)
+and checks `/`, `/icons.svg`, `/api/status`, the HTML/JSON 404 split and `/health`, plus a check
+that every icon reference resolves to a file. Run `npm run build` first, since the smoke test
+executes `dist/index.js`. Takes ~10 s, most of it GameDig timing out against the unreachable test
+server on purpose.
 
 ### Build & Run
 

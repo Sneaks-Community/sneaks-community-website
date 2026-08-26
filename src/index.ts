@@ -40,11 +40,15 @@ interface AppConfig {
     servers: ServerConfig[];
 }
 
-// Read and validate configuration
-const configPath = path.join(__dirname, '..', 'config', 'config.json');
+// Read and validate configuration; CONFIG_PATH overrides the default location.
+const configPathOverride = (process.env.CONFIG_PATH ?? '').trim();
+const configPath = configPathOverride
+    ? path.resolve(configPathOverride)
+    : path.join(__dirname, '..', 'config', 'config.json');
 let config: AppConfig;
 
 try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- operator-supplied path
     const rawConfig = fs.readFileSync(configPath, 'utf-8');
     config = JSON.parse(rawConfig) as AppConfig;
     logger.info({ serverCount: config.servers.length, configPath }, 'Configuration loaded successfully');

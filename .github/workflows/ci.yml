@@ -42,6 +42,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Smoke test runs dist/index.js, so it must follow the build.
+      - name: Test
+        run: npm test
+
       # Reports vulnerabilities in the full dependency tree without failing the
       # build. Pre-existing advisories in untouched packages stay visible here;
       # newly-introduced vulnerable deps are gated by the dependency-review job.
