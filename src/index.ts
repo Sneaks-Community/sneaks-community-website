@@ -309,9 +309,10 @@ app.use(helmet({
     },
 }));
 
-// Restrict CORS to allowed origins instead of allowing all
+// Restrict CORS to allowed origins instead of allowing all. /api only; a global mount would put
+// `Vary: Origin` on every asset.
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) ?? ['http://localhost:3000'];
-app.use(cors({
+app.use('/api', cors({
     origin: allowedOrigins,
     methods: ['GET'],
     allowedHeaders: ['Content-Type'],
