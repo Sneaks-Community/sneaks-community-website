@@ -122,7 +122,6 @@ jobs:
       - name: Stage Trivy PR artifact
         if: always() && github.event_name == 'pull_request'
         run: |
-          echo "${{ github.event.pull_request.number }}" > pr-number.txt
           echo "${{ steps.trivy.outcome }}" > trivy-outcome.txt
 
       - name: Upload Trivy PR artifact
@@ -132,7 +131,6 @@ jobs:
           name: trivy-pr-report-${{ matrix.variant }}
           path: |
             trivy-report.txt
-            pr-number.txt
             trivy-outcome.txt
           if-no-files-found: warn
           retention-days: 1

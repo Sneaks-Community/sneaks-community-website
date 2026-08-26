@@ -61,14 +61,18 @@ jobs:
               try { return fs.readFileSync(path.join(base, dir, f), 'utf8').trim(); } catch (e) { return ''; }
             };
 
-            // PR number is identical across variants; take the first available.
-            let issue_number;
-            for (const d of dirs) {
-              const n = parseInt(read(d, 'pr-number.txt'), 10);
-              if (Number.isInteger(n)) { issue_number = n; break; }
+            const { owner, repo } = context.repo;
+            const run = context.payload.workflow_run;
+
+            let issue_number = run.pull_requests?.[0]?.number;
+            if (!Number.isInteger(issue_number)) {
+              const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner, repo, commit_sha: run.head_sha,
+              });
+              issue_number = prs.find(p => p.state === 'open' && p.head.sha === run.head_sha)?.number;
             }
             if (!Number.isInteger(issue_number)) {
-              core.info('No PR number in artifacts; nothing to comment.');
+              core.info('No PR found for this run; nothing to comment.');
               return;
             }
 
@@ -76,6 +80,11 @@ jobs:
             const variants = dirs
               .map(d => ({ name: d.replace(/^trivy-pr-report-/, ''), dir: d }))
               .sort((a, b) => a.name.localeCompare(b.name));
+
+            // Artifact contents come from the PR's own run. Backticks stripped so a report cannot
+            // break out of the code fence, and variant names reduced to a safe token.
+            const fenced = (text) => text.replaceAll('`', "'");
+            const safeName = (name) => name.replaceAll(/[^\w.-]/g, '') || 'unknown';
 
             let anyFailure = false;
             const sections = variants.map(v => {
@@ -87,12 +96,12 @@ jobs:
               const block = !report
                 ? '_No report output was produced._'
                 : (report.length > LIMIT
-                    ? report.slice(0, LIMIT) + '\n... (truncated — see the CI run summary for the full report)'
-                    : report);
+                    ? fenced(report).slice(0, LIMIT) + '\n... (truncated — see the CI run summary for the full report)'
+                    : fenced(report));
               const body = report
                 ? `<details><summary>Full report</summary>\n\n\`\`\`\n${block}\n\`\`\`\n\n</details>`
                 : block;
-              return `#### \`${v.name}\` image — ${status}\n\n${body}`;
+              return `#### \`${safeName(v.name)}\` image — ${status}\n\n${body}`;
             });
 
             const marker = '<!-- trivy-image-scan -->';
@@ -101,7 +110,6 @@ jobs:
               : '### 🛡️ Trivy image scan — ✅ no HIGH/CRITICAL findings';
             const body = `${marker}\n${heading}\n\n${sections.join('\n\n')}`;
 
-            const { owner, repo } = context.repo;
             const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
             const existing = comments.find(c => c.body && c.body.includes(marker));
             if (existing) {
