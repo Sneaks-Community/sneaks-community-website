@@ -5,6 +5,9 @@ on:
     types: [published]
   push:
     branches: [main]
+  # Weekly rebuild so base-image CVE fixes reach :latest between releases
+  schedule:
+    - cron: '0 5 * * 6'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
