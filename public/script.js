@@ -20,17 +20,24 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // skip animation.
 const animationsOff = prefersReducedMotion || !motionReady;
 
-async function fetchServerStatus() {
+// The server caches /api/status for 60s and sends max-age=60, so a background poll must
+// revalidate or the browser cache would double the staleness window.
+const REFRESH_MS = 60_000;
+
+async function fetchServerStatus({ background = false } = {}) {
     const grid = document.getElementById('server-grid');
-    grid.setAttribute('aria-busy', 'true');
+    if (!background) { grid.setAttribute('aria-busy', 'true'); }
 
     try {
-        const res = await fetch('/api/status');
+        const res = await fetch('/api/status', { cache: 'no-cache' });
         const data = await res.json().catch(() => null);
 
         if (!res.ok || !data || !data.success || !data.data) {
             throw new Error(`API responded ${res.status}`);
         }
+
+        // Re-rendering would drop focus out of the grid; the next poll catches up.
+        if (background && grid.contains(document.activeElement)) { return; }
 
         grid.innerHTML = ''; // Specific clear removing skeletons
 
@@ -51,7 +58,7 @@ async function fetchServerStatus() {
             const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
             const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
-            card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${stateClass} opacity-0 translate-y-2`;
+            card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${stateClass}${background ? '' : ' opacity-0 translate-y-2'}`;
 
             const onlineCount = server.status === 'online'
                 ? `<span class="player-count" data-target="${currentPlayers}">0</span>/${escapeHTML(server.maxplayers || '?')}`
@@ -102,7 +109,7 @@ async function fetchServerStatus() {
         });
 
         // Animate Server Cards in with stagger
-        if (!animationsOff) {
+        if (!animationsOff && !background) {
             animate(
                 ".server-card",
                 { opacity: [0, 1], y: [10, 0] },
@@ -119,7 +126,7 @@ async function fetchServerStatus() {
                 });
             });
         } else {
-            // When reduced motion is preferred, make cards visible immediately
+            // Reduced motion, or a background refresh: show the final state immediately.
             document.querySelectorAll(".server-card").forEach(el => {
                 el.classList.remove('opacity-0', 'translate-y-2');
             });
@@ -129,6 +136,7 @@ async function fetchServerStatus() {
         }
     } catch (e) {
         console.error("Failed to fetch servers", e);
+        if (background) { return; }
         grid.innerHTML = `
             <div role="status" class="col-span-full surface-card rounded-2xl p-8 flex flex-col items-center text-center gap-3">
                 <div class="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
@@ -138,7 +146,7 @@ async function fetchServerStatus() {
                 <p class="text-xs text-slate-600 dark:text-slate-400">Failed to contact server API. Please try again later.</p>
             </div>`;
     } finally {
-        grid.setAttribute('aria-busy', 'false');
+        if (!background) { grid.setAttribute('aria-busy', 'false'); }
     }
 }
 
@@ -270,6 +278,32 @@ function initScrollSpy() {
     sections.forEach((section) => observer.observe(section));
 }
 
+// Polls only while the tab is visible, and catches up on return
+function initStatusPolling() {
+    let timer;
+    let lastRefresh = Date.now();
+
+    const refresh = () => {
+        lastRefresh = Date.now();
+        fetchServerStatus({ background: true });
+    };
+    const start = () => {
+        clearInterval(timer);
+        timer = setInterval(refresh, REFRESH_MS);
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(timer);
+            return;
+        }
+        if (Date.now() - lastRefresh >= REFRESH_MS) { refresh(); }
+        start();
+    });
+
+    if (!document.hidden) { start(); }
+}
+
 // Main Initialization (homepage-specific; shared init runs from common.js)
 document.addEventListener("DOMContentLoaded", () => {
     initAnimations();
@@ -277,4 +311,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initAurora();
     initCopyIp();
     fetchServerStatus();
+    initStatusPolling();
 });
