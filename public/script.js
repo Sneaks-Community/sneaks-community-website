@@ -120,7 +120,7 @@ async function fetchServerStatus({ background = false } = {}) {
             }
 
             const serverName = escapeHTML(`${server.name}`);
-            const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
+            const serverIp = escapeHTML(`${server.host}:${server.port}`);
             const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
             const state = CARD_STATES[server.status] ?? CARD_STATES.offline;
@@ -161,7 +161,7 @@ async function fetchServerStatus({ background = false } = {}) {
             const link = card.querySelector('.connect-link');
             link.href = `steam://connect/${server.host}:${server.port}`;
             link.setAttribute('aria-label', `Connect to ${server.name}`);
-            card.querySelector('.copy-ip').dataset.ip = `${server.host}:${server.port || 27015}`;
+            card.querySelector('.copy-ip').dataset.ip = `${server.host}:${server.port}`;
 
             grid.appendChild(card);
         });
