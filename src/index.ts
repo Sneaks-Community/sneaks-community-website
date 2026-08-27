@@ -197,6 +197,9 @@ const brandingTokens = new Map<string, string>([
     ['aboutParagraph1', escapeHtml(aboutParagraph1)],
     ['aboutParagraph2', escapeHtml(aboutParagraph2)],
     ['structuredData', structuredData],
+    // One skeleton per configured server, so the grid is already its final height when the
+    // browser resolves a #fragment: late-growing content above an anchor lands you short of it.
+    ['serverSkeletons', '<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"></div>'.repeat(config.servers.length)],
     // Logo tokens are trusted HTML markup (not user text), so they are injected raw. logoPath is
     // one of three fixed internal filenames, so there is nothing to escape.
     ['logoContainerClass', logoPath ? 'has-logo' : 'bg-brand-500 font-black'],

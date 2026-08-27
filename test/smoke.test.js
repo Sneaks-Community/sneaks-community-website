@@ -82,6 +82,9 @@ test('GET / serves the branded page with every token substituted', async () => {
     const body = await res.text();
     assert.ok(body.includes(COMMUNITY_NAME), 'COMMUNITY_NAME was not injected into the page');
     assert.equal(body.includes('{{'), false, 'page still contains an unsubstituted {{token}}');
+    // A short grid grows when the cards arrive, pushing every #fragment below it out of reach.
+    const skeletons = [...body.matchAll(/animate-pulse/g)].length;
+    assert.equal(skeletons, TEST_CONFIG.servers.length, 'skeleton count does not match configured servers');
 });
 
 test('GET /icons.svg serves the sprite built from public/icons/', async () => {
