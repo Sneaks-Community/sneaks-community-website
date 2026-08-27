@@ -23,17 +23,83 @@ const animationsOff = prefersReducedMotion || !motionReady;
 // The server caches /api/status for 60s and sends max-age=60, so a background poll must
 // revalidate or the browser cache would double the staleness window.
 const REFRESH_MS = 60_000;
+// Servers the API has not resolved yet settle within seconds, so chase them rather than
+// leaving a card blank until the next full refresh. A failed poll is retried on a slower
+// beat. The budget is capped and refilled each refresh cycle, so a persistent problem can
+// never turn into an unbounded request loop.
+const PENDING_RETRY_MS = 1500;
+const ERROR_RETRY_MS = 5000;
+const MAX_RETRIES = 8;
+// A hung request must not stall the retry chain; browsers give up far too late on their own.
+const FETCH_TIMEOUT_MS = 8000;
+let retryTimer;
+let retries = 0;
+let fetchInProgress = false;
+
+function scheduleRetry(delay) {
+    clearTimeout(retryTimer);
+    if (retries >= MAX_RETRIES || document.hidden) { return; }
+    retries++;
+    retryTimer = setTimeout(() => fetchServerStatus({ background: true }), delay);
+}
+
+// The "Live" badge must stop claiming live when polls stop landing.
+const STALE_AFTER_MS = 3 * REFRESH_MS;
+let lastSuccess = Date.now();
+
+// The age is aria-hidden so a screen reader hears the Live -> Stale transition once rather
+// than a new minute count every cycle.
+function updateFreshness() {
+    const indicator = document.getElementById('live-indicator');
+    if (!indicator) { return; }
+
+    const age = Date.now() - lastSuccess;
+    const stale = age > STALE_AFTER_MS;
+    const label = indicator.querySelector('.live-label');
+    const text = stale ? 'Stale' : 'Live';
+
+    if (label.textContent !== text) { label.textContent = text; }
+    indicator.querySelector('.live-age').textContent = stale ? ` ${String(Math.floor(age / 60_000))}m` : '';
+    indicator.querySelector('.status-dot').classList.toggle('status-dot--stale', stale);
+    // Normally desktop-only, but a stale warning is worth showing on phones too.
+    indicator.classList.toggle('hidden', !stale);
+}
+
+// 'pending' means the API has not heard back from that server yet: neither live nor down.
+const CARD_STATES = {
+    online: { card: 'server-card--online', text: 'text-brand-600 dark:text-brand-400', bar: 'bg-gradient-to-r from-live-500 to-live-300', label: '' },
+    offline: { card: 'server-card--offline', text: 'text-red-500 dark:text-red-400', bar: 'bg-red-500/50', label: 'OFFLINE' },
+    pending: { card: 'animate-pulse', text: 'text-slate-400 dark:text-slate-500', bar: 'bg-slate-400/30', label: 'CHECKING' },
+};
 
 async function fetchServerStatus({ background = false } = {}) {
+    // Overlapping polls could paint out of order, and one hung request would otherwise let
+    // the interval stack up more.
+    if (fetchInProgress) { return; }
+    fetchInProgress = true;
+
     const grid = document.getElementById('server-grid');
     if (!background) { grid.setAttribute('aria-busy', 'true'); }
 
     try {
-        const res = await fetch('/api/status', { cache: 'no-cache' });
+        const res = await fetch('/api/status', {
+            cache: 'no-cache',
+            signal: AbortSignal.timeout?.(FETCH_TIMEOUT_MS),
+        });
         const data = await res.json().catch(() => null);
 
         if (!res.ok || !data || !data.success || !data.data) {
             throw new Error(`API responded ${res.status}`);
+        }
+
+        lastSuccess = Date.now();
+        updateFreshness();
+
+        if (data.pending > 0) {
+            scheduleRetry(PENDING_RETRY_MS);
+        } else {
+            clearTimeout(retryTimer);
+            retries = 0;
         }
 
         // Re-rendering would drop focus out of the grid; the next poll catches up.
@@ -57,12 +123,12 @@ async function fetchServerStatus({ background = false } = {}) {
             const serverIp = escapeHTML(`${server.host}:${server.port || 27015}`);
             const serverMap = escapeHTML(`${server.map || 'N/A'}`);
 
-            const stateClass = server.status === 'online' ? 'server-card--online' : 'server-card--offline';
-            card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${stateClass}${background ? '' : ' opacity-0 translate-y-2'}`;
+            const state = CARD_STATES[server.status] ?? CARD_STATES.offline;
+            card.className = `group relative surface-card card-hover p-4 rounded-2xl server-card ${state.card}${background ? '' : ' opacity-0 translate-y-2'}`;
 
             const onlineCount = server.status === 'online'
                 ? `<span class="player-count" data-target="${currentPlayers}">0</span>/${escapeHTML(server.maxplayers || '?')}`
-                : 'OFFLINE';
+                : state.label;
 
             card.innerHTML = `
                 <a class="connect-link absolute inset-0 z-0 rounded-2xl cursor-pointer"></a>
@@ -77,14 +143,14 @@ async function fetchServerStatus({ background = false } = {}) {
                         </p>
                     </div>
                     <div class="text-right shrink-0">
-                        <span class="text-sm font-bold ${server.status === 'online' ? 'text-brand-600 dark:text-brand-400' : 'text-red-500 dark:text-red-400'}">
+                        <span class="text-sm font-bold ${state.text}">
                             ${onlineCount}
                         </span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 mt-4">
                     <div class="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden relative">
-                        <div class="absolute top-0 left-0 h-full rounded-full ${server.status === 'online' ? 'bg-gradient-to-r from-live-500 to-live-300' : 'bg-red-500/50'} transition-all duration-1000 server-bar" data-bar-width="${Math.ceil(playerPercentage / 10) * 10}"></div>
+                        <div class="absolute top-0 left-0 h-full rounded-full ${state.bar} transition-all duration-1000 server-bar" data-bar-width="${Math.ceil(playerPercentage / 10) * 10}"></div>
                     </div>
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right whitespace-nowrap">${serverMap}</span>
                 </div>
@@ -136,6 +202,9 @@ async function fetchServerStatus({ background = false } = {}) {
         }
     } catch (e) {
         console.error("Failed to fetch servers", e);
+        // Don't leave the page wrong for a whole refresh cycle over a blip.
+        scheduleRetry(ERROR_RETRY_MS);
+        updateFreshness();
         if (background) { return; }
         grid.innerHTML = `
             <div role="status" class="col-span-full surface-card rounded-2xl p-8 flex flex-col items-center text-center gap-3">
@@ -146,6 +215,7 @@ async function fetchServerStatus({ background = false } = {}) {
                 <p class="text-xs text-slate-600 dark:text-slate-400">Failed to contact server API. Please try again later.</p>
             </div>`;
     } finally {
+        fetchInProgress = false;
         if (!background) { grid.setAttribute('aria-busy', 'false'); }
     }
 }
@@ -285,6 +355,7 @@ function initStatusPolling() {
 
     const refresh = () => {
         lastRefresh = Date.now();
+        retries = 0; // fresh budget each cycle
         fetchServerStatus({ background: true });
     };
     const start = () => {
@@ -298,6 +369,13 @@ function initStatusPolling() {
             return;
         }
         if (Date.now() - lastRefresh >= REFRESH_MS) { refresh(); }
+        start();
+    });
+
+    // The browser knows when connectivity is back, so don't sit out the rest of the retry gap.
+    window.addEventListener('online', () => {
+        if (document.hidden) { return; }
+        refresh();
         start();
     });
 

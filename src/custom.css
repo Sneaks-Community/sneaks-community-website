@@ -116,6 +116,15 @@ button:focus-visible {
     }
 }
 
+/* No successful poll in a while: drop the live green and the ping, match the muted label. */
+.status-dot--stale {
+    background-color: currentColor;
+}
+
+.status-dot--stale::after {
+    animation: none;
+}
+
 /* Footer icon container background */
 .footer-icons-container {
     background-color: color-mix(in oklab, var(--color-brand-700) 7%, transparent);

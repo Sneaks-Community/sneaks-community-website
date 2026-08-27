@@ -376,11 +376,18 @@ app.get('/sitemap.xml', (req, res) => {
 
 app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setStaticCacheHeaders }));
 
-// In-memory cache for server queries (60 seconds TTL)
+// In-memory status cache, 60 s TTL, keyed per server so one unreachable server never delays
+// the others. inFlight is the single-flight guard: one query per server id at a time.
 const CACHE_TTL_MS = 60_000;
-let cached: { data: ServerStatusData[]; expires: number } | null = null;
-// Single-flight guard: concurrent cache-miss requests share one in-flight GameDig batch query
-let updatePromise: Promise<ServerStatusData[]> | null = null;
+// A server that just failed is re-checked on this shorter interval instead of the full TTL.
+const FAILURE_RETRY_MS = 10_000;
+// Consecutive failed queries before a previously-online server is published as offline.
+const OFFLINE_STRIKES = 2;
+// Backstop for a query that never settles, well above GameDig's own give-up time.
+const QUERY_WATCHDOG_MS = 30_000;
+const statusCache = new Map<string, { data: ServerStatusData; expires: number }>();
+const inFlight = new Map<string, Promise<void>>();
+const failures = new Map<string, number>();
 
 // Server status response type
 interface ServerStatusData {
@@ -390,7 +397,7 @@ interface ServerStatusData {
     players: number;
     maxplayers: number;
     ping: number | undefined;
-    status: 'online' | 'offline';
+    status: 'online' | 'offline' | 'pending';
     host?: string;
     port?: number;
 }
@@ -398,7 +405,9 @@ interface ServerStatusData {
 // Global rate limiter for all /api/* endpoints
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 240, // 240 requests per 15 minutes per IP (headroom for client polling + shared/CGNAT IPs)
+    max: 1200, // 80 req/min per IP. Cache hits are sub-millisecond; the expensive path (a GameDig
+    // refresh) is capped by the cache TTL regardless, so this only needs to stop one IP hogging the
+    // event loop while leaving room for many tabs behind a shared/CGNAT address.
     message: { success: false, message: 'Too many requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
@@ -408,73 +417,125 @@ const apiLimiter = rateLimit({
 // Apply global rate limiter to all /api/* routes
 app.use('/api', apiLimiter);
 
-// API Route for server status
-app.get('/api/status', async (req, res) => {
+// Placeholder entry, shared by the offline and not-yet-queried cases.
+const blankStatus = (server: ServerConfig, status: 'offline' | 'pending'): ServerStatusData => ({
+    id: server.id,
+    name: server.name ?? server.id,
+    map: 'N/A',
+    players: 0,
+    maxplayers: 0,
+    ping: undefined,
+    status,
+    host: server.host,
+    port: server.port,
+});
+
+// Query one server. Never rejects; null means the query failed.
+const queryServer = async (server: ServerConfig): Promise<ServerStatusData | null> => {
     try {
-        const cachedStatus = cached && cached.expires > Date.now() ? cached.data : null;
-        if (cachedStatus) {
-            logger.debug({ serverCount: cachedStatus.length }, 'Server status returned from cache');
-            res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
-            return res.json({ success: true, fromCache: true, data: cachedStatus });
-        }
+        const state = await GameDig.query({
+            type: server.type,
+            host: server.host,
+            port: server.port,
+            // An attempt is 2 datagrams costing 2x socketTimeout, and maxRetries below 2 never
+            // retries, so 1 lost packet used to mean a false OFFLINE. Measured p99 is 130 ms.
+            maxRetries: 2,
+            socketTimeout: 1000,
+        });
 
-        logger.info({ serverCount: config.servers.length }, 'Cache miss, querying servers');
-        updatePromise ??= (async () => {
-            try {
-                const serversData: ServerStatusData[] = await Promise.all(
-                    config.servers.map(async (server: ServerConfig) => {
-                        try {
-                            const state = await GameDig.query({
-                                type: server.type,
-                                host: server.host,
-                                port: server.port,
-                                maxRetries: 1,
-                                socketTimeout: 5000,
-                            });
+        logger.debug({ serverId: server.id, map: state.map, players: state.players.length, ping: state.ping }, `Server ${server.id} queried successfully`);
 
-                            logger.debug({ serverId: server.id, map: state.map, players: state.players.length, ping: state.ping }, `Server ${server.id} queried successfully`);
+        return {
+            id: server.id,
+            name: state.name || (server.name ?? server.id),
+            map: state.map || 'N/A',
+            players: state.players.length,
+            maxplayers: state.maxplayers,
+            ping: state.ping,
+            status: 'online' as const,
+            host: server.host,
+            port: server.port,
+        };
+    } catch {
+        logger.warn({ serverId: server.id, host: server.host, port: server.port }, `Server ${server.id} query failed`);
+        return null;
+    }
+};
 
-                            return {
-                                id: server.id,
-                                name: state.name || (server.name ?? server.id),
-                                map: state.map || 'N/A',
-                                players: state.players.length,
-                                maxplayers: state.maxplayers,
-                                ping: state.ping,
-                                status: 'online' as const,
-                                host: server.host,
-                                port: server.port,
-                            };
-                        } catch {
-                            logger.warn({ serverId: server.id, host: server.host, port: server.port }, `Server ${server.id} query failed`);
+// GameDig should always settle, but a query that never did would hold this server's inFlight
+// slot forever and freeze its card at the last known value.
+const withWatchdog = async (query: Promise<ServerStatusData | null>): Promise<ServerStatusData | null> => {
+    let timer: NodeJS.Timeout | undefined;
+    const watchdog = new Promise<null>((resolve) => {
+        timer = setTimeout(() => { resolve(null); }, QUERY_WATCHDOG_MS);
+    });
+    try {
+        return await Promise.race([query, watchdog]);
+    } finally {
+        clearTimeout(timer);
+    }
+};
 
-                            // Return default offline data instead of result.reason (which could be an Error object)
-                            return {
-                                id: server.id,
-                                name: server.name ?? server.id,
-                                map: 'N/A',
-                                players: 0,
-                                maxplayers: 0,
-                                ping: undefined,
-                                status: 'offline' as const,
-                                host: server.host,
-                                port: server.port,
-                            };
-                        }
-                    })
-                );
+// One failed query is usually transient (a lost packet burst, a brief A2S rate limit, a map
+// change), so hold the last good data and re-check sooner. Offline is only published once a
+// server has failed OFFLINE_STRIKES times in a row, or if it was never up to begin with.
+const recordFailure = (server: ServerConfig): void => {
+    const strikes = (failures.get(server.id) ?? 0) + 1;
+    failures.set(server.id, strikes);
 
-                cached = { data: serversData, expires: Date.now() + CACHE_TTL_MS };
-                return serversData;
-            } finally {
-                // Always clear the in-flight promise, whether it succeeds or fails
-                updatePromise = null;
+    const previous = statusCache.get(server.id);
+    if (strikes < OFFLINE_STRIKES && previous?.data.status === 'online') {
+        logger.debug({ serverId: server.id, strikes }, `Server ${server.id} query failed, holding last known state`);
+        statusCache.set(server.id, { data: previous.data, expires: Date.now() + FAILURE_RETRY_MS });
+        return;
+    }
+    statusCache.set(server.id, { data: blankStatus(server, 'offline'), expires: Date.now() + CACHE_TTL_MS });
+};
+
+// Fire off a refresh nobody waits for. Requests are served from the cache, so a slow server
+// costs nothing but its own staleness.
+const refreshServer = (server: ServerConfig): void => {
+    if (inFlight.has(server.id)) { return; }
+    const query = (async () => {
+        try {
+            const data = await withWatchdog(queryServer(server));
+            if (data) {
+                failures.delete(server.id);
+                statusCache.set(server.id, { data, expires: Date.now() + CACHE_TTL_MS });
+            } else {
+                recordFailure(server);
             }
-        })();
+        } catch (error: unknown) {
+            logger.error({ err: error, serverId: server.id }, `Server ${server.id} refresh failed`);
+            recordFailure(server);
+        } finally {
+            inFlight.delete(server.id);
+        }
+    })();
+    inFlight.set(server.id, query);
+};
 
-        const serversData = await updatePromise;
-        res.set('Cache-Control', 'public, max-age=60, s-maxage=60');
-        return res.json({ success: true, fromCache: false, data: serversData });
+// API Route for server status. Never blocks on a query: expired entries are served stale
+// while they refresh, and entries with no result yet come back as 'pending' for the client
+// to poll for. One unreachable server therefore cannot hold up the whole grid.
+app.get('/api/status', (req, res) => {
+    try {
+        const now = Date.now();
+        let pending = 0;
+
+        const data = config.servers.map((server: ServerConfig): ServerStatusData => {
+            const hit = statusCache.get(server.id);
+            if (!hit || hit.expires <= now) { refreshServer(server); }
+            if (hit) { return hit.data; }
+
+            pending++;
+            return blankStatus(server, 'pending');
+        });
+
+        logger.debug({ serverCount: data.length, pending }, 'Server status served');
+        // A pending payload is worthless in a minute, so keep proxies from pinning it.
+        res.set('Cache-Control', pending > 0 ? 'no-store' : 'public, max-age=60, s-maxage=60');
+        return res.json({ success: true, fromCache: pending === 0, pending, data });
     } catch (error) {
         logger.error({ err: error }, 'Server status error');
         // Use 'message' property instead of 'error' for API clarity

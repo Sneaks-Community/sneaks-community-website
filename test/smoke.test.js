@@ -10,7 +10,7 @@ import test, { after, before } from 'node:test';
 
 const root = path.join(import.meta.dirname, '..');
 const COMMUNITY_NAME = 'Smoke Test Community';
-// Loopback with nothing listening: no DNS, no live server. Costs GameDig's ~10s socketTimeout.
+// Loopback with nothing listening: no DNS, no live server. Costs GameDig's ~4s give-up time.
 const TEST_CONFIG = {
     servers: [{ id: 'smoke_test', host: '127.0.0.1', port: 1, type: 'csgo', name: 'Smoke Test Server' }],
 };
@@ -94,28 +94,45 @@ test('GET /icons.svg serves the sprite built from public/icons/', async () => {
     assert.equal(symbols, files, 'sprite symbol count does not match public/icons/');
 });
 
-test('GET /api/status returns the expected payload shape', async () => {
+test('GET /api/status answers without waiting for an unreachable server', async () => {
+    const started = Date.now();
     const res = await fetch(`${base}/api/status`);
+    const elapsed = Date.now() - started;
     assert.equal(res.status, 200);
     assert.match(res.headers.get('content-type'), /application\/json/);
+    // The configured server is a dead port, so a blocking implementation would sit on
+    // GameDig's ~4s give-up time here.
+    assert.ok(elapsed < 2000, `status took ${String(elapsed)}ms; it must not block on the query`);
+
     const body = await res.json();
     assert.equal(body.success, true);
     assert.ok(Array.isArray(body.data), 'data is not an array');
     assert.equal(body.data.length, TEST_CONFIG.servers.length);
+    assert.equal(body.pending, TEST_CONFIG.servers.length, 'unresolved servers should report as pending');
+    assert.equal(body.data[0].status, 'pending');
+    assert.match(res.headers.get('cache-control'), /no-store/, 'a pending payload must not be cacheable');
+});
+
+test('GET /api/status settles to offline and is then served from cache', async () => {
+    const deadline = Date.now() + 20_000;
+    let res;
+    let body;
+    for (;;) {
+        res = await fetch(`${base}/api/status`);
+        body = await res.json();
+        if (body.pending === 0) { break; }
+        assert.ok(Date.now() < deadline, 'status never settled within 20s');
+        await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
     const [server] = body.data;
     // What public/script.js renders; `ping` is absent when offline.
     for (const key of ['id', 'name', 'map', 'players', 'maxplayers', 'status', 'host', 'port']) {
         assert.ok(Object.hasOwn(server, key), `payload entry is missing "${key}"`);
     }
     assert.equal(server.id, 'smoke_test');
-    // Must degrade to offline, not throw.
+    // Must degrade to offline, not throw or stay pending.
     assert.equal(server.status, 'offline');
-});
-
-test('GET /api/status serves the second hit from cache', async () => {
-    const res = await fetch(`${base}/api/status`);
-    assert.equal(res.status, 200);
-    const body = await res.json();
     assert.equal(body.fromCache, true);
     assert.match(res.headers.get('cache-control'), /max-age=60/);
 });
