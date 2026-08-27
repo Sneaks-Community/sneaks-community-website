@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
@@ -178,6 +179,15 @@ const detectLogoPath = (): string | null => {
 const logoPath = detectLogoPath();
 if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
 
+// Content-hashed asset URLs: the hash names one exact build of the file, so the response can be
+// served immutable for a year (see setStaticCacheHeaders) and a deploy re-fetches only what changed.
+const assetUrl = (relativePath: string): string => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed call sites below
+    const bytes = fs.readFileSync(path.join(__dirname, '..', 'public', relativePath));
+    const hash = crypto.createHash('sha256').update(bytes).digest('base64url').slice(0, 10);
+    return `/${relativePath}?v=${hash}`;
+};
+
 // Token values, already fully escaped (or JSON-safe for structuredData). Substituted via a
 // single function-replacer pass so replaceAll's '$' patterns ($$, $&, ...) in values can't
 // mangle the output or re-inject the matched token.
@@ -197,6 +207,12 @@ const brandingTokens = new Map<string, string>([
     ['aboutParagraph1', escapeHtml(aboutParagraph1)],
     ['aboutParagraph2', escapeHtml(aboutParagraph2)],
     ['structuredData', structuredData],
+    // Hashes are base64url over fixed filenames, so there is nothing to escape.
+    ['themeInitJs', assetUrl('theme-init.js')],
+    ['tailwindCss', assetUrl('tailwind.css')],
+    ['motionJs', assetUrl('lib/motion.js')],
+    ['commonJs', assetUrl('common.js')],
+    ['scriptJs', assetUrl('script.js')],
     // One skeleton per configured server, so the grid is already its final height when the
     // browser resolves a #fragment: late-growing content above an anchor lands you short of it.
     ['serverSkeletons', '<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"></div>'.repeat(config.servers.length)],
@@ -344,8 +360,14 @@ app.use(pinoHttp({
 // Cache tiers for static assets
 const STATIC_SHORT_MAX_AGE = 300; // 5 minutes
 const STATIC_LONG_MAX_AGE = 86_400; // 1 day
+const IMMUTABLE_MAX_AGE = 31_536_000; // 1 year
 const LONG_CACHE_RE = /\.(?:woff2?|ttf|otf|eot|png|jpe?g|gif|webp|avif|ico|svg)$/i;
 function setStaticCacheHeaders(res: express.Response, filePath: string): void {
+    // A ?v= hash pins the URL to this exact content, so it can never need revalidating.
+    if (res.req.query.v) {
+        res.setHeader('Cache-Control', `public, max-age=${String(IMMUTABLE_MAX_AGE)}, immutable`);
+        return;
+    }
     const isVendorLibrary = filePath.includes(`${path.sep}lib${path.sep}`); // e.g. lib/motion.js
     const maxAge = LONG_CACHE_RE.test(filePath) || isVendorLibrary ? STATIC_LONG_MAX_AGE : STATIC_SHORT_MAX_AGE;
     res.setHeader('Cache-Control', `public, max-age=${String(maxAge)}`);

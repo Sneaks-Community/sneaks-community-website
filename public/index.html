@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Theme initialisation: runs synchronously before any CSS loads to prevent dark-mode flash -->
-    <script src="/theme-init.js"></script>
+    <script src="{{themeInitJs}}"></script>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>{{communityName}} | Since {{established}}</title>
     <!-- SEO Meta Tags -->
@@ -37,9 +37,9 @@
     <link rel="preload" href="/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Compiled from src/input.css (Tailwind + src/custom.css) -->
-    <link rel="stylesheet" href="/tailwind.css">
+    <link rel="stylesheet" href="{{tailwindCss}}">
     <!-- Motion.dev (self-hosted) -->
-    <script src="/lib/motion.js" defer></script>
+    <script src="{{motionJs}}" defer></script>
 </head>
 <body class="bg-surface-100 dark:bg-surface-950 text-slate-800 dark:text-ink font-sans antialiased transition-colors duration-300">
 
@@ -489,7 +489,7 @@
     </footer>
 
     <!-- Init scripts -->
-    <script src="/common.js" defer></script>
-    <script src="/script.js" defer></script>
+    <script src="{{commonJs}}" defer></script>
+    <script src="{{scriptJs}}" defer></script>
 </body>
 </html>

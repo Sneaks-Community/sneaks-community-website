@@ -97,6 +97,24 @@ test('GET /icons.svg serves the sprite built from public/icons/', async () => {
     assert.equal(symbols, files, 'sprite symbol count does not match public/icons/');
 });
 
+test('hashed asset URLs are served immutable, bare ones are not', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    const hashed = [...body.matchAll(/(?:src|href)="(\/[^"]+\?v=[\w-]+)"/g)].map((m) => m[1]);
+    // theme-init.js, tailwind.css, lib/motion.js, common.js, script.js
+    assert.equal(hashed.length, 5, `expected 5 hashed asset URLs, got ${String(hashed.length)}`);
+
+    for (const url of hashed) {
+        const res = await fetch(`${base}${url}`);
+        assert.equal(res.status, 200, `${url} did not resolve`);
+        assert.match(res.headers.get('cache-control'), /max-age=31536000, immutable/, `${url} is not immutable`);
+    }
+
+    // Without the hash the URL still means "whatever the current build is", so it must stay short.
+    const bare = await fetch(`${base}/tailwind.css`);
+    assert.equal(bare.status, 200);
+    assert.equal(bare.headers.get('cache-control'), 'public, max-age=300');
+});
+
 test('GET /api/status answers without waiting for an unreachable server', async () => {
     const started = Date.now();
     const res = await fetch(`${base}/api/status`);
