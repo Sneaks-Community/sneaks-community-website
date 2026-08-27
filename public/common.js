@@ -76,6 +76,7 @@ function initMobileMenu() {
 
     const toggleMenu = () => {
         isMenuOpen = !isMenuOpen;
+        mobileMenuBtn.setAttribute('aria-expanded', String(isMenuOpen));
 
         if (isMenuOpen) {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
