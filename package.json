@@ -45,7 +45,7 @@
     "@types/express": "^5.0.6",
     "@types/gamedig": "^5.0.3",
     "@types/node": "^26",
-    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/eslint-plugin": "^8.68.0",
     "@typescript-eslint/parser": "^8.67.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.8.1",
