@@ -377,6 +377,8 @@ function setStaticCacheHeaders(res: express.Response, filePath: string): void {
 // This allows users to hot-load custom assets without rebuilding the Docker image
 if (fs.existsSync(userAssetsPath)) {
     app.use(express.static(userAssetsPath, { setHeaders: setStaticCacheHeaders }));
+    // Static ignores dot-dirs; mounting .well-known directly exposes it (e.g. security.txt, RFC 9116).
+    app.use('/.well-known', express.static(path.join(userAssetsPath, '.well-known'), { setHeaders: setStaticCacheHeaders }));
 }
 // Serve the config-branded index for the root and direct requests. Registered after the
 // user-assets mount (so a user-supplied index.html still wins) and before the public mount.
