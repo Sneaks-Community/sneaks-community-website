@@ -306,6 +306,20 @@ function initAnimations() {
     // performance and to respect prefers-reduced-motion without JS.
 }
 
+// Play each scroll reveal once as it comes into view. Elements that arrive in the
+// same callback (a grid row, or everything on screen at load) are staggered.
+function initReveals() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.filter((entry) => entry.isIntersecting).forEach((entry, i) => {
+            entry.target.style.animationDelay = `${i * 90}ms`;
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.25 });
+
+    document.querySelectorAll('.reveal, .reveal-stagger > *').forEach((el) => observer.observe(el));
+}
+
 // Keep the aurora sweep off the compositor while it is scrolled out of view.
 function initAurora() {
     const aurora = document.querySelector('.aurora');
@@ -384,6 +398,7 @@ function initStatusPolling() {
 
 // Main Initialization (homepage-specific; shared init runs from common.js)
 document.addEventListener("DOMContentLoaded", () => {
+    initReveals();
     initAnimations();
     initScrollSpy();
     initAurora();

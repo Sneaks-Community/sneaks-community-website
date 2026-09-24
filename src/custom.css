@@ -751,46 +751,23 @@ nav.nav-scrolled {
     box-shadow: 0 10px 30px -8px color-mix(in oklab, var(--color-brand-500) 75%, transparent);
 }
 
-/* Scroll reveals */
+/* Scroll reveals: played once, on a timer, when initReveals marks them .is-revealed.
+   An animation rather than a transition, so the cards' own hover transitions survive. */
+@media (prefers-reduced-motion: no-preference) {
+    .js-reveal :is(.reveal, .reveal-stagger > *):not(.is-revealed) {
+        opacity: 0;
+    }
+
+    .js-reveal :is(.reveal, .reveal-stagger > *).is-revealed {
+        animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .js-reveal .reveal--left.is-revealed { animation-name: reveal-left; }
+    .js-reveal .reveal--scale.is-revealed { animation-name: reveal-scale; }
+}
+
 @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-        /* `cover` fractions, not the `entry` phase: `entry` ends as soon as the
-           subject is fully on screen, so a short card finished revealing while
-           still in the bottom sliver. A cover fraction keeps going past that,
-           settling once the card is a third of the way up the viewport. */
-        .reveal,
-        .reveal-stagger > * {
-            animation: reveal-up 0.7s ease-out both;
-            animation-timeline: view();
-            animation-range-start: cover 5%;
-            animation-range-end: cover 45%;
-        }
-
-        .reveal--left { animation-name: reveal-left; }
-        .reveal--scale { animation-name: reveal-scale; }
-
-        /* The last section sits ~220px above the footer, too little scroll left
-           to finish the range above, so its grids reveal over a shorter one. */
-        #rules .reveal-stagger > * {
-            animation-range-start: cover 0%;
-            animation-range-end: cover 28%;
-        }
-
-        /* From sm up these grids are two columns, whose cards would otherwise
-           reveal in lockstep. animation-delay is ignored on a scroll timeline,
-           so stagger the second column by offsetting its range. */
-        @media (min-width: 640px) {
-            .reveal-stagger > *:nth-child(even) {
-                animation-range-start: cover 16%;
-                animation-range-end: cover 54%;
-            }
-
-            #rules .reveal-stagger > *:nth-child(even) {
-                animation-range-start: cover 4%;
-                animation-range-end: cover 32%;
-            }
-        }
-
         /* Seams draw themselves out from the centre as their section arrives.
            One name on .ambient resolves per-section: a pseudo-element's
            timeline lookup walks up to its own section, not a shared one. */
@@ -840,21 +817,16 @@ nav.nav-scrolled {
     }
 }
 
-/* Motion is done by 65% and holds after: reveals near the footer run out of
-   scroll, and this leaves them finished rather than at partial opacity. */
 @keyframes reveal-up {
     from { opacity: 0; transform: translateY(28px); }
-    65% { opacity: 1; transform: none; }
 }
 
 @keyframes reveal-left {
     from { opacity: 0; transform: translateX(-36px); }
-    65% { opacity: 1; transform: none; }
 }
 
 @keyframes reveal-scale {
     from { opacity: 0; transform: scale(0.95); }
-    65% { opacity: 1; transform: none; }
 }
 
 /* Centre-out, and done by 80% so a section that runs out of scroll leaves its

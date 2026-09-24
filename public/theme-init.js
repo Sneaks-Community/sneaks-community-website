@@ -20,4 +20,6 @@ window.safeStorage = {
     if (stored ? stored === 'dark' : prefersDark) {
         document.documentElement.classList.add('dark');
     }
+    // Set before first paint so scroll reveals start hidden instead of flashing in.
+    document.documentElement.classList.add('js-reveal');
 }());
