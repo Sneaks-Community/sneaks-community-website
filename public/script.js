@@ -296,7 +296,7 @@ function initAnimations() {
         );
         animate(heroRest,
             { opacity: [0, 1], y: [24, 0] },
-            { duration: 0.7, delay: stagger(0.12, { startDelay: 0.35 }), ease: 'ease-out' }
+            { duration: 0.7, delay: stagger(0.12, { startDelay: 0.35 }), ease: 'easeOut' }
         );
     } else {
         heroWords.forEach(el => { el.style.transform = 'none'; });
