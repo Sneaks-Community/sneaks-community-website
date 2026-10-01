@@ -33,6 +33,20 @@ test('every referenced icon has a file', () => {
     }
 });
 
+test('icon wrappers keep a 0 0 viewBox origin', () => {
+    for (const source of sources) {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed list above
+        const text = fs.readFileSync(path.join(root, source), 'utf-8');
+        // <use> places the symbol's viewport at the wrapper's origin, so any other origin shifts and clips the icon.
+        for (const [, attributes, body] of text.matchAll(/<svg\b([^>]*)>(.*?)<\/svg>/gs)) {
+            const viewBox = /viewBox="([^"]*)"/.exec(attributes)?.[1];
+            if (body.includes('/icons.svg#') && viewBox) {
+                assert.ok(viewBox.startsWith('0 0 '), `${source}: ${body} wrapper has viewBox "${viewBox}"; it must start at 0 0`);
+            }
+        }
+    }
+});
+
 test('every icon file is a symbol-able svg with a viewBox', () => {
     assert.ok(available.size > 0, 'no icons found');
     for (const name of available) {
