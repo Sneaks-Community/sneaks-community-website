@@ -102,8 +102,10 @@ async function fetchServerStatus({ background = false } = {}) {
             retries = 0;
         }
 
-        // Re-rendering would drop focus out of the grid; the next poll catches up.
-        if (background && grid.contains(document.activeElement)) { return; }
+        // Re-rendering replaces the focused control, so focus goes back to the same position
+        // afterwards. Cards follow config order, so positions are stable.
+        const controls = () => grid.querySelectorAll('a, button');
+        const focusIndex = [...controls()].indexOf(document.activeElement);
 
         grid.innerHTML = ''; // Specific clear removing skeletons
 
@@ -165,6 +167,8 @@ async function fetchServerStatus({ background = false } = {}) {
 
             grid.appendChild(card);
         });
+
+        if (focusIndex >= 0) { controls().item(focusIndex)?.focus({ preventScroll: true }); }
 
         // Apply CSS custom property for player bar widths (CSP-compliant)
         document.querySelectorAll('.server-bar').forEach(bar => {
