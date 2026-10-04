@@ -102,6 +102,11 @@ function initMobileMenu() {
         }
     });
 
+    // The toggle hides from Tailwind's lg breakpoint (64rem) up, so close the menu there instead of stranding it.
+    window.matchMedia('(min-width: 64rem)').addEventListener('change', (event) => {
+        if (event.matches && isMenuOpen) { toggleMenu(); }
+    });
+
     // Close when a link inside is clicked
     mobileLinks.forEach(link => {
         link.addEventListener('click', () => {
