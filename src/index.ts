@@ -407,6 +407,9 @@ app.use(express.static(path.join(__dirname, '..', 'public'), { setHeaders: setSt
 // In-memory status cache, 60 s TTL, keyed per server so one unreachable server never delays
 // the others. inFlight is the single-flight guard: one query per server id at a time.
 const CACHE_TTL_MS = 60_000;
+// Expired entries are served while they refresh, up to this long past expiry; older ones come
+// back as 'pending'. A lone visitor's 60 s poll often lands a full TTL past expiry, hence two.
+const MAX_STALE_MS = 2 * CACHE_TTL_MS;
 // A server that just failed is re-checked on this shorter interval instead of the full TTL.
 const FAILURE_RETRY_MS = 10_000;
 // Consecutive failed queries before a previously-online server is published as offline.
@@ -469,6 +472,8 @@ const queryServer = async (server: ServerConfig): Promise<ServerStatusData | nul
             // retries, so 1 lost packet used to mean a false OFFLINE. Measured p99 is 130 ms.
             maxRetries: 2,
             socketTimeout: 1000,
+            // GameDig keys its port cache without the host, so same-port servers would share an entry.
+            portCache: false,
         });
 
         logger.debug({ serverId: server.id, map: state.map, players: state.players.length, ping: state.ping }, `Server ${server.id} queried successfully`);
@@ -506,13 +511,13 @@ const withWatchdog = async (query: Promise<ServerStatusData | null>): Promise<Se
 
 // One failed query is usually transient (a lost packet burst, a brief A2S rate limit, a map
 // change), so hold the last good data and re-check sooner. Offline is only published once a
-// server has failed OFFLINE_STRIKES times in a row, or if it was never up to begin with.
+// server has failed OFFLINE_STRIKES times in a row, or has no good data recent enough to serve.
 const recordFailure = (server: ServerConfig): void => {
     const strikes = (failures.get(server.id) ?? 0) + 1;
     failures.set(server.id, strikes);
 
     const previous = statusCache.get(server.id);
-    if (strikes < OFFLINE_STRIKES && previous?.data.status === 'online') {
+    if (strikes < OFFLINE_STRIKES && previous?.data.status === 'online' && previous.expires > Date.now() - MAX_STALE_MS) {
         logger.debug({ serverId: server.id, strikes }, `Server ${server.id} query failed, holding last known state`);
         statusCache.set(server.id, { data: previous.data, expires: Date.now() + FAILURE_RETRY_MS });
         return;
@@ -544,7 +549,7 @@ const refreshServer = (server: ServerConfig): void => {
 };
 
 // API Route for server status. Never blocks on a query: expired entries are served stale
-// while they refresh, and entries with no result yet come back as 'pending' for the client
+// while they refresh, and entries with no recent result come back as 'pending' for the client
 // to poll for. One unreachable server therefore cannot hold up the whole grid.
 app.get('/api/status', (req, res) => {
     try {
@@ -554,7 +559,7 @@ app.get('/api/status', (req, res) => {
         const data = config.servers.map((server: ServerConfig): ServerStatusData => {
             const hit = statusCache.get(server.id);
             if (!hit || hit.expires <= now) { refreshServer(server); }
-            if (hit) { return hit.data; }
+            if (hit && hit.expires > now - MAX_STALE_MS) { return hit.data; }
 
             pending++;
             return blankStatus(server, 'pending');
