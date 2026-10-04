@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 
 # Install all dependencies (including devDependencies) for build
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Copy application files
 COPY src/ ./src/

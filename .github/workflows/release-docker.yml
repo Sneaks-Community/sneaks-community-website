@@ -17,25 +17,20 @@ permissions:
   contents: read
   packages: write
 
+# Nothing here restores from the GitHub Actions cache: any job on main can write entries,
+# and BuildKit and binfmt trust whatever they restore.
 jobs:
-  build:
-    name: Build and Push Image
+  test:
+    name: Lint, Typecheck & Test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Root (default) — unsuffixed tags: latest / <version> / dev
-          - variant: root
-            target: production-root
-            suffix: ""
-          # Non-root — "-nonroot" suffixed tags: latest-nonroot / <version>-nonroot / dev-nonroot
-          - variant: nonroot
-            target: production
-            suffix: "-nonroot"
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.ref.outputs.tag }}
+      version: ${{ steps.ref.outputs.version }}
     steps:
-      # Weekly rebuild targets the last release, not main HEAD — :latest must
+      # Weekly rebuild targets the last release, not main HEAD. :latest must
       # stay released code, just with patched base packages.
       - name: Resolve release ref
         id: ref
@@ -53,11 +48,61 @@ jobs:
           # empty on non-schedule runs = default checkout
           ref: ${{ steps.ref.outputs.tag }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: '.nvmrc'
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # Smoke test runs dist/index.js, so it must follow the build.
+      - name: Test
+        run: npm test
+
+  build:
+    name: Build and Push Image
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Root (default) — unsuffixed tags: latest / <version> / dev
+          - variant: root
+            target: production-root
+            suffix: ""
+          # Non-root — "-nonroot" suffixed tags: latest-nonroot / <version>-nonroot / dev-nonroot
+          - variant: nonroot
+            target: production
+            suffix: "-nonroot"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          # empty on non-schedule runs = default checkout
+          ref: ${{ needs.test.outputs.tag }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4.4.0
+        with:
+          cache-image: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.4.1
+        with:
+          cache-binary: false
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4.6.0
@@ -79,12 +124,12 @@ jobs:
             type=semver,pattern={{version}},enable=${{ github.event_name == 'release' }}
             type=raw,value=dev,enable=${{ github.event_name == 'push' }}
             type=raw,value=latest,enable=${{ github.event_name == 'schedule' }}
-            type=raw,value=${{ steps.ref.outputs.version }},enable=${{ github.event_name == 'schedule' }}
+            type=raw,value=${{ needs.test.outputs.version }},enable=${{ github.event_name == 'schedule' }}
 
       # Single build per variant. Push by digest only — no consumable tag is
       # created yet, so :dev / :latest never point at an unscanned image. The
-      # real tags are applied after Trivy passes, via a server-side manifest
-      # copy (no rebuild).
+      # real tags are applied after Trivy and the smoke test pass, via a
+      # server-side manifest copy (no rebuild).
       - name: Build and push image by digest
         id: build
         uses: docker/build-push-action@v7.4.0
@@ -94,8 +139,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           outputs: type=image,name=ghcr.io/sneaks-community/sneaks-community-website,push-by-digest=true,name-canonical=true,push=true
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.variant }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
           provenance: true
           sbom: true
 
@@ -130,7 +173,17 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # Only reached if the scan passed. Applies the real tags to the scanned
+      # The test job runs dist/ with dev dependencies; this boots the image as shipped
+      # (amd64 only): distroless base, production node_modules, the variant's user.
+      - name: Smoke-test the image
+        run: |
+          docker run -d --name smoke -p 3000:3000 \
+            -v "$PWD/config/config.json.example:/usr/src/app/config/config.json:ro" \
+            ghcr.io/sneaks-community/sneaks-community-website@${{ steps.build.outputs.digest }}
+          curl -fsS --retry 15 --retry-all-errors --retry-delay 1 -o /dev/null http://127.0.0.1:3000/ \
+            || { docker logs smoke; exit 1; }
+
+      # Only reached if the scan and smoke test passed. Applies the real tags to the scanned
       # digest — a manifest copy in the registry, not another build.
       - name: Apply tags to the scanned image
         run: |

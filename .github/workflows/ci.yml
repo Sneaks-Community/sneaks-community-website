@@ -134,3 +134,13 @@ jobs:
             trivy-outcome.txt
           if-no-files-found: warn
           retention-days: 1
+
+      # The quality job runs dist/ with dev dependencies; this boots the image as shipped:
+      # distroless base, production node_modules, the variant's user.
+      - name: Smoke-test the image
+        run: |
+          docker run -d --name smoke -p 3000:3000 \
+            -v "$PWD/config/config.json.example:/usr/src/app/config/config.json:ro" \
+            sneaks-community-website:test-${{ matrix.variant }}
+          curl -fsS --retry 15 --retry-all-errors --retry-delay 1 -o /dev/null http://127.0.0.1:3000/ \
+            || { docker logs smoke; exit 1; }

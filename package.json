@@ -64,6 +64,7 @@
   "allowScripts": {
     "unrs-resolver@1.12.2": true,
     "@parcel/watcher@2.5.1": true,
-    "esbuild@0.28.2": true
+    "esbuild@0.28.2": true,
+    "fsevents": false
   }
 }
