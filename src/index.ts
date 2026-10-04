@@ -220,7 +220,7 @@ const brandingTokens = new Map<string, string>([
     // one of three fixed internal filenames, so there is nothing to escape.
     ['logoContainerClass', logoPath ? 'has-logo' : 'bg-brand-500 font-black'],
     ['logoContainerInner', logoPath
-        ? `<img src="${logoPath}" alt="Logo">`
+        ? `<img src="${logoPath}" alt="">`
         : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="/icons.svg#icon-crosshair"/></svg>'],
 ]);
 
