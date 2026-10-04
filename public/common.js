@@ -77,6 +77,8 @@ function initMobileMenu() {
     const toggleMenu = () => {
         isMenuOpen = !isMenuOpen;
         mobileMenuBtn.setAttribute('aria-expanded', String(isMenuOpen));
+        mobileMenu.inert = !isMenuOpen;
+        document.querySelectorAll('main, footer').forEach((el) => { el.inert = isMenuOpen; });
 
         if (isMenuOpen) {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
@@ -92,6 +94,13 @@ function initMobileMenu() {
     };
 
     mobileMenuBtn.addEventListener('click', toggleMenu);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && isMenuOpen) {
+            toggleMenu();
+            mobileMenuBtn.focus();
+        }
+    });
 
     // Close when a link inside is clicked
     mobileLinks.forEach(link => {
