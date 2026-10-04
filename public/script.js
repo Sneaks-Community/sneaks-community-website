@@ -34,18 +34,21 @@ const MAX_RETRIES = 8;
 const FETCH_TIMEOUT_MS = 8000;
 let retryTimer;
 let retries = 0;
+// A retry skipped while the tab is hidden runs as soon as the visitor comes back.
+let retryDeferred = false;
 let fetchInProgress = false;
 
 function scheduleRetry(delay) {
     clearTimeout(retryTimer);
-    if (retries >= MAX_RETRIES || document.hidden) { return; }
+    if (retries >= MAX_RETRIES) { return; }
+    if (document.hidden) { retryDeferred = true; return; }
     retries++;
     retryTimer = setTimeout(() => fetchServerStatus({ background: true }), delay);
 }
 
 // The "Live" badge must stop claiming live when polls stop landing.
 const STALE_AFTER_MS = 3 * REFRESH_MS;
-let lastSuccess = Date.now();
+let lastSuccess = 0; // until a poll lands: stale, but with no age to show
 
 // The age is aria-hidden so a screen reader hears the Live -> Stale transition once rather
 // than a new minute count every cycle.
@@ -54,12 +57,12 @@ function updateFreshness() {
     if (!indicator) { return; }
 
     const age = Date.now() - lastSuccess;
-    const stale = age > STALE_AFTER_MS;
+    const stale = lastSuccess === 0 || age > STALE_AFTER_MS;
     const label = indicator.querySelector('.live-label');
     const text = stale ? 'Stale' : 'Live';
 
     if (label.textContent !== text) { label.textContent = text; }
-    indicator.querySelector('.live-age').textContent = stale ? ` ${String(Math.floor(age / 60_000))}m` : '';
+    indicator.querySelector('.live-age').textContent = stale && lastSuccess > 0 ? ` ${String(Math.floor(age / 60_000))}m` : '';
     indicator.querySelector('.status-dot').classList.toggle('status-dot--stale', stale);
     // Normally desktop-only, but a stale warning is worth showing on phones too.
     indicator.classList.toggle('hidden', !stale);
@@ -374,6 +377,7 @@ function initStatusPolling() {
     const refresh = () => {
         lastRefresh = Date.now();
         retries = 0; // fresh budget each cycle
+        retryDeferred = false;
         fetchServerStatus({ background: true });
     };
     const start = () => {
@@ -386,7 +390,7 @@ function initStatusPolling() {
             clearInterval(timer);
             return;
         }
-        if (Date.now() - lastRefresh >= REFRESH_MS) { refresh(); }
+        if (retryDeferred || Date.now() - lastRefresh >= REFRESH_MS) { refresh(); }
         start();
     });
 
