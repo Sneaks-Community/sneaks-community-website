@@ -48,15 +48,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
             <div class="flex items-center justify-between h-full">
                 <!-- Logo -->
-                <a href="#home" class="flex-shrink-0 flex items-center space-x-3 cursor-pointer select-none">
+                <a href="#home" class="min-w-0 flex items-center space-x-3 cursor-pointer select-none">
                     <div id="logoContainer" class="flex-shrink-0 logo-container-default rounded-lg flex items-center justify-center text-white overflow-hidden {{logoContainerClass}}">
                         {{logoContainerInner}}
                     </div>
-                    <span class="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block uppercase">{{communityName}}</span>
+                    <span class="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block uppercase truncate">{{communityName}}</span>
                 </a>
                 
                 <!-- Links -->
-                <div class="hidden md:block select-none">
+                <div class="hidden lg:block select-none">
                     <div class="ml-10 flex items-baseline gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
                         <a href="#home" class="nav-link hover:text-brand-600 dark:hover:text-white transition-colors">Home</a>
                         <a href="#about" class="nav-link hover:text-brand-600 dark:hover:text-white transition-colors">About</a>
@@ -68,14 +68,14 @@
                 </div>
 
                 <!-- Controls -->
-                <div class="flex items-center space-x-4 border-l border-black/10 dark:border-white/10 pl-4 sm:pl-8">
+                <div class="shrink-0 flex items-center space-x-4 border-l border-black/10 dark:border-white/10 pl-4 sm:pl-8">
                     <!-- Theme Toggle -->
                     <button id="themeToggle" aria-label="Toggle Theme" class="p-2 rounded-full bg-slate-200/50 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-white transition-colors focus:outline-none" title="Toggle Theme">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 hidden dark:block"><use href="/icons.svg#icon-moon"/></svg>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 block dark:hidden"><use href="/icons.svg#icon-sun"/></svg>
                     </button>
                     <!-- Mobile Menu Toggle -->
-                    <button id="mobileMenuBtn" aria-label="Toggle Mobile Menu" aria-expanded="false" aria-controls="mobileMenu" class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-800 dark:text-white transition-colors focus:outline-none">
+                    <button id="mobileMenuBtn" aria-label="Toggle Mobile Menu" aria-expanded="false" aria-controls="mobileMenu" class="lg:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 text-slate-800 dark:text-white transition-colors focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="/icons.svg#icon-menu"/></svg>
                     </button>
                     <!-- CTA -->
