@@ -310,6 +310,7 @@ function getClientIp(req: express.Request): string | undefined {
 }
 
 app.use(helmet({
+    strictTransportSecurity: { maxAge: 31_536_000, includeSubDomains: false },
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
