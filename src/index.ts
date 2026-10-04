@@ -461,6 +461,14 @@ const blankStatus = (server: ServerConfig, status: 'offline' | 'pending'): Serve
     port: server.port,
 });
 
+// GameDig reports every network failure as "Failed all N attempts" and keeps each attempt's own
+// error only in the stack, so add the last one: a timeout and a DNS failure then log differently.
+const queryFailureReason = (error: unknown): string => {
+    if (!(error instanceof Error)) { return String(error); }
+    const lastAttempt = [...(error.stack ?? '').matchAll(/^Attempt #.*\n(.*)$/gm)].at(-1)?.[1]?.replace(/^\w*Error: /, '');
+    return lastAttempt ? `${error.message} (last attempt: ${lastAttempt})` : error.message;
+};
+
 // Query one server. Never rejects; null means the query failed.
 const queryServer = async (server: ServerConfig): Promise<ServerStatusData | null> => {
     try {
@@ -489,8 +497,8 @@ const queryServer = async (server: ServerConfig): Promise<ServerStatusData | nul
             host: server.host,
             port: server.port,
         };
-    } catch {
-        logger.warn({ serverId: server.id, host: server.host, port: server.port }, `Server ${server.id} query failed`);
+    } catch (error) {
+        logger.warn({ serverId: server.id, host: server.host, port: server.port, reason: queryFailureReason(error) }, `Server ${server.id} query failed`);
         return null;
     }
 };

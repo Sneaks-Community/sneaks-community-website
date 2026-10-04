@@ -18,6 +18,7 @@ const TEST_CONFIG = {
 let child;
 let base;
 let temporaryDirectory;
+let output = '';
 
 const freePort = () => new Promise((resolve, reject) => {
     const probe = net.createServer();
@@ -38,11 +39,10 @@ before(async () => {
     base = `http://127.0.0.1:${String(port)}`;
     child = spawn(process.execPath, ['dist/index.js'], {
         cwd: root,
-        env: { ...process.env, PORT: String(port), CONFIG_PATH: configPath, COMMUNITY_NAME, LOG_LEVEL: 'silent', NODE_ENV: 'production' },
+        env: { ...process.env, PORT: String(port), CONFIG_PATH: configPath, COMMUNITY_NAME, LOG_LEVEL: 'warn', NODE_ENV: 'production' },
         stdio: ['ignore', 'pipe', 'pipe'],
     });
 
-    let output = '';
     child.stdout.on('data', (chunk) => { output += chunk; });
     child.stderr.on('data', (chunk) => { output += chunk; });
 
@@ -156,6 +156,16 @@ test('GET /api/status settles to offline and is then served from cache', async (
     assert.equal(server.status, 'offline');
     assert.equal(body.fromCache, true);
     assert.match(res.headers.get('cache-control'), /max-age=60/);
+});
+
+test('a failed query logs why it failed, down to the last attempt', async () => {
+    // Written as the entry turns offline above, but the log line can trail the HTTP response.
+    const reason = /"reason":"Failed all \d+ attempts \(last attempt: [^"]+\)"/;
+    const deadline = Date.now() + 5000;
+    while (!reason.test(output)) {
+        assert.ok(Date.now() < deadline, `no query failure reason logged:\n${output}`);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
 });
 
 test('unknown paths 404 as HTML for browsers and JSON for the API', async () => {
