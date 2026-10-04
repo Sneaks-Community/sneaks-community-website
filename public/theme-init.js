@@ -23,3 +23,9 @@ window.safeStorage = {
     // Set before first paint so scroll reveals start hidden instead of flashing in.
     document.documentElement.classList.add('js-reveal');
 }());
+
+// Deferred scripts finish before load, so if script.js has not signalled by now it was
+// blocked, failed to parse, or threw: show everything rather than leave it hidden.
+window.addEventListener('load', () => {
+    if (!window.revealReady) { document.documentElement.classList.remove('js-reveal'); }
+});

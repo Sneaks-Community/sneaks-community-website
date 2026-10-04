@@ -859,15 +859,19 @@ nav.nav-scrolled {
 
 .reveal-word {
     display: inline-block;
-    transform: translateY(110%); /* hidden below the clip; JS animates to 0 */
     padding-bottom: 0.3em;
     margin-bottom: -0.3em;
 }
 
-/* No-JS / reduced-motion users must still see the headline. */
-@media (prefers-reduced-motion: reduce) {
-    .reveal-word {
-        transform: none;
+/* Hero start state for script.js to animate from. Gated on .js-reveal, which
+   theme-init.js drops if script.js never takes over. */
+@media (prefers-reduced-motion: no-preference) {
+    .js-reveal .reveal-word {
+        transform: translateY(110%);
+    }
+
+    .js-reveal .hero-rest {
+        opacity: 0;
     }
 }
 

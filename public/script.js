@@ -288,7 +288,6 @@ function initAnimations() {
     // Hero reveal: headline words mask up, then subtitle + CTAs fade in
     const heroWords = document.querySelectorAll("#hero-title .reveal-word");
     const heroRest = document.querySelectorAll("#hero-content > p, #hero-content > div");
-    heroRest.forEach(el => el.classList.remove('opacity-0'));
     if (!animationsOff) {
         animate(heroWords,
             { y: ['110%', '0%'] },
@@ -300,6 +299,7 @@ function initAnimations() {
         );
     } else {
         heroWords.forEach(el => { el.style.transform = 'none'; });
+        heroRest.forEach(el => el.classList.remove('hero-rest'));
     }
 
     // Rule-card hover lift/glow is handled in CSS (.rule-card:hover) for
@@ -405,4 +405,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initCopyIp();
     fetchServerStatus();
     initStatusPolling();
+    window.revealReady = true; // last, so a throw in any init above leaves it unset
 });
