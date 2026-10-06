@@ -17,8 +17,10 @@ permissions:
   contents: read
   packages: write
 
-# Nothing here restores from the GitHub Actions cache: any job on main can write entries,
-# and BuildKit and binfmt trust whatever they restore.
+# Any job on main can write cache entries, and BuildKit, binfmt and Trivy trust whatever they
+# restore, so this workflow never touches the GitHub Actions cache.
+cache-mode: none
+
 jobs:
   test:
     name: Lint, Typecheck & Test
@@ -27,26 +29,26 @@ jobs:
     permissions:
       contents: read
     outputs:
-      tag: ${{ steps.ref.outputs.tag }}
-      version: ${{ steps.ref.outputs.version }}
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
     steps:
       # Weekly rebuild targets the last release, not main HEAD. :latest must
       # stay released code, just with patched base packages.
       - name: Resolve release ref
-        id: ref
+        id: release
         if: github.event_name == 'schedule'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag=$(gh release view -R ${{ github.repository }} --json tagName -q .tagName)
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "tag=refs/tags/$tag" >> "$GITHUB_OUTPUT"
           echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           # empty on non-schedule runs = default checkout
-          ref: ${{ steps.ref.outputs.tag }}
+          ref: ${{ steps.release.outputs.tag }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v7.0.0
@@ -158,6 +160,7 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           vuln-type: os,library
+          cache: false
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
