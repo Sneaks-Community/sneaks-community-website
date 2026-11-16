@@ -181,10 +181,13 @@ if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
 
 // Content-hashed asset URLs: the hash names one exact build of the file, so the response can be
 // served immutable for a year (see setStaticCacheHeaders) and a deploy re-fetches only what changed.
+const assetHashes = new Map<string, string>();
 const assetUrl = (relativePath: string): string => {
+    const filePath = path.join(__dirname, '..', 'public', relativePath);
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed call sites below
-    const bytes = fs.readFileSync(path.join(__dirname, '..', 'public', relativePath));
+    const bytes = fs.readFileSync(filePath);
     const hash = crypto.createHash('sha256').update(bytes).digest('base64url').slice(0, 10);
+    assetHashes.set(filePath, hash);
     return `/${relativePath}?v=${hash}`;
 };
 
@@ -364,8 +367,9 @@ const STATIC_LONG_MAX_AGE = 86_400; // 1 day
 const IMMUTABLE_MAX_AGE = 31_536_000; // 1 year
 const LONG_CACHE_RE = /\.(?:woff2?|ttf|otf|eot|png|jpe?g|gif|webp|avif|ico|svg)$/i;
 function setStaticCacheHeaders(res: express.Response, filePath: string): void {
-    // A ?v= hash pins the URL to this exact content, so it can never need revalidating.
-    if (res.req.query.v) {
+    // Only this file's own hash pins the URL to its content; any other ?v= vouches for nothing.
+    const hash = assetHashes.get(filePath);
+    if (hash && res.req.query.v === hash) {
         res.setHeader('Cache-Control', `public, max-age=${String(IMMUTABLE_MAX_AGE)}, immutable`);
         return;
     }

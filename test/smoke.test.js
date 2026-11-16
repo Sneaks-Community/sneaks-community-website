@@ -113,6 +113,11 @@ test('hashed asset URLs are served immutable, bare ones are not', async () => {
     const bare = await fetch(`${base}/tailwind.css`);
     assert.equal(bare.status, 200);
     assert.equal(bare.headers.get('cache-control'), 'public, max-age=300');
+
+    // A made-up hash vouches for nothing, so it must not pin the current file for a year.
+    const wrong = await fetch(`${base}/tailwind.css?v=wrong`);
+    assert.equal(wrong.status, 200);
+    assert.equal(wrong.headers.get('cache-control'), 'public, max-age=300');
 });
 
 test('GET /api/status answers without waiting for an unreachable server', async () => {
