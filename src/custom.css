@@ -629,6 +629,77 @@ a.bg-brand-500 .icon-discord {
     to { opacity: 1; }
 }
 
+/* Optional hero surf ramps (HERO_RAMPS). Ribs stay paused unless .is-visible, so
+   their staggered delays double as the reduced-motion still. */
+.hero-ramps {
+    /* Centres the box, and with it the vanishing point, at 40% of the hero (behind the headline). */
+    inset: -20% 0 0;
+    perspective: 1000px;
+    container-type: size;
+    --ramp-a: var(--color-brand-500);
+    --ramp-b: var(--color-accent-500);
+    --ramp-opacity: 0.35;
+    stroke-opacity: var(--ramp-opacity);
+    /* Clears the headline and fades the edges. */
+    -webkit-mask-image: radial-gradient(60% 62.5%, transparent 12%, #000 40%, #000 85%, transparent);
+    mask-image: radial-gradient(60% 62.5%, transparent 12%, #000 40%, #000 85%, transparent);
+}
+
+.dark .hero-ramps {
+    --ramp-a: var(--color-brand-400);
+    --ramp-b: var(--color-accent-400);
+    --ramp-opacity: 0.5;
+}
+
+.hero-ramps > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Each rib layer covers only its triangles' band (view box -602 81 1204 204), placed where the
+   rays' full-size `slice` layout puts it. --k is that layout's pixels per view-box unit. */
+.hero-ramps > .ramp-rib {
+    --k: max(100cqw / 1600, 100cqh / 900);
+    inset: calc(50cqh + 81 * var(--k)) auto auto calc(50cqw - 602 * var(--k));
+    width: calc(1204 * var(--k));
+    height: calc(204 * var(--k));
+}
+
+@supports not (width: 1cqw) {
+    .ramp-rib { display: none; }
+}
+
+.ramp-stop-a { stop-color: var(--ramp-a); }
+.ramp-stop-b { stop-color: var(--ramp-b); }
+.ramp-rays { stroke-opacity: calc(var(--ramp-opacity) * 0.7); }
+
+.ramp-rib {
+    stroke-width: 1.5;
+    animation: ramp-pass 24s linear infinite paused;
+}
+
+.ramp-rib:nth-child(2) { animation-delay: -4s; }
+.ramp-rib:nth-child(3) { animation-delay: -8s; }
+.ramp-rib:nth-child(4) { animation-delay: -12s; }
+.ramp-rib:nth-child(5) { animation-delay: -16s; }
+.ramp-rib:nth-child(6) { animation-delay: -20s; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .hero-ramps.is-visible .ramp-rib {
+        animation-play-state: running;
+    }
+}
+
+/* Constant forward speed; the perspective projection makes ribs grow and speed up as they
+   pass, ending off screen behind the viewer. */
+@keyframes ramp-pass {
+    from { transform: translateZ(-1500px); opacity: 0; }
+    15% { opacity: 1; }
+    to { transform: translateZ(750px); }
+}
+
 /* Shared card hover: gentle lift + brand glow */
 
 /* DO NOT SCALE - Text becomes blurry */

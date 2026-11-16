@@ -114,6 +114,18 @@ const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
 const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
     || "Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.";
 
+// Optional surf-ramp scene behind the hero headline, off by default since it is surf-specific art.
+// View boxes are centred on the vanishing point. Rays run each ramp edge through it; each rib (one
+// ramp cross-section) is its own layer, cropped to its triangles, that CSS moves toward the viewer in 3D.
+const heroRampsEnabled = /^(?:true|1|yes|on)$/i.test((process.env.HERO_RAMPS ?? '').trim());
+const rampView = 'viewBox="-800 -450 1600 900" preserveAspectRatio="xMidYMid slice"';
+const heroRampsSvg = `<div class="hero-ramps glow-intro" aria-hidden="true">${'<svg class="ramp-rib" viewBox="-602 81 1204 204"><use href="#ramp-rib"/></svg>'.repeat(6)}
+<svg ${rampView}>
+<defs><linearGradient id="ramp-stroke" gradientUnits="userSpaceOnUse" x1="-800" y1="0" x2="800" y2="0"><stop class="ramp-stop-a" offset="0"/><stop class="ramp-stop-b" offset="1"/></linearGradient>
+<path id="ramp-rib" fill="none" stroke="url(#ramp-stroke)" stroke-linejoin="round" d="M-600 283L-466 83L-333 283ZM333 283L466 83L600 283ZM-275 283L-179 142L-83 283ZM83 283L179 142L275 283Z"/></defs>
+<path class="ramp-rays" fill="none" stroke="url(#ramp-stroke)" d="M-150 71L-3599 1699M-117 21L-2799 500M-83 71L-1999 1699M83 71L1999 1699M117 21L2799 500M150 71L3599 1699M-69 71L-1649 1699M-45 35L-1075 850M-21 71L-500 1699M21 71L500 1699M45 35L1075 850M69 71L1649 1699"/>
+</svg></div>`;
+
 // Structured data (JSON-LD) for search engines: Organization + WebSite. Built from the same
 // branding values as the meta tags and serialized here rather than templated into the HTML —
 // renderBranding() HTML-escapes its values ('"' -> '&quot;'), which is invalid inside a
@@ -209,6 +221,7 @@ const brandingTokens = new Map<string, string>([
     ['heroTagline', escapeHtml(heroTagline)],
     ['aboutParagraph1', escapeHtml(aboutParagraph1)],
     ['aboutParagraph2', escapeHtml(aboutParagraph2)],
+    ['heroRamps', heroRampsEnabled ? heroRampsSvg : ''],
     ['structuredData', structuredData],
     // Hashes are base64url over fixed filenames, so there is nothing to escape.
     ['themeInitJs', assetUrl('theme-init.js')],

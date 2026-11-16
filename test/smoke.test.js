@@ -61,6 +61,7 @@ before(async () => {
             NODE_ENV: 'production',
             DISCORD_LINK: 'https://discord.gg/smoketest',
             DISCORD_API_URL: discordApiUrl,
+            HERO_RAMPS: '',
         },
         stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -109,6 +110,7 @@ test('GET / serves the branded page with every token substituted', async () => {
     // A short grid grows when the cards arrive, pushing every #fragment below it out of reach.
     const skeletons = [...body.matchAll(/animate-pulse/g)].length;
     assert.equal(skeletons, TEST_CONFIG.servers.length, 'skeleton count does not match configured servers');
+    assert.equal(body.includes('hero-ramps'), false, 'hero ramps render without HERO_RAMPS set');
 });
 
 test('GET /icons.svg serves the sprite built from public/icons/', async () => {

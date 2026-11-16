@@ -347,18 +347,17 @@ function initReveals() {
     document.querySelectorAll('.reveal, .reveal-stagger > *').forEach((el) => observer.observe(el));
 }
 
-// Keep the aurora sweep off the compositor while it is scrolled out of view.
-function initAurora() {
-    const aurora = document.querySelector('.aurora');
-    if (!aurora || prefersReducedMotion) { return; }
+// Keep looping ambient animations (aurora, hero ramps) stopped while scrolled out of view.
+function initPlayWhileVisible() {
+    if (prefersReducedMotion) { return; }
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            aurora.classList.toggle('is-visible', entry.isIntersecting);
+            entry.target.classList.toggle('is-visible', entry.isIntersecting);
         });
     }, { rootMargin: '15% 0px' });
 
-    observer.observe(aurora);
+    document.querySelectorAll('.aurora, .hero-ramps').forEach((el) => { observer.observe(el); });
 }
 
 // URL hash updates + the matching nav link's underline. aria-current doubles as
@@ -429,7 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initReveals();
     initAnimations();
     initScrollSpy();
-    initAurora();
+    initPlayWhileVisible();
     initCopyIp();
     fetchServerStatus();
     initStatusPolling();

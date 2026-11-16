@@ -36,6 +36,7 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` |
 | `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Sneak's Community description |
 | `META_KEYWORDS` | SEO meta keywords | Sneak's Community keyword list |
+| `HERO_RAMPS` | `true` draws animated surf ramps behind the hero headline (static under reduced motion) | *unset* (off) |
 | `HERO_TAGLINE` | Hero subtitle line | `An open and fun gaming community for all. No application. No membership. Just fun and friends.` |
 | `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | Sneak's Community history copy |
 | `STEAM_LINK` | Steam group/community link | `https://steamcommunity.com/groups/sneakscommunity` |
