@@ -159,7 +159,7 @@ async function fetchServerStatus({ background = false } = {}) {
                 <a class="connect-link absolute inset-0 z-0 rounded-2xl cursor-pointer"></a>
                 <div class="flex justify-between items-start gap-2 mb-2">
                     <div class="min-w-0 break-words">
-                        <h4 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">${serverName}</h4>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">${serverName}</h3>
                         <p class="flex items-center gap-1.5 text-[10px] font-mono text-slate-500 mt-0.5">
                             ${serverIp}
                             <button type="button" class="copy-ip relative z-10 p-1 -m-1 rounded text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors" aria-label="Copy server address">
