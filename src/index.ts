@@ -561,6 +561,60 @@ const refreshServer = (server: ServerConfig): void => {
     inFlight.set(server.id, query);
 };
 
+// Live counts for the Discord card and nav CTA, from Discord's public invite endpoint. They are
+// requested from env alone, on a timer, so nothing a client sends can shape or trigger it.
+const DISCORD_API_URL = (process.env.DISCORD_API_URL ?? '').trim() || 'https://discord.com/api/v10';
+const DISCORD_REFRESH_MS = 10 * 60_000;
+// Counts older than this are withheld, and the page falls back to its static copy.
+const DISCORD_MAX_STALE_MS = 60 * 60_000;
+
+interface DiscordCounts {
+    online: number;
+    members: number;
+}
+let discordCounts: { data: DiscordCounts; fetchedAt: number } | null = null;
+
+function resolveDiscordInviteCode(link: string): string | null {
+    try {
+        const url = new URL(link);
+        const host = url.hostname.replace(/^www\./, '');
+        const [first, second] = url.pathname.split('/').filter(Boolean);
+        const code = host === 'discord.gg' ? first : (host === 'discord.com' && first === 'invite' ? second : undefined);
+        return code && /^[\w-]+$/.test(code) ? code : null;
+    } catch {
+        return null;
+    }
+}
+
+const isCount = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0;
+
+// Never rejects. Only the two validated integers are kept; the rest of Discord's reply is dropped.
+const refreshDiscordCounts = async (inviteCode: string): Promise<void> => {
+    try {
+        const response = await fetch(`${DISCORD_API_URL}/invites/${inviteCode}?with_counts=true`, {
+            signal: AbortSignal.timeout(5000),
+            redirect: 'error',
+        });
+        if (!response.ok) throw new Error(`Discord responded ${String(response.status)}`);
+        const body = await response.json() as { approximate_presence_count?: unknown; approximate_member_count?: unknown } | null;
+        const online = body?.approximate_presence_count;
+        const members = body?.approximate_member_count;
+        if (!isCount(online) || !isCount(members)) throw new Error('Discord reply has no usable counts');
+        discordCounts = { data: { online, members }, fetchedAt: Date.now() };
+    } catch (error) {
+        logger.warn({ reason: error instanceof Error ? error.message : String(error) }, 'Discord counts refresh failed');
+    }
+};
+
+const currentDiscordCounts = (): DiscordCounts | null =>
+    discordCounts && discordCounts.fetchedAt > Date.now() - DISCORD_MAX_STALE_MS ? discordCounts.data : null;
+
+const discordInviteCode = resolveDiscordInviteCode(discordLink);
+if (discordInviteCode) {
+    void refreshDiscordCounts(discordInviteCode);
+    setInterval(() => { void refreshDiscordCounts(discordInviteCode); }, DISCORD_REFRESH_MS).unref();
+}
+
 // API Route for server status. Never blocks on a query: expired entries are served stale
 // while they refresh, and entries with no recent result come back as 'pending' for the client
 // to poll for. One unreachable server therefore cannot hold up the whole grid.
@@ -581,7 +635,7 @@ app.get('/api/status', (req, res) => {
         logger.debug({ serverCount: data.length, pending }, 'Server status served');
         // A pending payload is worthless in a minute, so keep proxies from pinning it.
         res.set('Cache-Control', pending > 0 ? 'no-store' : 'public, max-age=60, s-maxage=60');
-        return res.json({ success: true, fromCache: pending === 0, pending, data });
+        return res.json({ success: true, fromCache: pending === 0, pending, data, discord: currentDiscordCounts() });
     } catch (error) {
         logger.error({ err: error }, 'Server status error');
         // Use 'message' property instead of 'error' for API clarity

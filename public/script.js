@@ -68,6 +68,25 @@ function updateFreshness() {
     indicator.classList.toggle('hidden', !stale);
 }
 
+// Without counts (feature off, or Discord unreachable) the card keeps its static copy and
+// the nav chip stays hidden.
+const compactCount = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
+function updateDiscordCounts(counts) {
+    if (!counts) { return; }
+    const online = Number(counts.online);
+
+    const label = document.getElementById('discord-counts');
+    if (label) {
+        label.textContent = `${online.toLocaleString('en-US')} ${online === 1 ? 'member' : 'members'} online now.`;
+    }
+
+    const chip = document.getElementById('discord-members');
+    if (chip) {
+        chip.querySelector('span').textContent = compactCount.format(Number(counts.members));
+        chip.hidden = false;
+    }
+}
+
 // 'pending' means the API has not heard back from that server yet: neither live nor down.
 const CARD_STATES = {
     online: { card: 'server-card--online', text: 'text-brand-600 dark:text-brand-400', bar: 'bg-gradient-to-r from-live-500 to-live-300', label: '' },
@@ -97,6 +116,7 @@ async function fetchServerStatus({ background = false } = {}) {
 
         lastSuccess = Date.now();
         updateFreshness();
+        updateDiscordCounts(data.discord);
 
         if (data.pending > 0) {
             scheduleRetry(PENDING_RETRY_MS);

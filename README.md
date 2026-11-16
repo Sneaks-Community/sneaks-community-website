@@ -41,7 +41,8 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `STEAM_LINK` | Steam group/community link | `https://steamcommunity.com/groups/sneakscommunity` |
 | `TWITCH_LINK` | Twitch channel link | `https://twitch.tv/snksrv` |
 | `GITHUB_LINK` | GitHub organization/repo link | `https://github.com/Sneaks-Community` |
-| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs | `https://discord.gg/snksrv` |
+| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs. An invite link (`discord.gg/<code>`) also enables [live member counts](#live-discord-member-counts) | `https://discord.gg/snksrv` |
+| `DISCORD_API_URL` | Base URL the member counts are fetched from; only the tests change it | `https://discord.com/api/v10` |
 | `STATS_LINK` | "Player Statistics" resource card destination | `https://stats.snksrv.com` |
 | `BANS_LINK` | "Ban List" resource card destination | `https://bans.snksrv.com` |
 | `ALLOWED_ORIGINS` | Comma-separated CORS allow-list | `http://localhost:3000` |
@@ -63,6 +64,18 @@ address from:
 > Whichever header you name, the app must be reachable only through the upstream that sets it, or a
 > visitor can send it themselves. Values that are not a single IP address are ignored and the peer
 > address is used instead.
+
+### Live Discord member counts
+
+When `DISCORD_LINK` is an invite link (`discord.gg/<code>` or `discord.com/invite/<code>`), two
+live numbers appear. The Discord card shows how many members are online ("312 members online now")
+in place of its static copy, and the navbar's "JOIN DISCORD" button carries the total member count
+in a small chip. Use an invite that never expires.
+
+The server asks Discord's public invite endpoint every 10 minutes, on its own timer; no token is
+needed. Visitors' browsers never contact Discord, and no request to this app can trigger or alter
+that call. `/api/status` exposes only those two numbers, as `discord: { online, members }`, or
+`discord: null` when the link is not an invite or Discord has been unreachable for an hour.
 
 ### Server Configuration
 
@@ -150,7 +163,8 @@ reference resolves to a file.
 
 `npm test` runs the Node built-in test runner: a smoke test that boots the built server on a free
 port against a throwaway config (via `CONFIG_PATH`, so your own `config/config.json` is untouched)
-and checks `/`, `/icons.svg`, `/api/status`, the HTML/JSON 404 split and `/health`, plus a check
+and checks `/`, `/icons.svg`, `/api/status`, the Discord counts (against a local stand-in, never
+Discord itself), the HTML/JSON 404 split and `/health`, plus a check
 that every icon reference resolves to a file. Run `npm run build` first, since the smoke test
 executes `dist/index.js`. Takes ~10 s, most of it GameDig timing out against the unreachable test
 server on purpose.

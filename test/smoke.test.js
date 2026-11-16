@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import http from 'node:http';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
@@ -14,6 +15,15 @@ const COMMUNITY_NAME = 'Smoke Test Community';
 const TEST_CONFIG = {
     servers: [{ id: 'smoke_test', host: '127.0.0.1', port: 1, type: 'csgo', name: 'Smoke Test Server' }],
 };
+
+// Stands in for Discord's invite endpoint. The extra field is the kind of detail that must stay server-side.
+const DISCORD_REPLY = { approximate_presence_count: 312, approximate_member_count: 4120, guild: { id: 'not-for-clients' } };
+const discordRequests = [];
+const discordStub = http.createServer((req, res) => {
+    discordRequests.push(req.url);
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(DISCORD_REPLY));
+});
 
 let child;
 let base;
@@ -35,11 +45,23 @@ before(async () => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- own temp dir
     fs.writeFileSync(configPath, JSON.stringify(TEST_CONFIG));
 
+    await new Promise((resolve) => { discordStub.listen(0, '127.0.0.1', resolve); });
+    const discordApiUrl = `http://127.0.0.1:${String(discordStub.address().port)}`;
+
     const port = await freePort();
     base = `http://127.0.0.1:${String(port)}`;
     child = spawn(process.execPath, ['dist/index.js'], {
         cwd: root,
-        env: { ...process.env, PORT: String(port), CONFIG_PATH: configPath, COMMUNITY_NAME, LOG_LEVEL: 'warn', NODE_ENV: 'production' },
+        env: {
+            ...process.env,
+            PORT: String(port),
+            CONFIG_PATH: configPath,
+            COMMUNITY_NAME,
+            LOG_LEVEL: 'warn',
+            NODE_ENV: 'production',
+            DISCORD_LINK: 'https://discord.gg/smoketest',
+            DISCORD_API_URL: discordApiUrl,
+        },
         stdio: ['ignore', 'pipe', 'pipe'],
     });
 
@@ -73,6 +95,8 @@ after(async () => {
     if (temporaryDirectory) {
         fs.rmSync(temporaryDirectory, { recursive: true, force: true });
     }
+    discordStub.closeAllConnections();
+    discordStub.close();
 });
 
 test('GET / serves the branded page with every token substituted', async () => {
@@ -183,6 +207,21 @@ test('unknown paths 404 as HTML for browsers and JSON for the API', async () => 
     assert.equal(json.status, 404);
     assert.match(json.headers.get('content-type'), /application\/json/);
     assert.equal((await json.json()).success, false);
+});
+
+test('Discord counts reach clients as two numbers, fetched on the server\'s own schedule', async () => {
+    const deadline = Date.now() + 5000;
+    let body;
+    for (;;) {
+        body = await (await fetch(`${base}/api/status`)).json();
+        if (body.discord) { break; }
+        assert.ok(Date.now() < deadline, 'Discord counts never appeared in /api/status');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    // Exact shape: nothing else from Discord's reply may leak through.
+    assert.deepEqual(body.discord, { online: 312, members: 4120 });
+    // Every test above hit the API, yet Discord was asked once: requests cannot trigger a fetch.
+    assert.deepEqual(discordRequests, ['/invites/smoketest?with_counts=true']);
 });
 
 test('GET /health answers on loopback', async () => {

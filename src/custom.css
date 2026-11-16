@@ -751,6 +751,27 @@ nav.nav-scrolled {
     box-shadow: 0 10px 30px -8px color-mix(in oklab, var(--color-brand-500) 75%, transparent);
 }
 
+/* Member total inside the nav CTA. A dark inset chip, so it reads as a figure
+   attached to the button and not as more of its label. */
+.discord-members {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-right: -0.5rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    background-color: rgb(0 0 0 / 0.22);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .discord-members {
+        animation: glow-in 0.4s ease-out both;
+    }
+}
+
 /* Scroll reveals: played once, on a timer, when initReveals marks them .is-revealed.
    An animation rather than a transition, so the cards' own hover transitions survive. */
 @media (prefers-reduced-motion: no-preference) {
