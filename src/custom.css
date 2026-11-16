@@ -898,7 +898,11 @@ nav.nav-scrolled {
 
 /* Custom logo styling */
 #logoContainer.has-logo {
-    background-color: transparent !important;
+    background-color: var(--color-surface-950);
+}
+
+.dark #logoContainer.has-logo {
+    background-color: transparent;
 }
 
 #logoContainer.has-logo img {
