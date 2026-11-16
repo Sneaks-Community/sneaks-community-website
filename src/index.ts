@@ -354,7 +354,8 @@ app.use(pinoHttp({
     logger,
     customLogLevel: (req, res, error) => {
         if (res.statusCode >= 500 || error) return 'error';
-        if (res.statusCode === 404) return 'debug';
+        // Clients set the pace of 404s and 429s, so neither may write to the default log.
+        if (res.statusCode === 404 || res.statusCode === 429) return 'debug';
         if (res.statusCode >= 400) return 'warn';
         return 'debug';
     },
