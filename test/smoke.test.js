@@ -71,6 +71,18 @@ before(async () => {
         CONFIG_PATH: configPath,
         COMMUNITY_NAME,
         COMMUNITY_ALIAS: 'smokey',
+        COMMUNITY_ESTABLISHED: '2015',
+        STEAM_LINK: 'https://steamcommunity.com/groups/smoke',
+        // Unset on purpose: each of these must leave its markup out of the page.
+        TWITCH_LINK: '',
+        GITHUB_LINK: '',
+        STATS_LINK: '',
+        BANS_LINK: '',
+        META_TITLE: '',
+        META_DESCRIPTION: '',
+        HERO_TAGLINE: '',
+        ABOUT_PARAGRAPH_1: '',
+        ABOUT_PARAGRAPH_2: '',
         SITE_URL: 'https://smoke.example',
         LOG_LEVEL: 'warn',
         NODE_ENV: 'production',
@@ -253,17 +265,32 @@ test('the shipped example config is loadable', () => {
     }
 });
 
-test('the title, hero tagline and description name the game', async () => {
+test('unset copy is left out and the title falls back to the community name', async () => {
     const body = await (await fetch(`${base}/`)).text();
-    const title = `${COMMUNITY_NAME} | CS:GO Surf, KZ &amp; Bhop Servers`;
-    assert.ok(body.includes(`<title>${title}</title>`), 'title does not name the game');
-    assert.ok(body.includes(`<meta property="og:title" content="${title}">`), 'og:title differs from the title');
-    assert.ok(body.includes(`<meta name="twitter:title" content="${title}">`), 'twitter:title differs from the title');
-    assert.ok(body.includes(`${COMMUNITY_NAME} is an open CS:GO community running US-based Surf, KZ, Bhop, 1v1 Arenas and Retakes servers since 2015.`), 'hero tagline does not define the community');
-    const description = /<meta name="description" content="([^"]*)">/.exec(body)[1];
-    assert.ok(description.startsWith(`${COMMUNITY_NAME}: open CS:GO Surf`), 'description does not name the game');
-    assert.ok(description.length <= 155, `description is ${String(description.length)} characters`);
-    assert.match(body, />CS:GO SERVERS<\/h2>/);
+    assert.ok(body.includes(`<title>${COMMUNITY_NAME}</title>`), 'title should fall back to the community name');
+    assert.ok(body.includes(`<meta property="og:title" content="${COMMUNITY_NAME}">`), 'og:title differs from the title');
+    for (const tag of ['name="description"', 'og:description', 'twitter:description']) {
+        assert.equal(body.includes(tag), false, `${tag} should be left out without META_DESCRIPTION`);
+    }
+    // #copy-status is a live region and starts empty on purpose.
+    assert.equal(/<p(?![^>]*\bid=)[^>]*>\s*<\/p>/.test(body), false, 'unset copy left an empty paragraph');
+    assert.equal(/sneak|snksrv/i.test(body), false, 'the page still carries Sneak\'s Community defaults');
+});
+
+test('unset links are left out of the page and the structured data', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    assert.ok(body.includes('href="https://steamcommunity.com/groups/smoke"'), 'a set link is missing');
+    for (const id of ['link-twitch-community', 'link-github-community', 'link-twitch-footer', 'link-github-footer', 'resources']) {
+        assert.equal(body.includes(`id="${id}"`), false, `#${id} should be left out when its link is unset`);
+    }
+    assert.equal(body.includes('href="#resources"'), false, 'the nav links to a section that was left out');
+    assert.equal(body.includes('href=""'), false, 'an unset link left an empty href');
+    const graph = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(body)[1]);
+    const org = graph.find((node) => node['@type'] === 'Organization');
+    assert.deepEqual(org.sameAs, ['https://discord.gg/smoketest', 'https://steamcommunity.com/groups/smoke']);
+    const notFound = await (await fetch(`${base}/nope`, { headers: { Accept: 'text/html' } })).text();
+    assert.ok(notFound.includes('id="link-steam-footer"'), '404 page lost a set link');
+    assert.equal(notFound.includes('id="link-twitch-footer"'), false, '404 page kept an unset link');
 });
 
 test('server names and addresses are in the HTML before any script runs', async () => {
@@ -311,4 +338,10 @@ test('the server refuses to start without a valid SITE_URL', async () => {
     const invalid = await startup({ ...childEnv, SITE_URL: 'https://smoke.example/path' });
     assert.equal(invalid.code, 1);
     assert.match(invalid.log, /SITE_URL must be a bare http\(s\) origin/);
+});
+
+test('the server refuses to start without COMMUNITY_NAME', async () => {
+    const { code, log } = await startup({ ...childEnv, COMMUNITY_NAME: ' ' });
+    assert.equal(code, 1);
+    assert.match(log, /COMMUNITY_NAME is required/);
 });

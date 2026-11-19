@@ -64,26 +64,29 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
 }
 
 // Community branding used to render the page title, headings, SEO metadata, links and a
-// few identity-specific prose fields. All are configured via environment variables (with
-// fallbacks to the current defaults) and injected into the HTML templates at startup, so a
-// precompiled image only needs an env change + restart — no rebuild. See renderBranding().
-const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
-const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
-// No default: an alias is identity-specific and invisible, so a wrong one would go unnoticed.
+// few identity-specific prose fields, read from env and injected into the HTML templates at
+// startup (an env change + restart, no rebuild). Nothing defaults to another community's
+// identity: unset values leave their markup out of the page (see renderBranding()).
+const communityName = (process.env.COMMUNITY_NAME ?? '').trim();
+if (!communityName) {
+    logger.fatal('COMMUNITY_NAME is required');
+    process.exit(1);
+}
+const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || undefined;
 const communityAlias = (process.env.COMMUNITY_ALIAS ?? '').trim();
 // Discord invite URL used by the "JOIN DISCORD" CTAs and the community Join card.
-// Set DISCORD_LINK to your server's invite (e.g. https://discord.gg/yourinvite).
-const discordLink = (process.env.DISCORD_LINK ?? '').trim() || "https://discord.gg/snksrv";
+const discordLink = (process.env.DISCORD_LINK ?? '').trim();
 
 // External social/community links, injected directly into the server-rendered anchors so
 // every visitor (including no-JS) gets correct links without any client-side API call.
-const steamLink = (process.env.STEAM_LINK ?? '').trim() || 'https://steamcommunity.com/groups/sneakscommunity';
-const twitchLink = (process.env.TWITCH_LINK ?? '').trim() || 'https://twitch.tv/snksrv';
-const githubLink = (process.env.GITHUB_LINK ?? '').trim() || 'https://github.com/Sneaks-Community';
+const steamLink = (process.env.STEAM_LINK ?? '').trim();
+const twitchLink = (process.env.TWITCH_LINK ?? '').trim();
+const githubLink = (process.env.GITHUB_LINK ?? '').trim();
+const profileLinks = [discordLink, steamLink, twitchLink, githubLink].filter(Boolean);
 
 // Resource-card destinations (Player Statistics / Ban List).
-const statsLink = (process.env.STATS_LINK ?? '').trim() || 'https://stats.snksrv.com';
-const bansLink = (process.env.BANS_LINK ?? '').trim() || 'https://bans.snksrv.com';
+const statsLink = (process.env.STATS_LINK ?? '').trim();
+const bansLink = (process.env.BANS_LINK ?? '').trim();
 
 // Canonical site origin, injected raw into sitemap.xml/robots.txt and composed as
 // `{{siteUrl}}/...` in the templates. No default: a wrong origin hands this site's pages to another.
@@ -105,16 +108,11 @@ function resolveSiteUrl(raw: string | undefined): string {
 const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 
 // SEO metadata and a few identity-specific prose fields.
-const metaTitle = (process.env.META_TITLE ?? '').trim()
-    || `${communityName} | CS:GO Surf, KZ & Bhop Servers`;
-const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
-    || `${communityName}: open CS:GO Surf, KZ, Bhop, 1v1 Arenas and Retakes servers in the US since ${String(communityEstablished)}. No application, just join and play.`;
-const heroTagline = (process.env.HERO_TAGLINE ?? '').trim()
-    || `${communityName} is an open CS:GO community running US-based Surf, KZ, Bhop, 1v1 Arenas and Retakes servers since ${String(communityEstablished)}. No application. No membership. Just fun and friends.`;
-const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
-    || "Founded in 2015, Sneak's Community started as a single CS:GO Minigames server. Over the years, our community evolved and has grown through many games, and we found our true home hosting Counter-Strike: Global Offensive servers, while providing a welcoming environment for all games.";
-const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
-    || "Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.";
+const metaTitle = (process.env.META_TITLE ?? '').trim() || communityName;
+const metaDescription = (process.env.META_DESCRIPTION ?? '').trim();
+const heroTagline = (process.env.HERO_TAGLINE ?? '').trim();
+const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim();
+const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim();
 
 // Validate each server entry: required non-empty strings, a port in the valid range, and
 // unique ids across the config (values come from JSON, so types are checked at runtime).
@@ -174,10 +172,10 @@ const structuredData = JSON.stringify([
         name: communityName,
         url: `${siteUrl}/`,
         alternateName: communityAlias || undefined,
-        foundingDate: String(communityEstablished),
+        foundingDate: communityEstablished === undefined ? undefined : String(communityEstablished),
         logo: `${siteUrl}${logoPath ?? '/og-image.png'}`,
-        description: metaDescription,
-        sameAs: [discordLink, steamLink, twitchLink, githubLink],
+        description: metaDescription || undefined,
+        sameAs: profileLinks.length > 0 ? profileLinks : undefined,
     },
     {
         '@context': 'https://schema.org',
@@ -205,7 +203,7 @@ const assetUrl = (relativePath: string): string => {
 // mangle the output or re-inject the matched token.
 const brandingTokens = new Map<string, string>([
     ['communityName', escapeHtml(communityName)],
-    ['established', String(communityEstablished)],
+    ['established', communityEstablished === undefined ? '' : String(communityEstablished)],
     ['discordLink', escapeHtml(discordLink)],
     ['siteUrl', escapeHtml(siteUrl)],
     ['metaTitle', escapeHtml(metaTitle)],
@@ -215,6 +213,8 @@ const brandingTokens = new Map<string, string>([
     ['githubLink', escapeHtml(githubLink)],
     ['statsLink', escapeHtml(statsLink)],
     ['bansLink', escapeHtml(bansLink)],
+    // Section flag only: the Resources section and its nav links need at least one card.
+    ['resources', statsLink || bansLink ? 'shown' : ''],
     ['heroTagline', escapeHtml(heroTagline)],
     ['aboutParagraph1', escapeHtml(aboutParagraph1)],
     ['aboutParagraph2', escapeHtml(aboutParagraph2)],
@@ -236,10 +236,19 @@ const brandingTokens = new Map<string, string>([
         : '<svg id="crosshairIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5"><use href="/icons.svg#icon-crosshair"/></svg>'],
 ]);
 
-const renderBranding = (html: string): string =>
-    html.replace(/\{\{(\w+)\}\}/g, (match, token: string) =>
+// {{#token}}...{{/token}} keeps its contents only when the token is non-empty. Sections are
+// resolved before values are substituted, so a value can never open one; repeated for nesting.
+const SECTION_RE = /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+const renderBranding = (html: string): string => {
+    let resolved = html;
+    for (let previous = ''; resolved !== previous;) {
+        previous = resolved;
+        resolved = resolved.replace(SECTION_RE, (_match, token: string, inner: string) => (brandingTokens.get(token) ? inner : ''));
+    }
+    return resolved.replace(/\{\{(\w+)\}\}/g, (match, token: string) =>
         brandingTokens.get(token) ?? match
     );
+};
 
 const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
 const notFoundHtmlPath = path.join(__dirname, '..', 'public', '404.html');

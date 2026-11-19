@@ -23,7 +23,8 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 > [!NOTE]
 > These values are read **at container start** and injected into the page templates — so on a
 > precompiled Docker image you only need to change the env and restart (`docker compose up -d`),
-> **no rebuild required**. Every variable falls back to a sensible default when unset.
+> **no rebuild required**. `COMMUNITY_NAME` and `SITE_URL` are required. Nothing else defaults to
+> another community's identity: an unset link hides its buttons, and unset copy is left out of the page.
 
 | Variable | Purpose | Default |
 | --- | --- | --- |
@@ -31,21 +32,21 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `PORT` | Port to listen on | `3000` |
 | `CONFIG_PATH` | Path to the server list JSON | `config/config.json` |
 | `LOG_LEVEL` | Pino log level | `info` (`debug` when `NODE_ENV=development`) |
-| `COMMUNITY_NAME` | Community name used in the title, headings and footer | `Sneak's Community` |
-| `COMMUNITY_ESTABLISHED` | Founding year used in the default description and hero tagline, the OG image alt text, and `foundingDate` in structured data | `2015` |
+| `COMMUNITY_NAME` | Community name used in the title, headings and footer | *required* |
+| `COMMUNITY_ESTABLISHED` | Founding year used in the OG image alt text and as `foundingDate` in structured data | *unset* (omitted) |
 | `COMMUNITY_ALIAS` | Short name people use for the community (e.g. `snksrv`); given to search engines as `alternateName` in structured data | *unset* (omitted) |
-| `META_TITLE` | Page title, also used as the OpenGraph/Twitter title | `<COMMUNITY_NAME> \| CS:GO Surf, KZ & Bhop Servers` |
+| `META_TITLE` | Page title, also used as the OpenGraph/Twitter title | `COMMUNITY_NAME` |
 | `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | *required* (the app won't start without it) |
-| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
-| `HERO_TAGLINE` | Hero subtitle line | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
-| `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | Sneak's Community history copy |
-| `STEAM_LINK` | Steam group/community link | `https://steamcommunity.com/groups/sneakscommunity` |
-| `TWITCH_LINK` | Twitch channel link | `https://twitch.tv/snksrv` |
-| `GITHUB_LINK` | GitHub organization/repo link | `https://github.com/Sneaks-Community` |
-| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs. An invite link (`discord.gg/<code>`) also enables [live member counts](#live-discord-member-counts) | `https://discord.gg/snksrv` |
+| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description and the structured data `description`) | *unset* (tags omitted) |
+| `HERO_TAGLINE` | Hero subtitle line | *unset* (omitted) |
+| `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | *unset* (omitted) |
+| `STEAM_LINK` | Steam group/community link | *unset* (hidden) |
+| `TWITCH_LINK` | Twitch channel link | *unset* (hidden) |
+| `GITHUB_LINK` | GitHub organization/repo link | *unset* (hidden) |
+| `DISCORD_LINK` | Discord invite used by the "JOIN DISCORD" CTAs. An invite link (`discord.gg/<code>`) also enables [live member counts](#live-discord-member-counts) | *unset* (Discord buttons and card hidden) |
 | `DISCORD_API_URL` | Base URL the member counts are fetched from; only the tests change it | `https://discord.com/api/v10` |
-| `STATS_LINK` | "Player Statistics" resource card destination | `https://stats.snksrv.com` |
-| `BANS_LINK` | "Ban List" resource card destination | `https://bans.snksrv.com` |
+| `STATS_LINK` | "Player Statistics" resource card destination | *unset* (card hidden; the Resources section too if `BANS_LINK` is also unset) |
+| `BANS_LINK` | "Ban List" resource card destination | *unset* (card hidden) |
 | `ALLOWED_ORIGINS` | Comma-separated CORS allow-list | `http://localhost:3000` |
 | `CLIENT_IP_HEADER` | Name of the header your proxy puts the real client IP in; see [Client IP resolution](#client-ip-resolution) | *unset* (TCP peer address) |
 
