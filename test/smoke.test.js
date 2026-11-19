@@ -60,6 +60,8 @@ before(async () => {
             PORT: String(port),
             CONFIG_PATH: configPath,
             COMMUNITY_NAME,
+            COMMUNITY_ALIAS: 'smokey',
+            SITE_URL: '',
             LOG_LEVEL: 'warn',
             NODE_ENV: 'production',
             DISCORD_LINK: 'https://discord.gg/smoketest',
@@ -263,4 +265,17 @@ test('server names and addresses are in the HTML before any script runs', async 
     assert.ok(grid.includes('127.0.0.1:1') && grid.includes('127.0.0.1:2'), 'connect address missing');
     assert.ok(grid.includes('smoke_unnamed'), 'a server without a name should show its id');
     assert.equal([...grid.matchAll(/h-\[88px\]/g)].length, TEST_CONFIG.servers.length, 'placeholders must keep their fixed height');
+});
+
+test('structured data carries the logo, founding year and alias', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    const graph = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(body)[1]);
+    const org = graph.find((node) => node['@type'] === 'Organization');
+    const site = graph.find((node) => node['@type'] === 'WebSite');
+    assert.equal(org.foundingDate, '2015');
+    assert.equal(org.alternateName, 'smokey');
+    assert.equal(site.alternateName, 'smokey');
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed filenames under the repo
+    const logo = ['logo.svg', 'logo.webp', 'logo.png'].find((file) => fs.existsSync(path.join(root, 'user-assets', file))) ?? 'og-image.png';
+    assert.equal(org.logo, `https://snksrv.com/${logo}`);
 });

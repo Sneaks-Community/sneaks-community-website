@@ -32,7 +32,8 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `CONFIG_PATH` | Path to the server list JSON | `config/config.json` |
 | `LOG_LEVEL` | Pino log level | `info` (`debug` when `NODE_ENV=development`) |
 | `COMMUNITY_NAME` | Community name used in the title, headings and footer | `Sneak's Community` |
-| `COMMUNITY_ESTABLISHED` | Founding year used in the default description and hero tagline, and in the OG image alt text | `2015` |
+| `COMMUNITY_ESTABLISHED` | Founding year used in the default description and hero tagline, the OG image alt text, and `foundingDate` in structured data | `2015` |
+| `COMMUNITY_ALIAS` | Short name people use for the community (e.g. `snksrv`); given to search engines as `alternateName` in structured data | *unset* (omitted) |
 | `META_TITLE` | Page title, also used as the OpenGraph/Twitter title | `<COMMUNITY_NAME> \| CS:GO Surf, KZ & Bhop Servers` |
 | `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` |
 | `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
@@ -146,7 +147,7 @@ The Docker Compose setup includes a `user-assets/` volume mount that allows you 
 
 #### Custom Logo
 
-To replace the default crosshair icon in the header with your own logo, place an image file named `logo.svg`, `logo.webp`, or `logo.png` in the `user-assets/` directory. The site will automatically detect and use your logo on page load.
+To replace the default crosshair icon in the header with your own logo, place an image file named `logo.svg`, `logo.webp`, or `logo.png` in the `user-assets/` directory. The site will automatically detect and use your logo on page load. It is also the logo search engines see in the page's structured data; without one, `og-image.png` is used.
 
 Recommended size: 64x64 pixels or larger. Transparent backgrounds work best.
 

@@ -69,6 +69,8 @@ if (!Array.isArray(config.servers) || config.servers.length === 0) {
 // precompiled image only needs an env change + restart — no rebuild. See renderBranding().
 const communityName = (process.env.COMMUNITY_NAME ?? '').trim() || "Sneak's Community";
 const communityEstablished = Number(process.env.COMMUNITY_ESTABLISHED) || 2015;
+// No default: an alias is identity-specific and invisible, so a wrong one would go unnoticed.
+const communityAlias = (process.env.COMMUNITY_ALIAS ?? '').trim();
 // Discord invite URL used by the "JOIN DISCORD" CTAs and the community Join card.
 // Set DISCORD_LINK to your server's invite (e.g. https://discord.gg/yourinvite).
 const discordLink = (process.env.DISCORD_LINK ?? '').trim() || "https://discord.gg/snksrv";
@@ -116,30 +118,6 @@ const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
 const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
     || "Whether you're grinding Surf, mastering your aim in 1v1 Arenas, or just hanging out in the Chill Zone, this is your community.";
 
-// Structured data (JSON-LD) for search engines: Organization + WebSite. Built from the same
-// branding values as the meta tags and serialized here rather than templated into the HTML —
-// renderBranding() HTML-escapes its values ('"' -> '&quot;'), which is invalid inside a
-// <script type="application/ld+json"> block (parsed as JSON, not HTML). JSON.stringify already
-// produces JSON-safe strings; we additionally escape '<' so a value can't break out of the
-// </script> element. Injected raw via the {{structuredData}} token in renderBranding().
-const structuredData = JSON.stringify([
-    {
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        name: communityName,
-        url: `${siteUrl}/`,
-        logo: `${siteUrl}/og-image.png`,
-        description: metaDescription,
-        sameAs: [discordLink, steamLink, twitchLink, githubLink],
-    },
-    {
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: communityName,
-        url: `${siteUrl}/`,
-    },
-]).replaceAll('<', '\\u003c');
-
 // Validate each server entry: required non-empty strings, a port in the valid range, and
 // unique ids across the config (values come from JSON, so types are checked at runtime).
 const seenServerIds = new Set<string>();
@@ -183,6 +161,33 @@ const detectLogoPath = (): string | null => {
 };
 const logoPath = detectLogoPath();
 if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
+
+// Structured data (JSON-LD) for search engines: Organization + WebSite. Built from the same
+// branding values as the meta tags and serialized here rather than templated into the HTML —
+// renderBranding() HTML-escapes its values ('"' -> '&quot;'), which is invalid inside a
+// <script type="application/ld+json"> block (parsed as JSON, not HTML). JSON.stringify already
+// produces JSON-safe strings; we additionally escape '<' so a value can't break out of the
+// </script> element. Injected raw via the {{structuredData}} token in renderBranding().
+const structuredData = JSON.stringify([
+    {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: communityName,
+        url: `${siteUrl}/`,
+        alternateName: communityAlias || undefined,
+        foundingDate: String(communityEstablished),
+        logo: `${siteUrl}${logoPath ?? '/og-image.png'}`,
+        description: metaDescription,
+        sameAs: [discordLink, steamLink, twitchLink, githubLink],
+    },
+    {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: communityName,
+        alternateName: communityAlias || undefined,
+        url: `${siteUrl}/`,
+    },
+]).replaceAll('<', '\\u003c');
 
 // Content-hashed asset URLs: the hash names one exact build of the file, so the response can be
 // served immutable for a year (see setStaticCacheHeaders) and a deploy re-fetches only what changed.
