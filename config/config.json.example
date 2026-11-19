@@ -1,4 +1,33 @@
 {
+  "serversHeading": "CS:GO SERVERS",
+  "globalReach": "Servers in the US with an international community, serving nearly 2 million unique players from over 200 countries and territories.",
+  "modes": [
+    {
+      "icon": "waves",
+      "title": "Surf",
+      "description": "Surf triangles on over 1000 maps. Tiers 1-6."
+    },
+    {
+      "icon": "kz-climb",
+      "title": "KZ Climb",
+      "description": "Scale towering structures and master technical movement."
+    },
+    {
+      "icon": "arrow-up",
+      "title": "Bhop",
+      "description": "Hop, skip and jump your way through maps."
+    },
+    {
+      "icon": "crosshair",
+      "title": "1v1 Arenas",
+      "description": "Face off in competitive 1v1 skill match-ups."
+    },
+    {
+      "icon": "retakes",
+      "title": "Retakes",
+      "description": "Compete in a fast-paced 5v5 site retake scenario!"
+    }
+  ],
   "servers": [
     {
       "id": "example_server",

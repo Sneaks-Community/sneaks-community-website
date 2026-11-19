@@ -13,6 +13,8 @@ const root = path.join(import.meta.dirname, '..');
 const COMMUNITY_NAME = 'Smoke Test Community';
 // Loopback with nothing listening: no DNS, no live server. Costs GameDig's ~4s give-up time.
 const TEST_CONFIG = {
+    serversHeading: 'Smoke & Servers',
+    modes: [{ icon: 'waves', title: 'Surf & Turf', description: 'Fast <b>maps</b>' }],
     servers: [
         { id: 'smoke_test', host: '127.0.0.1', port: 1, type: 'csgo', name: 'Smoke & Test <Server>' },
         { id: 'smoke_unnamed', host: '127.0.0.1', port: 2, type: 'csgo' },
@@ -259,6 +261,10 @@ test('GET /health answers on loopback', async () => {
 test('the shipped example config is loadable', () => {
     const example = JSON.parse(fs.readFileSync(path.join(root, 'config', 'config.json.example'), 'utf-8'));
     assert.ok(Array.isArray(example.servers) && example.servers.length > 0, 'example config has no servers');
+    for (const mode of example.modes ?? []) {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- icon names from the shipped example
+        assert.ok(fs.existsSync(path.join(root, 'public', 'icons', `${mode.icon}.svg`)), `example mode icon "${mode.icon}" does not exist`);
+    }
     for (const server of example.servers) {
         assert.ok(server.id && server.host && server.type, 'example server entry is missing a required field');
         assert.ok(Number.isInteger(server.port) && server.port > 0 && server.port < 65_536, 'example server port is invalid');
@@ -344,4 +350,24 @@ test('the server refuses to start without COMMUNITY_NAME', async () => {
     const { code, log } = await startup({ ...childEnv, COMMUNITY_NAME: ' ' });
     assert.equal(code, 1);
     assert.match(log, /COMMUNITY_NAME is required/);
+});
+
+test('the servers heading and game-mode cards come from config.json', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    assert.match(body, />Smoke &amp; Servers<\/h2>/);
+    assert.ok(body.includes('Surf &amp; Turf') && body.includes('Fast &lt;b&gt;maps&lt;/b&gt;'), 'mode card missing or unescaped');
+    assert.equal(body.includes('<b>maps</b>'), false, 'mode text was injected as raw HTML');
+    assert.ok(body.includes('/icons.svg#icon-waves'), 'mode icon missing');
+    assert.equal(body.includes('KZ Climb'), false, 'a built-in mode card is still in the page');
+    assert.equal(body.includes('Global Reach'), false, 'the Global Reach card should be left out without globalReach');
+    assert.equal(body.includes('CS:GO'), false, 'the page still names a game nobody configured');
+});
+
+test('the server refuses to start on a mode icon that does not exist', async () => {
+    const configPath = path.join(temporaryDirectory, 'bad-icon.json');
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- own temp dir
+    fs.writeFileSync(configPath, JSON.stringify({ ...TEST_CONFIG, modes: [{ icon: 'no-such-icon', title: 'x', description: 'y' }] }));
+    const { code, log } = await startup({ ...childEnv, CONFIG_PATH: configPath });
+    assert.equal(code, 1);
+    assert.match(log, /modes\[0\]\.icon/);
 });

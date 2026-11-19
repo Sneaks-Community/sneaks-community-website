@@ -167,13 +167,13 @@
                         <h3 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Longevity</h3>
                         <p class="text-slate-600 dark:text-slate-400 text-sm">Over 10 years of continuous operation, we are dedicated to gaming.</p>
                     </div>
-                    <div class="surface-card card-hover p-6 rounded-2xl sm:col-span-2">
+                    {{#globalReach}}<div class="surface-card card-hover p-6 rounded-2xl sm:col-span-2">
                         <div class="icon-chip w-12 h-12 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-globe-2"/></svg>
                         </div>
                         <h3 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Global Reach</h3>
-                        <p class="text-slate-600 dark:text-slate-400 text-sm">Servers in the US with an international community, serving nearly 2 million unique players from over 200 countries and territories.</p>
-                    </div>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">{{globalReach}}</p>
+                    </div>{{/globalReach}}
                 </div>
             </div>
         </div>
@@ -188,7 +188,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="flex justify-between items-end mb-16 reveal" id="servers-header">
                 <div>
-                    <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">CS:GO SERVERS</h2>
+                    <h2 class="font-display text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">{{serversHeading}}</h2>
                 </div>
                 <div id="live-indicator" role="status" class="hidden sm:block text-slate-500 dark:text-slate-400 text-sm font-mono uppercase whitespace-nowrap">
                     <span class="status-dot"></span><span class="live-label">Live</span><span class="live-age" aria-hidden="true"></span>
@@ -201,55 +201,11 @@
             </div>
             <p id="copy-status" role="status" class="sr-only"></p>
 
-            <div class="mt-16 surface-card rounded-2xl p-8">
+            {{#modeCards}}<div class="mt-16 surface-card rounded-2xl p-8">
                 <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-8 text-center reveal-stagger" id="modes-grid">
-                    <div class="group space-y-1">
-                        <div class="flex justify-center mb-3">
-                            <div class="icon-chip w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-waves"/></svg>
-                            </div>
-                        </div>
-                        <h3 class="font-bold text-slate-900 dark:text-white mb-2">Surf</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Surf triangles on over 1000 maps. Tiers 1-6.</p>
-                    </div>
-                    <div class="group space-y-1">
-                        <div class="flex justify-center mb-3">
-                            <div class="icon-chip w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-kz-climb"/></svg>
-                            </div>
-                        </div>
-                        <h3 class="font-bold text-slate-900 dark:text-white mb-2">KZ Climb</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Scale towering structures and master technical movement.</p>
-                    </div>
-                    <div class="group space-y-1">
-                        <div class="flex justify-center mb-3">
-                            <div class="icon-chip w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-arrow-up"/></svg>
-                            </div>
-                        </div>
-                        <h3 class="font-bold text-slate-900 dark:text-white mb-2">Bhop</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Hop, skip and jump your way through maps.</p>
-                    </div>
-                    <div class="group space-y-1">
-                        <div class="flex justify-center mb-3">
-                            <div class="icon-chip w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-crosshair"/></svg>
-                            </div>
-                        </div>
-                        <h3 class="font-bold text-slate-900 dark:text-white mb-2">1v1 Arenas</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Face off in competitive 1v1 skill match-ups.</p>
-                    </div>
-                    <div class="group space-y-1">
-                        <div class="flex justify-center mb-3">
-                            <div class="icon-chip w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-retakes"/></svg>
-                            </div>
-                        </div>
-                        <h3 class="font-bold text-slate-900 dark:text-white mb-2">Retakes</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Compete in a fast-paced 5v5 site retake scenario!</p>
-                    </div>
+                    {{modeCards}}
                 </div>
-            </div>
+            </div>{{/modeCards}}
         </div>
     </section>
 

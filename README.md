@@ -94,6 +94,11 @@ Example `config/config.json`:
 
 ```json
 {
+  "serversHeading": "CS:GO SERVERS",
+  "globalReach": "Servers in the US with an international community.",
+  "modes": [
+    { "icon": "waves", "title": "Surf", "description": "Surf triangles on over 1000 maps. Tiers 1-6." }
+  ],
   "servers": [
     {
       "id": "surf_tier1",
@@ -105,6 +110,16 @@ Example `config/config.json`:
   ]
 }
 ```
+
+Only `servers` is required. The other keys fill parts of the page and are left out when absent:
+
+| Key | Fills | When absent |
+| --- | --- | --- |
+| `serversHeading` | The heading above the server cards | `SERVERS` |
+| `globalReach` | The text of the "Global Reach" card in the About section | Card hidden |
+| `modes` | One card per game mode under the servers; `icon` names a file in `public/icons/` without `.svg` | Mode cards hidden |
+
+`config/config.json.example` has the full set used on snksrv.com.
 
 ### Docker Deployment
 

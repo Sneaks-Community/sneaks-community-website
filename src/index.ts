@@ -37,8 +37,17 @@ interface ServerConfig {
     name?: string;
 }
 
+interface ModeConfig {
+    icon: string;
+    title: string;
+    description: string;
+}
+
 interface AppConfig {
     servers: ServerConfig[];
+    serversHeading?: string;
+    globalReach?: string;
+    modes?: ModeConfig[];
 }
 
 // Read and validate configuration; CONFIG_PATH overrides the default location.
@@ -132,6 +141,27 @@ for (const server of config.servers) {
     seenServerIds.add(server.id);
 }
 
+// Optional page copy from the same file; checked at runtime like the servers above.
+const failConfig = (reason: string): never => {
+    logger.fatal(`Invalid configuration: ${reason}`);
+    process.exit(1);
+};
+const isText = (value: unknown): value is string => typeof value === 'string' && value.trim() !== '';
+if (config.serversHeading !== undefined && !isText(config.serversHeading)) failConfig('"serversHeading" must be a non-empty string');
+if (config.globalReach !== undefined && !isText(config.globalReach)) failConfig('"globalReach" must be a non-empty string');
+const serversHeading = config.serversHeading?.trim() ?? 'SERVERS';
+const globalReach = config.globalReach?.trim() ?? '';
+const modes = config.modes ?? [];
+if (!Array.isArray(modes)) failConfig('"modes" must be an array');
+for (const [index, mode] of modes.entries()) {
+    if (!isText(mode.title)) failConfig(`modes[${String(index)}].title must be a non-empty string`);
+    if (!isText(mode.description)) failConfig(`modes[${String(index)}].description must be a non-empty string`);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- pattern-checked first, so the path stays in public/icons/
+    if (!isText(mode.icon) || !/^[a-z0-9-]+$/.test(mode.icon) || !fs.existsSync(path.join(__dirname, '..', 'public', 'icons', `${mode.icon}.svg`))) {
+        failConfig(`modes[${String(index)}].icon must name an icon in public/icons/ (without .svg)`);
+    }
+}
+
 // Pre-render index.html with community branding. The values are fixed for the process
 // lifetime (the container is restarted to pick up env changes), so render once at startup.
 const escapeHtml = (value: string): string =>
@@ -145,6 +175,9 @@ const escapeHtml = (value: string): string =>
 const serverPlaceholder = (server: ServerConfig): string =>
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion -- name isn't type-checked in config JSON
     `<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"><p class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(String(server.name ?? server.id))}</p><p class="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">${escapeHtml(`${server.host}:${String(server.port)}`)}</p></div>`;
+
+const modeCard = (mode: ModeConfig): string =>
+    `<div class="group space-y-1"><div class="flex justify-center mb-3"><div class="icon-chip w-11 h-11 bg-brand-100 dark:bg-brand-500/10 rounded-xl flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6 text-brand-600 dark:text-brand-400"><use href="/icons.svg#icon-${mode.icon}"/></svg></div></div><h3 class="font-bold text-slate-900 dark:text-white mb-2">${escapeHtml(mode.title.trim())}</h3><p class="text-sm text-slate-600 dark:text-slate-400">${escapeHtml(mode.description.trim())}</p></div>`;
 
 // Detect a user-supplied logo at startup (user-assets/logo.{svg,webp,png}, in priority order)
 const userAssetsPath = path.join(__dirname, '..', 'user-assets');
@@ -218,6 +251,10 @@ const brandingTokens = new Map<string, string>([
     ['heroTagline', escapeHtml(heroTagline)],
     ['aboutParagraph1', escapeHtml(aboutParagraph1)],
     ['aboutParagraph2', escapeHtml(aboutParagraph2)],
+    ['serversHeading', escapeHtml(serversHeading)],
+    ['globalReach', escapeHtml(globalReach)],
+    // The icon name is pattern-checked at startup, so it needs no escaping.
+    ['modeCards', modes.map(modeCard).join('')],
     ['structuredData', structuredData],
     // Hashes are base64url over fixed filenames, so there is nothing to escape.
     ['themeInitJs', assetUrl('theme-init.js')],
