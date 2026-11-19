@@ -238,3 +238,16 @@ test('the shipped example config is loadable', () => {
         assert.ok(Number.isInteger(server.port) && server.port > 0 && server.port < 65_536, 'example server port is invalid');
     }
 });
+
+test('the title, hero tagline and description name the game', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    const title = `${COMMUNITY_NAME} | CS:GO Surf, KZ &amp; Bhop Servers`;
+    assert.ok(body.includes(`<title>${title}</title>`), 'title does not name the game');
+    assert.ok(body.includes(`<meta property="og:title" content="${title}">`), 'og:title differs from the title');
+    assert.ok(body.includes(`<meta name="twitter:title" content="${title}">`), 'twitter:title differs from the title');
+    assert.ok(body.includes(`${COMMUNITY_NAME} is an open CS:GO community running US-based Surf, KZ, Bhop, 1v1 Arenas and Retakes servers since 2015.`), 'hero tagline does not define the community');
+    const description = /<meta name="description" content="([^"]*)">/.exec(body)[1];
+    assert.ok(description.startsWith(`${COMMUNITY_NAME}: open CS:GO Surf`), 'description does not name the game');
+    assert.ok(description.length <= 155, `description is ${String(description.length)} characters`);
+    assert.match(body, />CS:GO SERVERS<\/h2>/);
+});

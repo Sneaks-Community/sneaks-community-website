@@ -32,11 +32,12 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `CONFIG_PATH` | Path to the server list JSON | `config/config.json` |
 | `LOG_LEVEL` | Pino log level | `info` (`debug` when `NODE_ENV=development`) |
 | `COMMUNITY_NAME` | Community name used in the title, headings and footer | `Sneak's Community` |
-| `COMMUNITY_ESTABLISHED` | Founding year shown in the title/OG tags | `2015` |
+| `COMMUNITY_ESTABLISHED` | Founding year used in the default description and hero tagline, and in the OG image alt text | `2015` |
+| `META_TITLE` | Page title, also used as the OpenGraph/Twitter title | `<COMMUNITY_NAME> \| CS:GO Surf, KZ & Bhop Servers` |
 | `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` |
-| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Sneak's Community description |
+| `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
 | `META_KEYWORDS` | SEO meta keywords | Sneak's Community keyword list |
-| `HERO_TAGLINE` | Hero subtitle line | `An open and fun gaming community for all. No application. No membership. Just fun and friends.` |
+| `HERO_TAGLINE` | Hero subtitle line | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
 | `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | Sneak's Community history copy |
 | `STEAM_LINK` | Steam group/community link | `https://steamcommunity.com/groups/sneakscommunity` |
 | `TWITCH_LINK` | Twitch channel link | `https://twitch.tv/snksrv` |

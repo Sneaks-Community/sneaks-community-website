@@ -103,12 +103,14 @@ function resolveSiteUrl(raw: string | undefined): string {
 const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 
 // SEO metadata and a few identity-specific prose fields.
+const metaTitle = (process.env.META_TITLE ?? '').trim()
+    || `${communityName} | CS:GO Surf, KZ & Bhop Servers`;
 const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
-    || "Sneak's Community - An open and fun gaming community for all. Join our CS:GO servers for Surf, KZ Climb, Bhop, 1v1 Arenas, and more. No application. No membership. Just fun and friends.";
+    || `${communityName}: open CS:GO Surf, KZ, Bhop, 1v1 Arenas and Retakes servers in the US since ${String(communityEstablished)}. No application, just join and play.`;
 const metaKeywords = (process.env.META_KEYWORDS ?? '').trim()
     || 'sneak community, gaming, cs2, csgo, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community';
 const heroTagline = (process.env.HERO_TAGLINE ?? '').trim()
-    || 'An open and fun gaming community for all. No application. No membership. Just fun and friends.';
+    || `${communityName} is an open CS:GO community running US-based Surf, KZ, Bhop, 1v1 Arenas and Retakes servers since ${String(communityEstablished)}. No application. No membership. Just fun and friends.`;
 const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
     || "Founded in 2015, Sneak's Community started as a single CS:GO Minigames server. Over the years, our community evolved and has grown through many games, and we found our true home hosting Counter-Strike: Global Offensive servers, while providing a welcoming environment for all games.";
 const aboutParagraph2 = (process.env.ABOUT_PARAGRAPH_2 ?? '').trim()
@@ -199,6 +201,7 @@ const brandingTokens = new Map<string, string>([
     ['established', String(communityEstablished)],
     ['discordLink', escapeHtml(discordLink)],
     ['siteUrl', escapeHtml(siteUrl)],
+    ['metaTitle', escapeHtml(metaTitle)],
     ['metaDescription', escapeHtml(metaDescription)],
     ['metaKeywords', escapeHtml(metaKeywords)],
     ['steamLink', escapeHtml(steamLink)],
