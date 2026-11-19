@@ -109,8 +109,6 @@ const metaTitle = (process.env.META_TITLE ?? '').trim()
     || `${communityName} | CS:GO Surf, KZ & Bhop Servers`;
 const metaDescription = (process.env.META_DESCRIPTION ?? '').trim()
     || `${communityName}: open CS:GO Surf, KZ, Bhop, 1v1 Arenas and Retakes servers in the US since ${String(communityEstablished)}. No application, just join and play.`;
-const metaKeywords = (process.env.META_KEYWORDS ?? '').trim()
-    || 'sneak community, gaming, cs2, csgo, surf, kz climb, bhop, 1v1 arenas, retakes, counter-strike, discord, gaming community';
 const heroTagline = (process.env.HERO_TAGLINE ?? '').trim()
     || `${communityName} is an open CS:GO community running US-based Surf, KZ, Bhop, 1v1 Arenas and Retakes servers since ${String(communityEstablished)}. No application. No membership. Just fun and friends.`;
 const aboutParagraph1 = (process.env.ABOUT_PARAGRAPH_1 ?? '').trim()
@@ -211,7 +209,6 @@ const brandingTokens = new Map<string, string>([
     ['siteUrl', escapeHtml(siteUrl)],
     ['metaTitle', escapeHtml(metaTitle)],
     ['metaDescription', escapeHtml(metaDescription)],
-    ['metaKeywords', escapeHtml(metaKeywords)],
     ['steamLink', escapeHtml(steamLink)],
     ['twitchLink', escapeHtml(twitchLink)],
     ['githubLink', escapeHtml(githubLink)],

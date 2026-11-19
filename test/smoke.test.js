@@ -279,3 +279,15 @@ test('structured data carries the logo, founding year and alias', async () => {
     const logo = ['logo.svg', 'logo.webp', 'logo.png'].find((file) => fs.existsSync(path.join(root, 'user-assets', file))) ?? 'og-image.png';
     assert.equal(org.logo, `https://snksrv.com/${logo}`);
 });
+
+test('pages and sitemap carry no tags search engines ignore', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    for (const tag of ['name="keywords"', 'name="robots"', 'twitter:url', 'twitter:image:width', 'twitter:image:height']) {
+        assert.equal(body.includes(tag), false, `${tag} is still in the page`);
+    }
+    const notFound = await (await fetch(`${base}/nope`, { headers: { Accept: 'text/html' } })).text();
+    assert.ok(notFound.includes('<meta name="robots" content="noindex, follow">'), 'the 404 page lost its noindex');
+    const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
+    assert.ok(sitemap.includes('<loc>https://snksrv.com/</loc>'), 'sitemap lost its URL');
+    assert.equal(/<changefreq>|<priority>/.test(sitemap), false, 'sitemap still has changefreq/priority');
+});

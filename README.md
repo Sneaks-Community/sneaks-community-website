@@ -37,7 +37,6 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `META_TITLE` | Page title, also used as the OpenGraph/Twitter title | `<COMMUNITY_NAME> \| CS:GO Surf, KZ & Bhop Servers` |
 | `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` |
 | `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
-| `META_KEYWORDS` | SEO meta keywords | Sneak's Community keyword list |
 | `HERO_TAGLINE` | Hero subtitle line | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
 | `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | Sneak's Community history copy |
 | `STEAM_LINK` | Steam group/community link | `https://steamcommunity.com/groups/sneakscommunity` |
