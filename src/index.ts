@@ -148,7 +148,8 @@ const escapeHtml = (value: string): string =>
         .replaceAll("'", '&#39;');
 
 const serverPlaceholder = (server: ServerConfig): string =>
-    `<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"><p class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(server.name ?? server.id)}</p><p class="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">${escapeHtml(`${server.host}:${String(server.port)}`)}</p></div>`;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion -- name isn't type-checked in config JSON
+    `<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"><p class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(String(server.name ?? server.id))}</p><p class="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">${escapeHtml(`${server.host}:${String(server.port)}`)}</p></div>`;
 
 // Detect a user-supplied logo at startup (user-assets/logo.{svg,webp,png}, in priority order)
 const userAssetsPath = path.join(__dirname, '..', 'user-assets');

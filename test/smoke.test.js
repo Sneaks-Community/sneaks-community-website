@@ -16,6 +16,7 @@ const TEST_CONFIG = {
     servers: [
         { id: 'smoke_test', host: '127.0.0.1', port: 1, type: 'csgo', name: 'Smoke & Test <Server>' },
         { id: 'smoke_unnamed', host: '127.0.0.1', port: 2, type: 'csgo' },
+        { id: 'smoke_numeric', host: '127.0.0.1', port: 3, type: 'csgo', name: 2024 },
     ],
 };
 
@@ -264,6 +265,7 @@ test('server names and addresses are in the HTML before any script runs', async 
     assert.equal(grid.includes('<Server>'), false, 'server name was injected as raw HTML');
     assert.ok(grid.includes('127.0.0.1:1') && grid.includes('127.0.0.1:2'), 'connect address missing');
     assert.ok(grid.includes('smoke_unnamed'), 'a server without a name should show its id');
+    assert.ok(grid.includes('>2024</p>'), 'a numeric name should show as text');
     assert.equal([...grid.matchAll(/h-\[88px\]/g)].length, TEST_CONFIG.servers.length, 'placeholders must keep their fixed height');
 });
 
