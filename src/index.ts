@@ -86,24 +86,21 @@ const statsLink = (process.env.STATS_LINK ?? '').trim() || 'https://stats.snksrv
 const bansLink = (process.env.BANS_LINK ?? '').trim() || 'https://bans.snksrv.com';
 
 // Canonical site origin, injected raw into sitemap.xml/robots.txt and composed as
-// `{{siteUrl}}/...` in the templates, so it must be a clean http(s) origin (no path, query,
-// or hash). Parse with URL and fall back to the default with a loud warning if it isn't.
-const DEFAULT_SITE_URL = 'https://snksrv.com';
+// `{{siteUrl}}/...` in the templates. No default: a wrong origin hands this site's pages to another.
 function resolveSiteUrl(raw: string | undefined): string {
     const value = (raw ?? '').trim();
     if (value === '') {
-        logger.warn(`SITE_URL is not set, so canonical, sitemap and robots.txt URLs use ${DEFAULT_SITE_URL}`);
-        return DEFAULT_SITE_URL;
+        logger.fatal('SITE_URL is required: set it to this site\'s origin, e.g. https://example.com');
+        process.exit(1);
     }
     try {
         const url = new URL(value);
-        if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('protocol must be http(s)');
-        if (url.search || url.hash || (url.pathname !== '/' && url.pathname !== '')) throw new Error('must be a bare origin');
-        return url.origin;
-    } catch (error) {
-        logger.warn({ err: error, siteUrl: value }, `Invalid SITE_URL, falling back to ${DEFAULT_SITE_URL}`);
-        return DEFAULT_SITE_URL;
-    }
+        if ((url.protocol === 'http:' || url.protocol === 'https:') && !url.search && !url.hash && url.pathname === '/') {
+            return url.origin;
+        }
+    } catch { /* reported below */ }
+    logger.fatal({ siteUrl: value }, 'SITE_URL must be a bare http(s) origin, e.g. https://example.com');
+    process.exit(1);
 }
 const siteUrl = resolveSiteUrl(process.env.SITE_URL);
 

@@ -30,9 +30,20 @@ const discordStub = http.createServer((req, res) => {
 });
 
 let child;
+let childEnv;
 let base;
 let temporaryDirectory;
 let output = '';
+
+// Boots a second server with `env` and resolves once it exits; startup checks exit before listening.
+const startup = (env) => new Promise((resolve) => {
+    const proc = spawn(process.execPath, ['dist/index.js'], { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let log = '';
+    proc.stdout.on('data', (chunk) => { log += chunk; });
+    proc.stderr.on('data', (chunk) => { log += chunk; });
+    const timer = setTimeout(() => { proc.kill('SIGKILL'); }, 10_000);
+    proc.on('exit', (code) => { clearTimeout(timer); resolve({ code, log }); });
+});
 
 const freePort = () => new Promise((resolve, reject) => {
     const probe = net.createServer();
@@ -54,22 +65,19 @@ before(async () => {
 
     const port = await freePort();
     base = `http://127.0.0.1:${String(port)}`;
-    child = spawn(process.execPath, ['dist/index.js'], {
-        cwd: root,
-        env: {
-            ...process.env,
-            PORT: String(port),
-            CONFIG_PATH: configPath,
-            COMMUNITY_NAME,
-            COMMUNITY_ALIAS: 'smokey',
-            SITE_URL: '',
-            LOG_LEVEL: 'warn',
-            NODE_ENV: 'production',
-            DISCORD_LINK: 'https://discord.gg/smoketest',
-            DISCORD_API_URL: discordApiUrl,
-        },
-        stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    childEnv = {
+        ...process.env,
+        PORT: String(port),
+        CONFIG_PATH: configPath,
+        COMMUNITY_NAME,
+        COMMUNITY_ALIAS: 'smokey',
+        SITE_URL: 'https://smoke.example',
+        LOG_LEVEL: 'warn',
+        NODE_ENV: 'production',
+        DISCORD_LINK: 'https://discord.gg/smoketest',
+        DISCORD_API_URL: discordApiUrl,
+    };
+    child = spawn(process.execPath, ['dist/index.js'], { cwd: root, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
 
     child.stdout.on('data', (chunk) => { output += chunk; });
     child.stderr.on('data', (chunk) => { output += chunk; });
@@ -279,7 +287,7 @@ test('structured data carries the logo, founding year and alias', async () => {
     assert.equal(site.alternateName, 'smokey');
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed filenames under the repo
     const logo = ['logo.svg', 'logo.webp', 'logo.png'].find((file) => fs.existsSync(path.join(root, 'user-assets', file))) ?? 'og-image.png';
-    assert.equal(org.logo, `https://snksrv.com/${logo}`);
+    assert.equal(org.logo, `https://smoke.example/${logo}`);
 });
 
 test('pages and sitemap carry no tags search engines ignore', async () => {
@@ -290,10 +298,17 @@ test('pages and sitemap carry no tags search engines ignore', async () => {
     const notFound = await (await fetch(`${base}/nope`, { headers: { Accept: 'text/html' } })).text();
     assert.ok(notFound.includes('<meta name="robots" content="noindex, follow">'), 'the 404 page lost its noindex');
     const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
-    assert.ok(sitemap.includes('<loc>https://snksrv.com/</loc>'), 'sitemap lost its URL');
+    assert.ok(sitemap.includes('<loc>https://smoke.example/</loc>'), 'sitemap lost its URL');
     assert.equal(/<changefreq>|<priority>/.test(sitemap), false, 'sitemap still has changefreq/priority');
 });
 
-test('an unset SITE_URL is logged, since canonical URLs then point at snksrv.com', () => {
-    assert.match(output, /SITE_URL is not set/);
+test('the server refuses to start without a valid SITE_URL', async () => {
+    const withoutSiteUrl = { ...childEnv };
+    delete withoutSiteUrl.SITE_URL;
+    const unset = await startup(withoutSiteUrl);
+    assert.equal(unset.code, 1);
+    assert.match(unset.log, /SITE_URL is required/);
+    const invalid = await startup({ ...childEnv, SITE_URL: 'https://smoke.example/path' });
+    assert.equal(invalid.code, 1);
+    assert.match(invalid.log, /SITE_URL must be a bare http\(s\) origin/);
 });
