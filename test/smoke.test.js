@@ -13,7 +13,10 @@ const root = path.join(import.meta.dirname, '..');
 const COMMUNITY_NAME = 'Smoke Test Community';
 // Loopback with nothing listening: no DNS, no live server. Costs GameDig's ~4s give-up time.
 const TEST_CONFIG = {
-    servers: [{ id: 'smoke_test', host: '127.0.0.1', port: 1, type: 'csgo', name: 'Smoke Test Server' }],
+    servers: [
+        { id: 'smoke_test', host: '127.0.0.1', port: 1, type: 'csgo', name: 'Smoke & Test <Server>' },
+        { id: 'smoke_unnamed', host: '127.0.0.1', port: 2, type: 'csgo' },
+    ],
 };
 
 // Stands in for Discord's invite endpoint. The extra field is the kind of detail that must stay server-side.
@@ -250,4 +253,14 @@ test('the title, hero tagline and description name the game', async () => {
     assert.ok(description.startsWith(`${COMMUNITY_NAME}: open CS:GO Surf`), 'description does not name the game');
     assert.ok(description.length <= 155, `description is ${String(description.length)} characters`);
     assert.match(body, />CS:GO SERVERS<\/h2>/);
+});
+
+test('server names and addresses are in the HTML before any script runs', async () => {
+    const body = await (await fetch(`${base}/`)).text();
+    const grid = /<div id="server-grid"[^>]*>([\s\S]*?)<\/div>\s*<p id="copy-status"/.exec(body)[1];
+    assert.ok(grid.includes('Smoke &amp; Test &lt;Server&gt;'), 'configured name missing or unescaped');
+    assert.equal(grid.includes('<Server>'), false, 'server name was injected as raw HTML');
+    assert.ok(grid.includes('127.0.0.1:1') && grid.includes('127.0.0.1:2'), 'connect address missing');
+    assert.ok(grid.includes('smoke_unnamed'), 'a server without a name should show its id');
+    assert.equal([...grid.matchAll(/h-\[88px\]/g)].length, TEST_CONFIG.servers.length, 'placeholders must keep their fixed height');
 });

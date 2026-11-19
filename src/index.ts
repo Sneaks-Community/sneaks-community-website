@@ -168,6 +168,9 @@ const escapeHtml = (value: string): string =>
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
 
+const serverPlaceholder = (server: ServerConfig): string =>
+    `<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"><p class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(server.name ?? server.id)}</p><p class="mt-0.5 font-mono text-xs text-slate-500 dark:text-slate-400">${escapeHtml(`${server.host}:${String(server.port)}`)}</p></div>`;
+
 // Detect a user-supplied logo at startup (user-assets/logo.{svg,webp,png}, in priority order)
 const userAssetsPath = path.join(__dirname, '..', 'user-assets');
 const detectLogoPath = (): string | null => {
@@ -219,9 +222,9 @@ const brandingTokens = new Map<string, string>([
     ['motionJs', assetUrl('lib/motion.js')],
     ['commonJs', assetUrl('common.js')],
     ['scriptJs', assetUrl('script.js')],
-    // One skeleton per configured server, so the grid is already its final height when the
-    // browser resolves a #fragment: late-growing content above an anchor lands you short of it.
-    ['serverSkeletons', '<div class="surface-card rounded-2xl p-4 animate-pulse w-full h-[88px]"></div>'.repeat(config.servers.length)],
+    // One fixed-height placeholder per server keeps #fragment targets below the grid in place,
+    // and carries each name and address for crawlers that never run script.js.
+    ['serverSkeletons', config.servers.map(serverPlaceholder).join('')],
     // Logo tokens are trusted HTML markup (not user text), so they are injected raw. logoPath is
     // one of three fixed internal filenames, so there is nothing to escape.
     ['logoContainerClass', logoPath ? 'has-logo' : 'bg-brand-500 font-black'],
