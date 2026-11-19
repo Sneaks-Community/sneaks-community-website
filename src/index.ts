@@ -192,12 +192,9 @@ const detectLogoPath = (): string | null => {
 const logoPath = detectLogoPath();
 if (logoPath) logger.info({ logoPath }, 'Custom logo detected in user-assets');
 
-// Structured data (JSON-LD) for search engines: Organization + WebSite. Built from the same
-// branding values as the meta tags and serialized here rather than templated into the HTML —
-// renderBranding() HTML-escapes its values ('"' -> '&quot;'), which is invalid inside a
-// <script type="application/ld+json"> block (parsed as JSON, not HTML). JSON.stringify already
-// produces JSON-safe strings; we additionally escape '<' so a value can't break out of the
-// </script> element. Injected raw via the {{structuredData}} token in renderBranding().
+// JSON-LD structured data (Organization + WebSite) serialized from branding values and
+// injected raw via {{structuredData}} because renderBranding() HTML-escapes quotes.
+// JSON.stringify ensures valid JSON, while '<' is escaped to prevent </script> breakout.
 const structuredData = JSON.stringify([
     {
         '@context': 'https://schema.org',
