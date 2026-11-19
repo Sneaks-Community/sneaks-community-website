@@ -91,7 +91,10 @@ const bansLink = (process.env.BANS_LINK ?? '').trim() || 'https://bans.snksrv.co
 const DEFAULT_SITE_URL = 'https://snksrv.com';
 function resolveSiteUrl(raw: string | undefined): string {
     const value = (raw ?? '').trim();
-    if (value === '') return DEFAULT_SITE_URL;
+    if (value === '') {
+        logger.warn(`SITE_URL is not set, so canonical, sitemap and robots.txt URLs use ${DEFAULT_SITE_URL}`);
+        return DEFAULT_SITE_URL;
+    }
     try {
         const url = new URL(value);
         if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('protocol must be http(s)');

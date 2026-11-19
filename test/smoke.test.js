@@ -291,3 +291,7 @@ test('pages and sitemap carry no tags search engines ignore', async () => {
     assert.ok(sitemap.includes('<loc>https://snksrv.com/</loc>'), 'sitemap lost its URL');
     assert.equal(/<changefreq>|<priority>/.test(sitemap), false, 'sitemap still has changefreq/priority');
 });
+
+test('an unset SITE_URL is logged, since canonical URLs then point at snksrv.com', () => {
+    assert.match(output, /SITE_URL is not set/);
+});

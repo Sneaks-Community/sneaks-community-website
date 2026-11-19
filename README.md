@@ -35,7 +35,7 @@ Configure your environment by setting properties in your `.env` file (see `.env.
 | `COMMUNITY_ESTABLISHED` | Founding year used in the default description and hero tagline, the OG image alt text, and `foundingDate` in structured data | `2015` |
 | `COMMUNITY_ALIAS` | Short name people use for the community (e.g. `snksrv`); given to search engines as `alternateName` in structured data | *unset* (omitted) |
 | `META_TITLE` | Page title, also used as the OpenGraph/Twitter title | `<COMMUNITY_NAME> \| CS:GO Surf, KZ & Bhop Servers` |
-| `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` |
+| `SITE_URL` | Canonical site origin (no trailing slash); fills canonical/OpenGraph/Twitter URLs, the absolute `og:image`, and `robots.txt` / `sitemap.xml` | `https://snksrv.com` (logs a warning) |
 | `META_DESCRIPTION` | SEO meta description (also OpenGraph/Twitter description) | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
 | `HERO_TAGLINE` | Hero subtitle line | Built from `COMMUNITY_NAME` and `COMMUNITY_ESTABLISHED`; names the game, modes and region |
 | `ABOUT_PARAGRAPH_1` / `ABOUT_PARAGRAPH_2` | The two "Our History" paragraphs | Sneak's Community history copy |
