@@ -1,6 +1,9 @@
 # Sneak's Community Website
 
-A lightweight static landing page designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord community link.
+A highly configurable & lightweight static landing page designed for [Sneak's Community](https://snksrv.com), open sourced for anyone interested. Features live server status fetching, theming (light/dark mode), responsive layout, and Discord community link.
+
+![Homepage hero](docs/images/hero-split.webp)
+![Live server list](docs/images/servers-split.webp)
 
 ## Features
 
